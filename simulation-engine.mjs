@@ -1,17 +1,17 @@
-import{npcFlag,npcProfile,standardizeNpcFlags}from'./npc-flags.mjs?v=0.17.2';
+import{npcFlag,npcProfile,standardizeNpcFlags}from'./npc-flags.mjs?v=0.17.3';
 import{emitActivity}from'./activity-hooks.mjs';
-import{ECONOMY_VERSION,INITIAL_RESOURCES,buildingCost,requiredWarehouse}from'./economy.mjs?v=0.17.2';
-import{hasWall,storageCapacity,sailorState,defendingTroops,migrateHarbor}from'./harbor.mjs?v=0.17.2';
-import{defaultFlag,normalizeFlag}from'./flags.mjs?v=0.17.2';
-import{NPC_MAX,NPC_LEVEL_RANGE,NAVAL_ROUND_SECONDS,npcShipCount,seaFields,npcRoute,makeNpcFleet,navalUnits,rollNavalRound,distributeSeaLoot,createWreck,battleSnapshot,npcAccess,botPoint,interceptionPoint,fleetPoint,wreckPoint,routeLootBonus,resourceTotal}from'./sea-system.mjs?v=0.17.2';
-import{recordOrder,recordReturn,recordJobCompletion}from'./onboarding.mjs?v=0.17.2';
-import {DEFAULT_SLOTS,waterPoint,seaRoute,routePoint,routeLength,harbor,coastPoint,nearestWater} from './navigation.mjs?v=0.17.2';
-import {WORKER_POOL,WORK_SHIFT_SECONDS,PRODUCTION_MODEL,workerCount,workerCapacity,workerState,workOrder,productionBetween} from './workers.mjs?v=0.17.2';
-export {WORKER_POOL,WORK_SHIFT_SECONDS,workerState} from './workers.mjs?v=0.17.2';
-import{populationState}from'./population.mjs?v=0.17.2';
-import{maxBuildingLevel,queueDelay,researchSpec}from'./progression.mjs?v=0.17.2';
-export{maxBuildingLevel,queueDelay}from'./progression.mjs?v=0.17.2';
-import{MIN_CREW_PER_SHIP,PERMIT_BANK_MAX,PERMIT_DAILY_MAX,PERMIT_RECHARGE,PERMIT_CATCHUP_RECHARGE,PERMIT_CATCHUP_GAP,licenseCost,plannedWarehouse,spawnAnchor}from'./pace-rules.mjs?v=0.17.2';
+import{ECONOMY_VERSION,INITIAL_RESOURCES,buildingCost,requiredWarehouse}from'./economy.mjs?v=0.17.3';
+import{hasWall,storageCapacity,sailorState,defendingTroops,migrateHarbor}from'./harbor.mjs?v=0.17.3';
+import{defaultFlag,normalizeFlag}from'./flags.mjs?v=0.17.3';
+import{NPC_MAX,NPC_LEVEL_RANGE,NAVAL_ROUND_SECONDS,npcShipCount,seaFields,npcRoute,makeNpcFleet,navalUnits,rollNavalRound,distributeSeaLoot,createWreck,battleSnapshot,npcAccess,botPoint,interceptionPoint,fleetPoint,wreckPoint,routeLootBonus,resourceTotal}from'./sea-system.mjs?v=0.17.3';
+import{recordOrder,recordReturn,recordJobCompletion}from'./onboarding.mjs?v=0.17.3';
+import {DEFAULT_SLOTS,waterPoint,seaRoute,routePoint,routeLength,harbor,coastPoint,nearestWater} from './navigation.mjs?v=0.17.3';
+import {WORKER_POOL,WORK_SHIFT_SECONDS,PRODUCTION_MODEL,workerCount,workerCapacity,workerState,workOrder,productionBetween} from './workers.mjs?v=0.17.3';
+export {WORKER_POOL,WORK_SHIFT_SECONDS,workerState} from './workers.mjs?v=0.17.3';
+import{populationState}from'./population.mjs?v=0.17.3';
+import{maxBuildingLevel,queueDelay,researchSpec}from'./progression.mjs?v=0.17.3';
+export{maxBuildingLevel,queueDelay}from'./progression.mjs?v=0.17.3';
+import{MIN_CREW_PER_SHIP,PERMIT_BANK_MAX,PERMIT_DAILY_MAX,PERMIT_RECHARGE,PERMIT_CATCHUP_RECHARGE,PERMIT_CATCHUP_GAP,licenseCost,plannedWarehouse,spawnAnchor}from'./pace-rules.mjs?v=0.17.3';
 export const BUILDINGS=['sede','serraria','pedreira','armazem','estaleiro','muralha','academia'];
 export const SHIPS={pesqueiro:{wood:80,stone:20,minutes:5,slots:1,capacity:20,cargo:20,speed:1},cargueiro:{wood:120,stone:60,minutes:7,slots:2,capacity:60,cargo:350,speed:.85},explorador:{wood:100,stone:40,minutes:6,slots:1,capacity:15,cargo:30,speed:1.35},combate:{wood:180,stone:120,minutes:10,slots:4,capacity:40,cargo:80,speed:1}};
 export const SHIP_UNLOCKS={pesqueiro:1,cargueiro:1,explorador:5,combate:8};
@@ -32,7 +32,7 @@ const level=p=>p.levels.sede;
 const same=(w,a,b)=>!!a?.alliance&&a.alliance===b?.alliance;
 const slot=(w,p)=>w.slots[p.slot];
 const home=(w,p)=>harbor(w.slots,slot(w,p));
-function allocSlot(w,l){const used=new Set(activePlayers(w).map(p=>p.slot));let candidates=w.slots.map((s,i)=>({s,i})).filter(x=>!used.has(x.i));ok(candidates.length,'O arquipélago está cheio.');const peers=activePlayers(w).filter(p=>Math.abs(level(p)-l)<=2);candidates.sort((a,b)=>{const score=x=>peers.length?peers.reduce((n,p)=>n+distance(x.s,slot(w,p)),0)/peers.length:Math.abs(x.s.x-.25);return score(a)-score(b)});return candidates[0].i;}
+function allocSlot(w,l,random=false,avoid=null){const occupied=activePlayers(w).filter(p=>Number.isInteger(p.slot)&&p.slot>=0&&p.slot<w.slots.length),used=new Set(occupied.map(p=>p.slot));let candidates=w.slots.map((s,i)=>({s,i})).filter(x=>!used.has(x.i));ok(candidates.length,'O arquipélago está cheio.');const alternate=candidates.filter(x=>x.i!==avoid);if(alternate.length)candidates=alternate;const spread=candidates.filter(x=>occupied.every(p=>Math.hypot(x.s.x-w.slots[p.slot].x,x.s.y-w.slots[p.slot].y)>=.20));if(spread.length)candidates=spread;return candidates[random?Math.min(candidates.length-1,Math.floor(rnd(w)*candidates.length)):0].i;}
 export function distance(a,b){return Math.hypot(a.x-b.x,a.y-b.y)*5000;}
 export function travel(w,p,a,b,fleet){const types=Object.keys(fleet).filter(k=>fleet[k]>0);let speed=Math.min(...types.map(k=>SHIPS[k].speed));return Math.max(120,Math.ceil((120+routeLength(seaRoute(w.slots,nearestWater(w.slots,a),nearestWater(w.slots,b)))*5000/6)/speed*(1-.07*p.tech.navegacao)));}
 function lootBaseline(p){p.dayBase??={};p.lost??={wood:0,stone:0,food:0};for(const k of ['wood','stone','food'])p.dayBase[k]=Math.max(p.dayBase[k]||0,p.resources[k]+(p.lost[k]||0));}
@@ -94,11 +94,11 @@ export function quote(w,id,request){const p=w.players[id];const kind=request.kin
 function fleetSlots(p){return Object.entries(p.fleet).reduce((n,[k,v])=>n+SHIPS[k].slots*v,0)+Object.values(p.reserved||{}).reduce((n,v)=>n+v,0);}
 export function execute(w,id,name,request,wall=Date.now()){
  ok(w.live,'O jogo só aceita ordens durante a transmissão.');migrateHarbor(w);w.wall=wall;const q=quote(w,id,request);let p=w.players[id];const v=q.payload;
- if(q.kind==='entrar'){p={id,name,flag:v.flag,islandName:'Ilha de '+name,slot:allocSlot(w,1),levels:Object.fromEntries(BUILDINGS.map(k=>[k,k==='academia'?0:1])),damage:Object.fromEntries(BUILDINGS.map(k=>[k,0])),tech:{navegacao:0,logistica:0,artilharia:0},resources:{...INITIAL_RESOURCES},fleet:{pesqueiro:2,cargueiro:1,explorador:0,combate:0},reserved:{},workers:WORKER_POOL,troops:20,garrison:0,alliance:null,protectedUntil:wall+72*3600000,shieldUntil:0,liveShield:'',attacks:0,repeat:{},farmUntil:0,permits:6,submitted:0,spent:0,dailySpent:0};w.players[id]=p;for(const a of Object.values(w.alliances)){a.invites??={};a.invites[id]=invitation();refreshInvites(w,a);}event(w,name+' fundou uma ilha.',{user:id});}
+ if(q.kind==='entrar'){p={id,name,flag:v.flag,islandName:'Ilha de '+name,slot:allocSlot(w,1,true),levels:Object.fromEntries(BUILDINGS.map(k=>[k,k==='academia'?0:1])),damage:Object.fromEntries(BUILDINGS.map(k=>[k,0])),tech:{navegacao:0,logistica:0,artilharia:0},resources:{...INITIAL_RESOURCES},fleet:{pesqueiro:2,cargueiro:1,explorador:0,combate:0},reserved:{},workers:WORKER_POOL,troops:20,garrison:0,alliance:null,protectedUntil:wall+72*3600000,shieldUntil:0,liveShield:'',attacks:0,repeat:{},farmUntil:0,permits:6,submitted:0,spent:0,dailySpent:0};w.players[id]=p;for(const a of Object.values(w.alliances)){a.invites??={};a.invites[id]=invitation();refreshInvites(w,a);}event(w,name+' fundou uma ilha.',{user:id});}
  else if(q.kind==='construcoes'){
   if(q.permits){ok(p.permits>=q.permits&&p.submitted<PERMIT_DAILY_MAX,'Limite de projetos desta data.');p.permits-=q.permits;p.submitted++;}
   pay(p,v.resources);const last=w.clock+queueDelay(w,id,q.action);w.jobs.push({id:uid(w,'O'),user:id,action:q.action,payload:v,start:last,end:last+q.seconds});
- }else if(q.kind==='gestao'){if(q.action==='bandeira'){p.flag=v.flag;event(w,name+' atualizou a bandeira.',{user:id});}else if(q.action==='regressar'){p.slot=v.slot;p.hibernating=false;delete p.hibernatedAt;event(w,`${name} regressou ao arquipélago.`,{user:id});}else if(q.action==='guarnicao'){p.garrison=v.count;}else if(q.action==='produzir'||q.action==='trabalhar'){p.work={model:PRODUCTION_MODEL,woodWorkers:v.woodWorkers,stoneWorkers:v.stoneWorkers,start:w.clock,until:w.clock+q.seconds,gathered:{wood:0,stone:0},completed:false};p.farmUntil=0;event(w,`${name} enviou trabalhadores para um turno de duas horas.`,{user:id});}else if(q.action==='pescar'){p.fleet.pesqueiro-=v.count;p.reserved.pesqueiro=(p.reserved.pesqueiro||0)+v.count;w.jobs.push({id:uid(w,'P'),user:id,action:'pescar',payload:v,start:w.clock,end:w.clock+q.seconds});}}
+ }else if(q.kind==='gestao'){if(q.action==='bandeira'){p.flag=v.flag;event(w,name+' atualizou a bandeira.',{user:id});}else if(q.action==='regressar'){p.slot=allocSlot(w,level(p),true);p.hibernating=false;delete p.hibernatedAt;event(w,`${name} regressou ao arquipélago.`,{user:id});}else if(q.action==='guarnicao'){p.garrison=v.count;}else if(q.action==='produzir'||q.action==='trabalhar'){p.work={model:PRODUCTION_MODEL,woodWorkers:v.woodWorkers,stoneWorkers:v.stoneWorkers,start:w.clock,until:w.clock+q.seconds,gathered:{wood:0,stone:0},completed:false};p.farmUntil=0;event(w,`${name} enviou trabalhadores para um turno de duas horas.`,{user:id});}else if(q.action==='pescar'){p.fleet.pesqueiro-=v.count;p.reserved.pesqueiro=(p.reserved.pesqueiro||0)+v.count;w.jobs.push({id:uid(w,'P'),user:id,action:'pescar',payload:v,start:w.clock,end:w.clock+q.seconds});}}
  else if(q.kind==='aliancas'){
   if(q.action==='criar'){let a={id:uid(w,'A'),name:v.name,members:[id],invites:Object.fromEntries(Object.keys(w.players).filter(uid=>uid!==id).map(uid=>[uid,invitation()]))};w.alliances[a.id]=a;p.alliance=a.id;refreshInvites(w,a);}
   else if(q.action==='entrar'){w.alliances[v.alliance].members.push(id);p.alliance=v.alliance;delete w.alliances[v.alliance].invites[id];refreshInvites(w,w.alliances[v.alliance]);}
@@ -200,7 +200,8 @@ export function advance(w,seconds,wall=Date.now()){
 }
 export function validate(w){const used=new Set();for(const p of Object.values(w.players)){if(p.hibernating)ok(p.slot===null,'Ilha em hibernação não pode ocupar posição.');else{ok(Number.isInteger(p.slot)&&p.slot>=0&&p.slot<w.slots.length,'Posição inválida.');ok(!used.has(p.slot),'Posição repetida.');used.add(p.slot);}ok(p.troops>=p.garrison&&p.garrison>=0,'Guarnição inválida.');for(const n of Object.values(p.resources))ok(Number.isFinite(n)&&n>=0,'Recursos inválidos.');if(p.workers!==undefined)int(p.workers,WORKER_POOL,100000);if(p.work){int(p.work.woodWorkers,0,workerCount(p));int(p.work.stoneWorkers,0,workerCount(p));ok(p.work.woodWorkers+p.work.stoneWorkers<=workerCount(p),'Trabalhadores acima da capacidade.');}for(const n of Object.values(p.fleet))ok(Number.isInteger(n)&&n>=0,'Frota inválida.');}for(const a of Object.values(w.alliances))ok(a.members.length<=3,'Aliança com mais de 3.');}
 export function publicState(w,user=null){const safe=copy(w);delete safe.rng;delete safe.secureRandom;delete safe.exposure;delete safe.nextSpawn;delete safe.npcCoverage;delete safe.coverageRetryAt;for(const a of Object.values(safe.alliances)){delete a.invite;delete a.invites;}for(const p of Object.values(safe.players)){delete p.repeat;if(p.id!==user){delete p.onboarding;delete p.allianceInvite;delete p.allianceInvites;delete p.lastActiveLiveDay;delete p.dailySpent;delete p.dayBase;delete p.lost;delete p.work;delete p.farmUntil;delete p.workers;delete p.resources;delete p.fleet;delete p.troops;delete p.garrison;delete p.spent;}}return safe;}
-export function regroup(w){hibernateInactive(w);if(w.missions.length||Object.keys(w.encounters).length)return false;const players=activePlayers(w).sort((a,b)=>level(a)-level(b)||a.id.localeCompare(b.id));players.forEach((p,i)=>p.slot=i);return true;}
+export function regroup(w){hibernateInactive(w);return false;}
+export function redistributeIslands(w){ok(!w.missions.length&&!Object.keys(w.encounters).length,'Há viagens ou batalhas em curso.');const players=activePlayers(w),before=players.map(p=>({user:p.id,from:p.slot}));for(const p of players)p.slot=-1;for(const p of players)p.slot=allocSlot(w,level(p),true,before.find(x=>x.user===p.id).from);event(w,'As ilhas foram distribuídas pelo arquipélago.');return before.map(x=>({...x,to:w.players[x.user].slot}));}
 
 function archiveBattle(w,e,outcome){seaFields(w);const item={...battleSnapshot(w,e),name:e.name||w.players[e.target]?.islandName||'Batalha',outcome,ended:w.clock,expires:w.clock+1800};w.battleHistory.push(item);w.battleHistory=w.battleHistory.slice(-30);}
 function navalMissions(w,e){return w.missions.filter(m=>e.attackers.includes(m.id));}
