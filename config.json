@@ -4,7 +4,7 @@
   "redirectUri": "https://z3rgtv.github.io/grand-line/",
   "stateUrl": "https://raw.githubusercontent.com/Z3RGtv/grand-line/state/world.json",
   "costs": {
-    "entrar": 1500,
+    "entrar": 500,
     "construcoes": 350,
     "navegar": 200,
     "aliancas": 100,
