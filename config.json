@@ -1,0 +1,14 @@
+{
+  "mode": "github",
+  "clientId": "9scnpz2yzk84xus03ke9946znj1knv",
+  "redirectUri": "https://z3rgtv.github.io/grand-line/",
+  "stateUrl": "https://raw.githubusercontent.com/Z3RGtv/grand-line/state/world.json",
+  "costs": {
+    "entrar": 1500,
+    "construcoes": 350,
+    "navegar": 200,
+    "aliancas": 100,
+    "gestao": 100
+  },
+  "launchEnabled": false
+}

@@ -1,0 +1,359 @@
+{
+  "name": "Grand Line · arquipélago e canais navegáveis",
+  "version": 5,
+  "capacity": 30,
+  "canvas": {
+    "width": 3000,
+    "height": 2000
+  },
+  "background": "world-sea-v5.png",
+  "slots": [
+    {
+      "id": "east-09",
+      "x": 0.085,
+      "y": 0.93,
+      "width": 234,
+      "region": "east",
+      "port": {
+        "x": 0.163,
+        "y": 0.93
+      }
+    },
+    {
+      "id": "west-04",
+      "x": 0.095,
+      "y": 0.43,
+      "width": 251,
+      "region": "west",
+      "port": {
+        "x": 0.095,
+        "y": 0.512
+      }
+    },
+    {
+      "id": "west-07",
+      "x": 0.12,
+      "y": 0.64,
+      "width": 248,
+      "region": "west",
+      "port": {
+        "x": 0.12,
+        "y": 0.722
+      }
+    },
+    {
+      "id": "west-01",
+      "x": 0.13,
+      "y": 0.14,
+      "width": 230,
+      "region": "west",
+      "port": {
+        "x": 0.13,
+        "y": 0.22200000000000003
+      }
+    },
+    {
+      "id": "west-09",
+      "x": 0.17,
+      "y": 0.83,
+      "width": 238,
+      "region": "west",
+      "port": {
+        "x": 0.17,
+        "y": 0.9119999999999999
+      }
+    },
+    {
+      "id": "west-03",
+      "x": 0.2,
+      "y": 0.29,
+      "width": 244,
+      "region": "west",
+      "port": {
+        "x": 0.2,
+        "y": 0.372
+      }
+    },
+    {
+      "id": "west-06",
+      "x": 0.25,
+      "y": 0.49,
+      "width": 241,
+      "region": "west",
+      "port": {
+        "x": 0.25,
+        "y": 0.572
+      }
+    },
+    {
+      "id": "west-02",
+      "x": 0.3,
+      "y": 0.12,
+      "width": 237,
+      "region": "west",
+      "port": {
+        "x": 0.3,
+        "y": 0.202
+      }
+    },
+    {
+      "id": "west-08",
+      "x": 0.32,
+      "y": 0.69,
+      "width": 231,
+      "region": "west",
+      "port": {
+        "x": 0.32,
+        "y": 0.7719999999999999
+      }
+    },
+    {
+      "id": "west-05",
+      "x": 0.36,
+      "y": 0.36,
+      "width": 234,
+      "region": "west",
+      "port": {
+        "x": 0.36,
+        "y": 0.442
+      }
+    },
+    {
+      "id": "west-10",
+      "x": 0.38,
+      "y": 0.89,
+      "width": 245,
+      "region": "west",
+      "port": {
+        "x": 0.31514537024040146,
+        "y": 0.9355567591076074
+      }
+    },
+    {
+      "id": "east-10",
+      "x": 0.39,
+      "y": 0.545,
+      "width": 241,
+      "region": "east",
+      "port": {
+        "x": 0.39,
+        "y": 0.627
+      }
+    },
+    {
+      "id": "north-06",
+      "x": 0.46,
+      "y": 0.44,
+      "width": 239,
+      "region": "north",
+      "port": {
+        "x": 0.46,
+        "y": 0.522
+      }
+    },
+    {
+      "id": "east-01",
+      "x": 0.47,
+      "y": 0.77,
+      "width": 250,
+      "region": "east",
+      "port": {
+        "x": 0.47,
+        "y": 0.852
+      }
+    },
+    {
+      "id": "north-01",
+      "x": 0.48,
+      "y": 0.1,
+      "width": 252,
+      "region": "north",
+      "port": {
+        "x": 0.48,
+        "y": 0.182
+      }
+    },
+    {
+      "id": "east-04",
+      "x": 0.53,
+      "y": 0.91,
+      "width": 247,
+      "region": "east",
+      "port": {
+        "x": 0.4579373964641197,
+        "y": 0.9413800414539374
+      }
+    },
+    {
+      "id": "north-04",
+      "x": 0.56,
+      "y": 0.27,
+      "width": 249,
+      "region": "north",
+      "port": {
+        "x": 0.56,
+        "y": 0.35200000000000004
+      }
+    },
+    {
+      "id": "north-09",
+      "x": 0.57,
+      "y": 0.6,
+      "width": 236,
+      "region": "north",
+      "port": {
+        "x": 0.57,
+        "y": 0.6819999999999999
+      }
+    },
+    {
+      "id": "east-02",
+      "x": 0.64,
+      "y": 0.75,
+      "width": 233,
+      "region": "east",
+      "port": {
+        "x": 0.64,
+        "y": 0.832
+      }
+    },
+    {
+      "id": "north-07",
+      "x": 0.65,
+      "y": 0.44,
+      "width": 246,
+      "region": "north",
+      "port": {
+        "x": 0.65,
+        "y": 0.522
+      }
+    },
+    {
+      "id": "north-02",
+      "x": 0.66,
+      "y": 0.12,
+      "width": 235,
+      "region": "north",
+      "port": {
+        "x": 0.66,
+        "y": 0.202
+      }
+    },
+    {
+      "id": "east-05",
+      "x": 0.7,
+      "y": 0.91,
+      "width": 230,
+      "region": "east",
+      "port": {
+        "x": 0.6279373964641196,
+        "y": 0.9413800414539374
+      }
+    },
+    {
+      "id": "north-05",
+      "x": 0.78,
+      "y": 0.28,
+      "width": 232,
+      "region": "north",
+      "port": {
+        "x": 0.78,
+        "y": 0.36200000000000004
+      }
+    },
+    {
+      "id": "north-10",
+      "x": 0.79,
+      "y": 0.61,
+      "width": 243,
+      "region": "north",
+      "port": {
+        "x": 0.79,
+        "y": 0.692
+      }
+    },
+    {
+      "id": "north-03",
+      "x": 0.85,
+      "y": 0.11,
+      "width": 242,
+      "region": "north",
+      "port": {
+        "x": 0.85,
+        "y": 0.192
+      }
+    },
+    {
+      "id": "east-03",
+      "x": 0.86,
+      "y": 0.76,
+      "width": 240,
+      "region": "east",
+      "port": {
+        "x": 0.86,
+        "y": 0.842
+      }
+    },
+    {
+      "id": "north-08",
+      "x": 0.89,
+      "y": 0.45,
+      "width": 253,
+      "region": "north",
+      "port": {
+        "x": 0.89,
+        "y": 0.532
+      }
+    },
+    {
+      "id": "east-06",
+      "x": 0.89,
+      "y": 0.91,
+      "width": 237,
+      "region": "east",
+      "port": {
+        "x": 0.8179373964641197,
+        "y": 0.9413800414539374
+      }
+    },
+    {
+      "id": "east-07",
+      "x": 0.93,
+      "y": 0.285,
+      "width": 244,
+      "region": "east",
+      "port": {
+        "x": 0.93,
+        "y": 0.367
+      }
+    },
+    {
+      "id": "east-08",
+      "x": 0.95,
+      "y": 0.61,
+      "width": 251,
+      "region": "east",
+      "port": {
+        "x": 0.95,
+        "y": 0.692
+      }
+    }
+  ],
+  "islandAssets": {
+    "1": "island-nav-1.png",
+    "2": "island-nav-2.png",
+    "3": "island-nav-3.png",
+    "empty": "island-nav-empty.png"
+  },
+  "navigation": {
+    "landRadiusX": 0.058,
+    "landRadiusY": 0.064,
+    "checkedPortPairs": 435,
+    "seaBounds": {
+      "left": 0.035,
+      "right": 0.965,
+      "top": 0.075,
+      "bottom": 0.945
+    }
+  }
+}
