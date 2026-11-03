@@ -10,5 +10,6 @@
     "aliancas": 100,
     "gestao": 100
   },
-  "launchEnabled": true
+  "launchEnabled": true,
+  "apiOrigin": "https://specially-angel-executives-deer.trycloudflare.com"
 }
