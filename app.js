@@ -184,7 +184,7 @@ async function prepare(request,button=actionButton){
   planRequest=request;$('#plan').innerHTML='';document.body.classList.remove('order-open');
   if(request.kind==='navegar'&&q.payload?.route){previewVoyage={route:q.payload.route,createdAt:clock(),existingIds:state.world.missions.map(m=>m.id),target:q.payload.target};updateRoutes();}
   const reward={construcoes:'Construções',navegar:'Navegar',aliancas:'Alianças',gestao:'Gestão'}[q.kind]||'Entrar';
-  const hint=document.createElement('small');hint.className='inline-order-hint';hint.textContent=q.cost+' pontos'+(q.seconds>0?' · '+time(q.seconds):'')+' · '+(config.demo?'Teste local':'Colar em Grand Line · '+reward)+(q.payload?.mayEscape?' · Pode escapar':'');button.after(hint);
+  const hint=document.createElement('small');hint.className='inline-order-hint';hint.textContent=q.cost+' pontos'+(q.seconds>0?' · '+time(q.seconds):'')+' · '+(config.demo?'Teste local':'Colar em Grand Line · '+reward);button.after(hint);
   delete button.dataset.orderBusy;setButtonRequirement(button,'');button.classList.add('copy-ready');button.disabled=false;
   if(config.demo){button.dataset.inlineExecute='1';button.textContent='Executar no teste';}else{button.dataset.inlineCode=q.code;button.textContent='Copiar código → '+reward;}
   inlineOrder={button,label,hint,q,request,timer:setTimeout(()=>{clearInlineOrder();toast('Código expirado. Prepara novamente a ação.');},600000)};decorateGuide();
