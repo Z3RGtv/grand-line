@@ -1,4 +1,4 @@
-import{EQUIPMENT_SLOTS,ITEM_TYPES,bestSetSlots}from'./equipment.mjs?v=0.22.1';
+import{EQUIPMENT_SLOTS,ITEM_TYPES,bestSetSlots}from'./equipment.mjs?v=0.23.0';
 export const equipmentSlots=equipment=>Object.fromEntries(Object.keys(EQUIPMENT_SLOTS).map(slot=>[slot,equipment?.[slot]??null]));
 export const equipmentSignature=equipment=>JSON.stringify(equipmentSlots(equipment));
 export const equipmentRevision=p=>p.equipmentRevision??0;

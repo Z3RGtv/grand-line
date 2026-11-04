@@ -1,7 +1,7 @@
-import{equippedItems,validItem,EQUIPMENT_CAPS}from'./equipment.mjs?v=0.22.1';
-import{defaultFlag}from'./flags.mjs?v=0.22.1';
-export function combatLoadout(p){return equippedItems(p).map(({type,rarity,value})=>({type,rarity,value}));}
-const items=list=>(list||[]).filter(validItem).slice(0,4).map(({type,rarity,value})=>({type,rarity,value}));
+import{equippedItems,validItem,EQUIPMENT_CAPS}from'./equipment.mjs?v=0.23.0';
+import{defaultFlag}from'./flags.mjs?v=0.23.0';
+export function combatLoadout(p){return equippedItems(p).map(({type,rarity,value,displayName})=>({type,rarity,value,...(displayName?{displayName}:{})}));}
+const items=list=>(list||[]).filter(validItem).slice(0,4).map(({type,rarity,value,displayName})=>({type,rarity,value,...(displayName?{displayName}:{})}));
 const stats=gear=>Object.fromEntries(Object.entries(EQUIPMENT_CAPS).map(([key,cap])=>[key,Math.min(cap,Math.max(0,Number(gear?.[key])||0))]));
 const count=fleet=>Object.values(fleet||{}).reduce((n,v)=>n+(Number.isFinite(v)?Math.max(0,v):0),0);
 export function battleParticipants(w,e){

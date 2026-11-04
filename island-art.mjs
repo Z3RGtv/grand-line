@@ -1,4 +1,4 @@
-import{buildingTier}from'./progression.mjs?v=0.22.1';
+import{buildingTier}from'./progression.mjs?v=0.23.0';
 // Defence evolution is visual: level 1 is the unfortified founding stage.
 export function wallTier(level=1){return level<=1?0:Math.min(3,Math.ceil(level/4));}
 export const WALL_NAMES=['Sem muralha','Paliçada de madeira','Muralha de pedra','Muralha reforçada'];
