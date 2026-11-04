@@ -45,7 +45,7 @@ function wake(){if(!request&&!document.hidden&&!reduced.matches&&!unavailable&&[
 function scan(){
  for(const el of document.querySelectorAll('.boss-sprite[data-boss]')){
   if(sprites.has(el)||!BOSS_MOTION[el.dataset.boss])continue;
-  const key=el.dataset.boss,s={el,key,phase:phaseOf(el.dataset.idleId||key),visible:!intersections,canvas:null,ctx:null};sprites.set(el,s);intersections?.observe(el);load(key);
+  const key=el.dataset.boss,s={el,key,phase:phaseOf(el.dataset.idleId||key),visible:!intersections,canvas:null,ctx:null};sprites.set(el,s);intersections?.observe(el);load(key);if(images.get(key)?.ready&&!reduced.matches)draw(s,performance.now()/1000);
  }
  for(const[el]of sprites)if(!el.isConnected){intersections?.unobserve(el);sprites.delete(el);}
  wake();

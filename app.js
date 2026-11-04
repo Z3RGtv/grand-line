@@ -1,5 +1,5 @@
 import{coinIcon,walletView}from'./wallet-view.mjs?v=0.24.0&rev=wallet2';
-import './boss-idle.mjs?v=0.24.0';
+import './boss-idle.mjs?v=0.24.0&rev=refresh1';
 import{itemDetailsView,discoveryDetailsView}from'./item-details.mjs?v=0.24.0';
 import{inventoryExpansion,inventoryCapacity}from'./inventory-capacity.mjs?v=0.24.0';
 import{createEquipmentDraft,selectEquipment,equipmentDraftOrder,markEquipmentPending,reconcileEquipmentDraft}from'./equipment-draft.mjs?v=0.24.0';
