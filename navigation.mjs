@@ -1,10 +1,10 @@
-import{BOSS_SITES,LEGACY_BOSS_SITES,FINAL_BOSS_CLEARING}from'./adventure.mjs?v=0.19.3';
+import{BOSS_SITES,EXPANDED_BOSS_SITES,LEGACY_BOSS_SITES,FINAL_BOSS_CLEARING}from'./adventure.mjs?v=0.20.0';
 // Shared sea geometry. Paths use water corridors, never island centres.
 export const MAP_WIDTH=3000,MAP_HEIGHT=2000;
 export const LAND_RX=.058,LAND_RY=.064;
 const positions=[[.13,.14],[.30,.12],[.20,.29],[.095,.43],[.36,.36],[.25,.49],[.12,.64],[.32,.69],[.17,.83],[.38,.89],[.48,.10],[.66,.12],[.85,.11],[.56,.27],[.78,.28],[.46,.44],[.65,.44],[.89,.45],[.57,.60],[.79,.61],[.47,.77],[.64,.75],[.86,.76],[.53,.91],[.70,.91],[.89,.91],[.93,.285],[.95,.61],[.085,.93],[.39,.545]];
 export const DEFAULT_SLOTS=positions.map(([x,y],i)=>({id:['west','north','east'][Math.floor(i/10)]+'-'+String(i%10+1).padStart(2,'0'),x,y,width:230+(i*7)%24})).sort((a,b)=>a.x-b.x||a.y-b.y).map(s=>({...s,...(FINAL_BOSS_CLEARING[s.id]?.to||{})}));
-const obstacles=slots=>slots[0]?.adventureSea?[...slots.map(s=>({...s,rx:.047,ry:.050})),...(slots[0].adventureSea>=2?BOSS_SITES:LEGACY_BOSS_SITES)]:slots;
+const obstacles=slots=>slots[0]?.adventureSea?[...slots.map(s=>({...s,rx:.047,ry:.050})),...(slots[0].adventureSea>=3?BOSS_SITES:slots[0].adventureSea>=2?EXPANDED_BOSS_SITES:LEGACY_BOSS_SITES)]:slots;
 const length=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
 export const routeLength=route=>route.slice(1).reduce((n,p,i)=>n+length(route[i],p),0);
 export function waterPoint(slots,p){return p.x>=.035&&p.x<=.965&&p.y>=.075&&p.y<=.945&&obstacles(slots).every(s=>((p.x-s.x)/(s.rx||LAND_RX))**2+((p.y-s.y)/(s.ry||LAND_RY))**2>=1.00001);}
@@ -49,7 +49,7 @@ export function seaRoute(slots,from,to){
 }
 
 // Old NPC patrols belong to the old shoreline. Never relocate an active encounter or voyage.
-export function applyWorldLayout(w,slots,version=6){
+export function applyWorldLayout(w,slots,version=7){
  if(w.missions?.length||Object.keys(w.encounters||{}).length)return false;
  if(w.mapVersion!==version)w.bots=[];
  w.slots=slots.map(s=>({...s}));w.mapVersion=version;return true;
