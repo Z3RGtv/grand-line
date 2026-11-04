@@ -1,4 +1,4 @@
-import{BOSS_SITES}from'./adventure.mjs?v=0.19.0';
+import{BOSS_SITES}from'./adventure.mjs?v=0.19.2';
 // Shared sea geometry. Paths use water corridors, never island centres.
 export const MAP_WIDTH=3000,MAP_HEIGHT=2000;
 export const LAND_RX=.058,LAND_RY=.064;

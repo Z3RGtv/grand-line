@@ -1,7 +1,7 @@
-import{npcFlag,npcProfile}from'./npc-flags.mjs?v=0.19.0';
-import{seaRoute,routePoint,routeLength,coastPoint,waterPoint,clearLeg,nearestWater}from'./navigation.mjs?v=0.19.0';
+import{npcFlag,npcProfile}from'./npc-flags.mjs?v=0.19.2';
+import{seaRoute,routePoint,routeLength,coastPoint,waterPoint,clearLeg,nearestWater}from'./navigation.mjs?v=0.19.2';
 
-import{MIN_CREW_PER_SHIP}from'./pace-rules.mjs?v=0.19.0';
+import{MIN_CREW_PER_SHIP}from'./pace-rules.mjs?v=0.19.2';
 export const NPC_MAX=8,NPC_MIN_SECONDS=840,NPC_MAX_SECONDS=1560,NAVAL_ROUND_SECONDS=12,NPC_LEVEL_RANGE=3;
 export const HULLS={pesqueiro:{hp:90,attack:42,capacity:20,cargo:20,slots:1},cargueiro:{hp:140,attack:46,capacity:60,cargo:350,slots:2},explorador:{hp:85,attack:52,capacity:15,cargo:30,slots:1},combate:{hp:170,attack:95,capacity:40,cargo:80,slots:4}};
 export const npcShipCount=w=>(w.bots||[]).reduce((n,b)=>n+Object.values(b.fleet||{}).reduce((a,v)=>a+v,0),0);

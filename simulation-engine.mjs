@@ -1,19 +1,19 @@
-import{ensureAdventure,bossAlive,bossAccess,bossUnits,bossFormation,refreshBosses,report}from'./adventure.mjs?v=0.19.0';
-import{equipmentOrder,equipmentBonuses,applyFleetEquipment,rollItem,dismantleYield,itemName}from'./equipment.mjs?v=0.19.0';
-import{npcFlag,npcProfile,standardizeNpcFlags}from'./npc-flags.mjs?v=0.19.0';
+import{ensureAdventure,bossAlive,bossAccess,bossUnits,bossFormation,refreshBosses,report}from'./adventure.mjs?v=0.19.2';
+import{equipmentOrder,equipmentBonuses,applyFleetEquipment,rollItem,dismantleYield,itemName}from'./equipment.mjs?v=0.19.2';
+import{npcFlag,npcProfile,standardizeNpcFlags}from'./npc-flags.mjs?v=0.19.2';
 import{emitActivity}from'./activity-hooks.mjs';
-import{ECONOMY_VERSION,INITIAL_RESOURCES,buildingCost,requiredWarehouse}from'./economy.mjs?v=0.19.0';
-import{hasWall,storageCapacity,sailorState,defendingTroops,migrateHarbor}from'./harbor.mjs?v=0.19.0';
-import{defaultFlag,normalizeFlag}from'./flags.mjs?v=0.19.0';
-import{NPC_MAX,NPC_LEVEL_RANGE,NAVAL_ROUND_SECONDS,npcShipCount,seaFields,npcRoute,makeNpcFleet,navalUnits,rollNavalRound,distributeSeaLoot,createWreck,battleSnapshot,npcAccess,botPoint,interceptionPoint,fleetPoint,wreckPoint,routeLootBonus,resourceTotal}from'./sea-system.mjs?v=0.19.0';
-import{recordOrder,recordReturn,recordJobCompletion}from'./onboarding.mjs?v=0.19.1';
-import {DEFAULT_SLOTS,waterPoint,seaRoute,routePoint,routeLength,harbor,coastPoint,nearestWater} from './navigation.mjs?v=0.19.0';
-import {WORKER_POOL,WORK_SHIFT_SECONDS,PRODUCTION_MODEL,workerCount,workerCapacity,workerState,workOrder,productionBetween} from './workers.mjs?v=0.19.0';
-export {WORKER_POOL,WORK_SHIFT_SECONDS,workerState} from './workers.mjs?v=0.19.0';
-import{populationState}from'./population.mjs?v=0.19.0';
-import{maxBuildingLevel,queueDelay,researchSpec}from'./progression.mjs?v=0.19.0';
-export{maxBuildingLevel,queueDelay}from'./progression.mjs?v=0.19.0';
-import{MIN_CREW_PER_SHIP,PERMIT_BANK_MAX,PERMIT_DAILY_MAX,PERMIT_RECHARGE,PERMIT_CATCHUP_RECHARGE,PERMIT_CATCHUP_GAP,licenseCost,plannedWarehouse,spawnAnchor}from'./pace-rules.mjs?v=0.19.0';
+import{ECONOMY_VERSION,INITIAL_RESOURCES,buildingCost,requiredWarehouse}from'./economy.mjs?v=0.19.2';
+import{hasWall,storageCapacity,sailorState,defendingTroops,migrateHarbor}from'./harbor.mjs?v=0.19.2';
+import{defaultFlag,normalizeFlag}from'./flags.mjs?v=0.19.2';
+import{NPC_MAX,NPC_LEVEL_RANGE,NAVAL_ROUND_SECONDS,npcShipCount,seaFields,npcRoute,makeNpcFleet,navalUnits,rollNavalRound,distributeSeaLoot,createWreck,battleSnapshot,npcAccess,botPoint,interceptionPoint,fleetPoint,wreckPoint,routeLootBonus,resourceTotal}from'./sea-system.mjs?v=0.19.2';
+import{recordOrder,recordReturn,recordJobCompletion}from'./onboarding.mjs?v=0.19.2';
+import {DEFAULT_SLOTS,waterPoint,seaRoute,routePoint,routeLength,harbor,coastPoint,nearestWater} from './navigation.mjs?v=0.19.2';
+import {WORKER_POOL,WORK_SHIFT_SECONDS,PRODUCTION_MODEL,workerCount,workerCapacity,workerState,workOrder,productionBetween} from './workers.mjs?v=0.19.2';
+export {WORKER_POOL,WORK_SHIFT_SECONDS,workerState} from './workers.mjs?v=0.19.2';
+import{populationState}from'./population.mjs?v=0.19.2';
+import{maxBuildingLevel,queueDelay,researchSpec}from'./progression.mjs?v=0.19.2';
+export{maxBuildingLevel,queueDelay}from'./progression.mjs?v=0.19.2';
+import{MIN_CREW_PER_SHIP,PERMIT_BANK_MAX,PERMIT_DAILY_MAX,PERMIT_RECHARGE,PERMIT_CATCHUP_RECHARGE,PERMIT_CATCHUP_GAP,licenseCost,plannedWarehouse,spawnAnchor}from'./pace-rules.mjs?v=0.19.2';
 export const BUILDINGS=['sede','serraria','pedreira','armazem','estaleiro','muralha','academia'];
 export const SHIPS={pesqueiro:{wood:80,stone:20,minutes:5,slots:1,capacity:20,cargo:20,speed:1},cargueiro:{wood:120,stone:60,minutes:7,slots:2,capacity:60,cargo:350,speed:.85},explorador:{wood:100,stone:40,minutes:6,slots:1,capacity:15,cargo:30,speed:1.35},combate:{wood:180,stone:120,minutes:10,slots:4,capacity:40,cargo:80,speed:1}};
 export const SHIP_UNLOCKS={pesqueiro:1,cargueiro:1,explorador:5,combate:8};
@@ -73,7 +73,7 @@ export function quote(w,id,request){ensureAdventure(w);const p=w.players[id];con
   else if(q.action==='regressar'){ok(p.hibernating,'A tua ilha já está ativa.');v.slot=allocSlot(w,level(p));q.description='Regressar ao mapa com a ilha e o progresso guardados';}
   else if(q.action==='guarnicao'){ok(hasWall(p),'Constrói a muralha N2 antes de atribuir defensores.');ok(!w.encounters[id],'Não podes alterar a guarnição durante um ataque ativo à tua ilha.');int(v.count,0,p.troops);q.description=`Deixar ${v.count} tropas a defender`;}
   else if(q.action==='ligar'){q.description='Autorizar este navegador para ver a tua ilha';}
-  else if(q.action==='produzir'||q.action==='trabalhar'){const order=workOrder(p,w.clock,v);v.woodWorkers=order.woodWorkers;v.stoneWorkers=order.stoneWorkers;q.seconds=order.seconds;q.description=`Enviar ${v.woodWorkers} lenhadores e ${v.stoneWorkers} mineiros por 15 minutos de live`;}
+  else if(q.action==='produzir'||q.action==='trabalhar'){const order=workOrder(p,w.clock,v);v.woodWorkers=order.woodWorkers;v.stoneWorkers=order.stoneWorkers;v.redistribution=order.redistribution;v.progress=order.progress;q.seconds=order.seconds;q.description=order.redistribution?`Redistribuir trabalhadores e iniciar um turno de 15 minutos`:`Enviar ${v.woodWorkers} lenhadores e ${v.stoneWorkers} mineiros por 15 minutos de live`;}
   else if(q.action==='pescar'){ok(p.fleet.pesqueiro>0,'Sem pesqueiros livres.');v.count=p.fleet.pesqueiro;const fishing=fishingOrder(p);q.seconds=fishing.seconds;v.foodPerBoat=fishing.foodPerBoat;q.description=`Pescar com ${v.count} barcos`;}
   else throw new Error('Gestão inválida.');
  }else if(kind==='aliancas'){
@@ -103,7 +103,7 @@ export function execute(w,id,name,request,wall=Date.now()){
   if(q.permits){ok(p.permits>=q.permits&&p.submitted<PERMIT_DAILY_MAX,'Limite de projetos desta data.');p.permits-=q.permits;p.submitted++;}
   pay(p,v.resources);const last=w.clock+queueDelay(w,id,q.action);w.jobs.push({id:uid(w,'O'),user:id,action:q.action,payload:v,start:last,end:last+q.seconds});
  }else if(q.kind==='gestao'){if(q.action==='equipar'){p.equipment=v.equipment;report(w,p,'equipamento','Equipamento atualizado');}else if(q.action==='desmontar'){p.inventory=p.inventory.filter(i=>!v.items.includes(i.id));const overflow=add(p,v.resources);report(w,p,'reciclagem','Itens transformados em recursos',{resources:v.resources,overflow});}
-  else if(q.action==='bandeira'){p.flag=v.flag;event(w,name+' atualizou a bandeira.',{user:id});}else if(q.action==='regressar'){p.slot=allocSlot(w,level(p),true);p.hibernating=false;delete p.hibernatedAt;event(w,`${name} regressou ao arquipélago.`,{user:id});}else if(q.action==='guarnicao'){p.garrison=v.count;}else if(q.action==='produzir'||q.action==='trabalhar'){p.work={model:PRODUCTION_MODEL,woodWorkers:v.woodWorkers,stoneWorkers:v.stoneWorkers,start:w.clock,until:w.clock+q.seconds,gathered:{wood:0,stone:0},completed:false,gearBonus:equipmentBonuses(p).production};p.farmUntil=0;event(w,`${name} enviou trabalhadores para um turno de 15 minutos.`,{user:id});}else if(q.action==='pescar'){p.fleet.pesqueiro-=v.count;p.reserved.pesqueiro=(p.reserved.pesqueiro||0)+v.count;w.jobs.push({id:uid(w,'P'),user:id,action:'pescar',payload:v,start:w.clock,end:w.clock+q.seconds});}}
+  else if(q.action==='bandeira'){p.flag=v.flag;event(w,name+' atualizou a bandeira.',{user:id});}else if(q.action==='regressar'){p.slot=allocSlot(w,level(p),true);p.hibernating=false;delete p.hibernatedAt;event(w,`${name} regressou ao arquipélago.`,{user:id});}else if(q.action==='guarnicao'){p.garrison=v.count;}else if(q.action==='produzir'||q.action==='trabalhar'){const previous=p.work;p.work={model:v.redistribution?'batches-v3':PRODUCTION_MODEL,progress:v.progress,woodWorkers:v.woodWorkers,stoneWorkers:v.stoneWorkers,start:w.clock,until:w.clock+q.seconds,gathered:v.redistribution?{wood:previous?.gathered?.wood||0,stone:previous?.gathered?.stone||0}:{wood:0,stone:0},completed:false,gearBonus:equipmentBonuses(p).production};p.farmUntil=0;event(w,`${name} enviou trabalhadores para um turno de 15 minutos.`,{user:id});}else if(q.action==='pescar'){p.fleet.pesqueiro-=v.count;p.reserved.pesqueiro=(p.reserved.pesqueiro||0)+v.count;w.jobs.push({id:uid(w,'P'),user:id,action:'pescar',payload:v,start:w.clock,end:w.clock+q.seconds});}}
  else if(q.kind==='aliancas'){
   if(q.action==='criar'){let a={id:uid(w,'A'),name:v.name,members:[id],invites:Object.fromEntries(Object.keys(w.players).filter(uid=>uid!==id).map(uid=>[uid,invitation()]))};w.alliances[a.id]=a;p.alliance=a.id;refreshInvites(w,a);}
   else if(q.action==='entrar'){w.alliances[v.alliance].members.push(id);p.alliance=v.alliance;delete w.alliances[v.alliance].invites[id];refreshInvites(w,w.alliances[v.alliance]);}

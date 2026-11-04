@@ -1,7 +1,7 @@
-import{workerState,workerCount,productionBetween}from'./workers.mjs?v=0.19.0';
-import{buildingCost}from'./economy.mjs?v=0.19.0';
-import{populationState}from'./population.mjs?v=0.19.0';
-import{defendingTroops,storageCapacity}from'./harbor.mjs?v=0.19.0';
+import{workerState,workerCount,productionBetween}from'./workers.mjs?v=0.19.2';
+import{buildingCost}from'./economy.mjs?v=0.19.2';
+import{populationState}from'./population.mjs?v=0.19.2';
+import{defendingTroops,storageCapacity}from'./harbor.mjs?v=0.19.2';
 const names={wood:'madeira',stone:'pedra',food:'provisões'},houses={sede:'casa principal',armazem:'armazém',estaleiro:'estaleiro'};
 const shortfall=(p,res)=>Object.fromEntries(Object.entries(res).map(([k,n])=>[k,Math.max(0,Math.ceil(n-(p.resources?.[k]||0)))]).filter(([,n])=>n>0));
 const list=missing=>Object.entries(missing).map(([k,n])=>n+' '+names[k]).join(' e ');
@@ -23,6 +23,7 @@ export function nextLearningStep(w,p,goal,{quote}={}){
   }
   const kinds=['wood','stone'].filter(k=>missing[k]);
   if(work.active){
+   if(kinds.some(k=>!work[k+'Workers'])){const total=workerCount(p),both=kinds.length===2,woodWorkers=missing.wood?(both?Math.ceil(total/2):total):0,stoneWorkers=missing.stone?(both?Math.floor(total/2):total):0;return check(step('work','Redistribui os trabalhadores','Faltam '+list(missing)+'. Inicia um novo turno com a distribuição necessária.',kinds[0]==='stone'?'pedreira':'serraria',{kind:'gestao',action:'trabalhar',payload:{woodWorkers,stoneWorkers}},{missing}));}
    const allAssigned=kinds.every(k=>work[k+'Workers']>0),until=Math.max(w.clock,work.until);let end=until;
    const enough=t=>kinds.every(k=>productionBetween(p,w.clock,t)[k]>=missing[k]);
    if(allAssigned&&enough(until)){let lo=w.clock,hi=until;for(let i=0;i<30;i++){const mid=(lo+hi)/2;if(enough(mid))hi=mid;else lo=mid;}end=Math.ceil(hi-1e-6);}
