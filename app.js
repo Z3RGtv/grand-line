@@ -356,7 +356,7 @@ function showPurchase(info){document.body.classList.add('purchase-feedback-open'
 function applyPurchaseWallet(result){if(!result.wallet||!state)return;if((state.world.wallet?.revision||0)<=result.wallet.revision)state.world.wallet=result.wallet;updateWalletButton();}
 function showReceipt(result){if(result.id)handledOrderKey=result.id+':'+result.status;applyPurchaseWallet(result);showPurchase(purchaseFeedback(result));}
 async function spendCoins(request,button=actionButton){
- clearInlineOrder();if(button?.dataset.orderBusy)return;const actor=state?.user.id,label=button?.textContent;let reason=writeRestriction(state),pending=false;
+ clearInlineOrder();if(button?.dataset.orderBusy||button?.disabled)return;const actor=state?.user.id,label=button?.textContent;let reason=writeRestriction(state),pending=false,confirmed=false;
  try{if(!reason)quoteRule(state.world,state.user.id,request);if(!reason)reason=walletRequirement(request);}catch(e){reason=e.message;}
  if(reason){showPurchase(purchaseFeedback({orderState:'not_sent',error:reason}));if(button){setButtonRequirement(button,reason);showActionRequirement(button);}return;}
  if(button){button.dataset.orderBusy='1';button.disabled=true;button.textContent='A confirmar…';}
@@ -364,10 +364,10 @@ async function spendCoins(request,button=actionButton){
  try{
   const result=await api('/api/order',{id:crypto.randomUUID(),request});if(state?.user.id!==actor)return;showReceipt(result);
   if(result.status!=='fulfilled'){if(button?.isConnected){button.textContent=label;setButtonRequirement(button,result.error||'Ação não efetuada.');showActionRequirement(button);}return;}
-  if(button?.isConnected){button.textContent='✓ −'+result.cost+' moedas';button.classList.add('purchase-confirmed');}
+  confirmed=true;if(button?.isConnected){button.textContent='✓ −'+result.cost+' moedas';button.classList.add('purchase-confirmed');}
   if(request.action==='equipar')equipmentDraft=markEquipmentPending(equipmentDraft,result.id);
   if(request.kind==='entrar'){flagDraft=null;selected=null;tab='ilha';document.body.classList.remove('inspector-open');}
   previewVoyage=null;planRequest=null;$('#plan').innerHTML='';void refresh({quiet:true});
  }catch(e){if(state?.user.id!==actor)return;pending=!!e.purchasePending;showPurchase(purchaseFeedback(pending?null:{orderState:'not_sent',error:e.message}));if(button?.isConnected){button.textContent=pending?'A confirmar…':label;if(!pending){setButtonRequirement(button,e.message);showActionRequirement(button);}}}
- finally{if(button?.isConnected&&!pending){delete button.dataset.orderBusy;button.disabled=false;}}
+ finally{if(button?.isConnected&&!pending){delete button.dataset.orderBusy;button.disabled=confirmed;}}
 }
