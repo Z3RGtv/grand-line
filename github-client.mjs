@@ -1,5 +1,5 @@
-import {quote,DAILY_GAME_LIMIT,queueDelay} from './rules.mjs?v=0.20.0';
-import {encodeOrder,bytes} from './orders.mjs?v=0.20.0';
+import {quote,DAILY_GAME_LIMIT,queueDelay} from './rules.mjs?v=0.20.1';
+import {encodeOrder,bytes} from './orders.mjs?v=0.20.1';
 let settings,user,pair,latest,validatedAt=0,pendingCode,settingsCheckedAt=0;
 const authKey='mc-twitch-session';
 let idb;const openDb=()=>idb||=new Promise((resolve,reject)=>{const r=indexedDB.open('grand-line-devices',1);r.onupgradeneeded=()=>r.result.createObjectStore('keys');r.onsuccess=()=>resolve(r.result);r.onerror=()=>reject(Error('O navegador não permite guardar a chave da ilha.'));});
