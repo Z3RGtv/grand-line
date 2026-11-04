@@ -6,7 +6,7 @@ import{ECONOMY_VERSION,INITIAL_RESOURCES,buildingCost,requiredWarehouse}from'./e
 import{hasWall,storageCapacity,sailorState,defendingTroops,migrateHarbor}from'./harbor.mjs?v=0.19.0';
 import{defaultFlag,normalizeFlag}from'./flags.mjs?v=0.19.0';
 import{NPC_MAX,NPC_LEVEL_RANGE,NAVAL_ROUND_SECONDS,npcShipCount,seaFields,npcRoute,makeNpcFleet,navalUnits,rollNavalRound,distributeSeaLoot,createWreck,battleSnapshot,npcAccess,botPoint,interceptionPoint,fleetPoint,wreckPoint,routeLootBonus,resourceTotal}from'./sea-system.mjs?v=0.19.0';
-import{recordOrder,recordReturn,recordJobCompletion}from'./onboarding.mjs?v=0.19.0';
+import{recordOrder,recordReturn,recordJobCompletion}from'./onboarding.mjs?v=0.19.1';
 import {DEFAULT_SLOTS,waterPoint,seaRoute,routePoint,routeLength,harbor,coastPoint,nearestWater} from './navigation.mjs?v=0.19.0';
 import {WORKER_POOL,WORK_SHIFT_SECONDS,PRODUCTION_MODEL,workerCount,workerCapacity,workerState,workOrder,productionBetween} from './workers.mjs?v=0.19.0';
 export {WORKER_POOL,WORK_SHIFT_SECONDS,workerState} from './workers.mjs?v=0.19.0';

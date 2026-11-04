@@ -11,12 +11,13 @@ export function nextMissionCue(id,c={}){
  }
  if(!id||c.complete)return null;
  if(c.view==='missoes')return cue('.current-mission [data-guide="continue"]','Continuar');
- if(c.waiting){if(c.inspectorOpen&&!c.waitingInInspector)return cue('.inspector-close','Ver progresso');return cue([c.waitingSelector,'.queue-panel .job-row [data-end]','#mission-dock [data-guide="continue"]'].filter(Boolean),'Em curso','status');}
+
  if(id==='return'){
   if(c.inspectorOpen)return c.selectedMission?cue(['#detail [data-end]','.inspector-close'],'Em viagem','status'):cue('.inspector-close','Ver expedições');
   if(c.view==='viagens')return cue(['.expedition-row.own [data-object]','.expedition-row.own strong'],'Acompanhar a frota');
   return cue(c.view==='mundo'?'#sea-navigation-slot [data-tab="viagens"]':'.primary-navigation [data-tab="mundo"]','Ver expedições');
  }
+ if(c.waiting){if(c.waitingKind==='fleet'){if(c.inspectorOpen)return cue('.inspector-close','Ver expedições');return cue(c.view==='viagens'?'.expedition-row.own [data-object]':'.primary-navigation [data-tab="mundo"]','Acompanhar a frota');}if(c.inspectorOpen&&!c.waitingInInspector)return cue('.inspector-close','Ver progresso');return cue([c.waitingSelector,'.queue-panel .job-row [data-end]','#mission-dock [data-guide="continue"]'].filter(Boolean),c.waitingKind==='resources'?'A recolher':'Em curso','status');}
  if(id==='expedition'){
   if(c.view!=='mundo')return cue('.primary-navigation [data-tab="mundo"]','Abrir o mar');
   if(c.inspectorOpen&&!c.targetOpen)return cue('.inspector-close','Ver o mar');
@@ -24,18 +25,21 @@ export function nextMissionCue(id,c={}){
   if(!c.hasShips)return cue(c.shipSelector||'#send-cargueiro','Escolher barcos','field');
   return cue('#detail [data-action="sail"]','Enviar frota');
  }
- const building={work:'serraria',storage:'armazem',headquarters:'sede',fishing:'estaleiro',crew:'sede'}[id];
+ const building=c.targetBuilding||{work:'serraria',storage:'armazem',headquarters:'sede',fishing:'estaleiro',crew:'sede',ship:'estaleiro',defense:'muralha'}[id];
  if(!building)return cue('.primary-navigation [data-tab="ilha"]','Ver a ilha');
  if(c.building!==building){
   if(c.inspectorOpen)return cue('.inspector-close','Voltar à ilha');
-  if(c.view==='ilha')return cue('.island-stage [data-build="'+building+'"]','Abrir '+({serraria:'serraria',armazem:'armazém',sede:'sede',estaleiro:'estaleiro'}[building]),'object');
+  if(c.view==='ilha')return cue('.island-stage [data-build="'+building+'"]','Abrir '+({serraria:'serraria',armazem:'armazém',sede:'sede',estaleiro:'estaleiro',pedreira:'pedreira',muralha:'muralha'}[building]),'object');
   return cue('.primary-navigation [data-tab="ilha"]','Ver a ilha');
  }
  if(id==='crew'){
   if(!c.recruitOpen)return cue('#detail [data-building-section="recrutar"]>summary','Abrir recrutamento');
-  if(c.crewCount<10)return cue('#train-count','Escolher 10 marinheiros','field');
+  if(c.crewCount!==(c.requiredCrew||10))return cue('#train-count','Escolher '+(c.requiredCrew||10)+' marinheiros','field');
   return cue('#detail [data-recruit="tropas"]','Recrutar marinheiros');
  }
+ if(id==='ship'){if(!c.shipsOpen)return cue('#detail [data-building-section="navios"]>summary','Abrir estaleiro');return cue('#detail [data-ship="'+(c.ship||'cargueiro')+'"]','Construir barco');}
+ if(id==='defense')return cue('#detail [data-action="garrison"]','Atribuir defesa');
+ if(id==='work'&&c.workerRequirement){if(c.workerRequirement.woodWorkers>0&&!c.woodWorkers)return cue('#detail [data-workers-resource="wood"]','Enviar lenhadores','field');if(c.workerRequirement.stoneWorkers>0&&!c.stoneWorkers)return cue('#detail [data-workers-resource="stone"]','Enviar mineiros','field');}
  if(id==='work')return cue('#detail [data-action="work"]','Iniciar produção');
  if(id==='fishing')return cue('#detail [data-action="fish"]','Mandar pescar');
  return cue('#detail [data-upgrade="'+building+'"]','Melhorar edifício');
