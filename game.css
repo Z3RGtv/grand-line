@@ -42,3 +42,5 @@ main{display:grid;grid-template-columns:180px minmax(0,1fr);min-height:calc(100v
 
 /* Perimeter defences v2 */
 .perimeter-wall{filter:none}.island>img.map-wall-art{position:absolute;inset:0;width:100%;height:auto;pointer-events:none;filter:none}.island>.map-wall-art+span{z-index:2}
+
+button.copy-ready{background:linear-gradient(#7c49ae,#543075)!important;border:2px solid #d2a4fa!important;color:#fff!important;box-shadow:0 0 0 3px #a567de25}button.copy-done{background:linear-gradient(#297e75,#1a5951)!important;border-color:#72e3ce!important}.inline-order-hint{display:block;font-size:14px;line-height:1.45;margin:8px 0 12px;color:#765c38}.entry-twitch{display:inline-block;padding:14px 20px;text-decoration:none}.entry-step{max-width:370px;font-size:16px;line-height:1.5}

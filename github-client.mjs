@@ -1,5 +1,5 @@
-import {quote,DAILY_GAME_LIMIT,queueDelay} from './rules.mjs?v=0.17.3';
-import {encodeOrder,bytes} from './orders.mjs?v=0.17.3';
+import {quote,DAILY_GAME_LIMIT,queueDelay} from './rules.mjs?v=0.18.0';
+import {encodeOrder,bytes} from './orders.mjs?v=0.18.0';
 let settings,user,pair,latest,validatedAt=0,pendingCode,settingsCheckedAt=0;
 const authKey='mc-twitch-session';
 let idb;const openDb=()=>idb||=new Promise((resolve,reject)=>{const r=indexedDB.open('grand-line-devices',1);r.onupgradeneeded=()=>r.result.createObjectStore('keys');r.onsuccess=()=>resolve(r.result);r.onerror=()=>reject(Error('O navegador não permite guardar a chave da ilha.'));});
@@ -16,5 +16,7 @@ async function realtime(route,request){if(!settings.apiOrigin)throw Error('A lig
 
 export async function githubState(){await refreshSettings();if(settings.apiOrigin){if(!user||Date.now()-validatedAt>3600000)await validateLogin();const d=await realtime('/state'+(pendingCode?'?order='+encodeURIComponent(pendingCode):''));if(d.order&&['fulfilled','canceled','expired'].includes(d.order.status))pendingCode=null;return{...d,csrf:'',demo:false,github:true,realtime:true};}if(!user||Date.now()-validatedAt>3600000)await validateLogin();const r=await fetch(settings.stateUrl+(settings.stateUrl.includes('?')?'&':'?')+'t='+Date.now(),{cache:'no-store'});if(!r.ok)throw Error('O primeiro estado do mar ainda não foi publicado.');latest=await r.json();if(latest.format!==1)throw Error('Formato de estado desconhecido.');const w=latest.world;const p=w.players[user.id];let needsDevice=false;if(p){try{w.players[user.id]=await openOwn(latest.privateViews[user.id]);}catch{needsDevice=true;}}return {world:w,user,needsDevice,publishedAt:latest.publishedAt,now:Date.now(),csrf:'',github:true,launchEnabled:!!settings.launchEnabled};}
 export async function githubPlan(request){if(!user)throw Error('Entra com Twitch.');if(!settings.launchEnabled)throw Error('A partida real ainda não foi aberta.');if(!settings.apiOrigin)throw Error('A ligação direta ao jogo ainda está a iniciar. Atualiza a página dentro de instantes.');const r=structuredClone(request);if(r.kind==='entrar'||r.action==='ligar')r.clientKey=await publicPair();const q=await realtime('/plan',r);pendingCode=q.code;return q;}
+
+export async function githubFound(flag){await refreshSettings();return realtime('/found',{flag});}
 
 export async function githubOwner(action,body){if(!user)await validateLogin();return realtime('/owner/'+action,body);}
