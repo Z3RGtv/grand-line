@@ -1,6 +1,6 @@
-import{EQUIPMENT_SLOTS,ITEM_TYPES,ITEM_SETS,RARITIES,STAT_NAMES,equippedItems,equipmentBonuses,equipmentSets,bestSetSlots,itemName,itemBonus,dismantleYield}from'./equipment.mjs?v=0.22.0';
-import{inventoryExpansion}from'./inventory-capacity.mjs?v=0.22.0';
-import{createEquipmentDraft,draftChanged}from'./equipment-draft.mjs?v=0.22.0';
+import{EQUIPMENT_SLOTS,ITEM_TYPES,ITEM_SETS,RARITIES,STAT_NAMES,equippedItems,equipmentBonuses,equipmentSets,bestSetSlots,itemName,itemBonus,dismantleYield}from'./equipment.mjs?v=0.22.1';
+import{inventoryExpansion}from'./inventory-capacity.mjs?v=0.22.1';
+import{createEquipmentDraft,draftChanged}from'./equipment-draft.mjs?v=0.22.1';
 const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const image=i=>'<img class="equipment-art" src="assets/items/'+i.type+'.png" alt="'+esc(itemName(i))+'">';
 const attributes=i=>Object.entries(itemBonus(i)).map(([key,value])=>'<b>+'+value+'% '+STAT_NAMES[key]+'</b>').join('');
