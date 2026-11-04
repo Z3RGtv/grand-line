@@ -16,7 +16,7 @@ import{flagSVG,crestSVG,defaultFlag,flagEditor,readFlagEditor,updateFlagEditor}f
 import{populationState}from'./population.mjs?v=0.20.0';
 import{maxBuildingLevel,buildingTier,researchSpec,researchBenefits,jobLane}from'./progression.mjs?v=0.20.0';
 import{npcShipCount,npcAccess,fleetPoint,botPoint,wreckPoint,battlePoint}from'./sea-system.mjs?v=0.20.0';
-import{battleView,resolveBattle,seaMarkers,accessBadge}from'./naval-view.mjs?v=0.20.0';
+import{battleView,resolveBattle,seaMarkers,accessBadge}from'./naval-view.mjs?v=0.20.0&rev=teams';
 import{islandArt,buildingArt,wallTier,WALL_NAMES}from'./island-art.mjs?v=0.20.0';
 import{missionProgress,missionWait}from'./onboarding.mjs?v=0.20.0';
 
