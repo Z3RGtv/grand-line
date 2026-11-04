@@ -1,7 +1,7 @@
-import{workerState,workerCount,productionBetween}from'./workers.mjs?v=0.21.0';
-import{buildingCost}from'./economy.mjs?v=0.21.0';
-import{populationState}from'./population.mjs?v=0.21.0';
-import{defendingTroops,storageCapacity}from'./harbor.mjs?v=0.21.0';
+import{workerState,workerCount,productionBetween}from'./workers.mjs?v=0.22.0';
+import{buildingCost}from'./economy.mjs?v=0.22.0';
+import{populationState}from'./population.mjs?v=0.22.0';
+import{defendingTroops,storageCapacity}from'./harbor.mjs?v=0.22.0';
 const names={wood:'madeira',stone:'pedra',food:'provisões'},houses={sede:'casa principal',armazem:'armazém',estaleiro:'estaleiro'};
 const shortfall=(p,res)=>Object.fromEntries(Object.entries(res).map(([k,n])=>[k,Math.max(0,Math.ceil(n-(p.resources?.[k]||0)))]).filter(([,n])=>n>0));
 const list=missing=>Object.entries(missing).map(([k,n])=>n+' '+names[k]).join(' e ');

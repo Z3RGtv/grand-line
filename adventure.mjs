@@ -14,7 +14,7 @@ export const EXPANDED_BOSS_SITES=BOSS_SITES.slice(0,6);
 export const LEGACY_BOSS_SITES=EXPANDED_BOSS_SITES.map(s=>s.final?{...s,width:300,rx:.051,ry:.047}:s);
 
 export function ensureAdventure(w){
-for(const p of Object.values(w.players||{})){p.inventory??=[];p.equipment??={};p.reports??=[];p.reportSerial??=0;}
+for(const p of Object.values(w.players||{})){p.inventory??=[];p.equipment??={};p.equipmentRevision??=0;p.inventoryTier??=0;p.inventoryProgress??=0;p.reports??=[];p.reportSerial??=0;}
 if(!w.adventureVersion&&(w.missions?.length||Object.keys(w.encounters||{}).length))return false;
 if(!w.adventureVersion)w.bots=[];w.adventureVersion=1;w.bosses??=BOSS_SITES.map(s=>({...s,life:1,respawnAt:0}));
 // Change coastlines only after every player voyage and encounter is over.

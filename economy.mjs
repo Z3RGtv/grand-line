@@ -1,4 +1,4 @@
-import{WAREHOUSE_HEADROOM}from'./pace-rules.mjs?v=0.21.0';
+import{WAREHOUSE_HEADROOM}from'./pace-rules.mjs?v=0.22.0';
 export const ECONOMY_VERSION='warehouse-v2';
 export const INITIAL_RESOURCES=Object.freeze({wood:45,stone:45,food:40});
 const BUILDING_MULTIPLIERS=Object.freeze({sede:1,serraria:1,pedreira:1,armazem:.55,estaleiro:1,muralha:1,academia:.55});
