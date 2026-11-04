@@ -1,6 +1,6 @@
-import{EQUIPMENT_SLOTS,ITEM_TYPES,ITEM_SETS,RARITIES,STAT_NAMES,equippedItems,equipmentBonuses,equipmentSets,bestSetSlots,itemName,itemArt,itemBonus,dismantleYield}from'./equipment.mjs?v=0.25.0';
-import{inventoryExpansion}from'./inventory-capacity.mjs?v=0.25.0';
-import{createEquipmentDraft,draftChanged}from'./equipment-draft.mjs?v=0.25.0';
+import{EQUIPMENT_SLOTS,ITEM_TYPES,ITEM_SETS,RARITIES,STAT_NAMES,equippedItems,equipmentBonuses,equipmentSets,bestSetSlots,itemName,itemArt,itemBonus,dismantleYield}from'./equipment.mjs?v=0.25.1';
+import{inventoryExpansion}from'./inventory-capacity.mjs?v=0.25.1';
+import{createEquipmentDraft,draftChanged}from'./equipment-draft.mjs?v=0.25.1';
 const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const image=i=>'<button class="item-art-button" data-item-id="'+esc(i.id)+'" aria-label="Ver '+esc(itemName(i))+'"><img class="equipment-art" src="'+itemArt(i)+'" alt=""></button>';
 const attributes=i=>Object.entries(itemBonus(i)).map(([key,value])=>'<b>+'+value+'% '+STAT_NAMES[key]+'</b>').join('');
