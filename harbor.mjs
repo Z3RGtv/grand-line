@@ -1,6 +1,6 @@
-import{storageCapacityAt}from'./economy.mjs?v=0.24.0';
-import{workerCount,workerCapacity,workerState}from'./workers.mjs?v=0.24.0';
-import{populationState,populationCapacity}from'./population.mjs?v=0.24.0';
+import{storageCapacityAt}from'./economy.mjs?v=0.25.0';
+import{workerCount,workerCapacity,workerState}from'./workers.mjs?v=0.25.0';
+import{populationState,populationCapacity}from'./population.mjs?v=0.25.0';
 export const hasWall=p=>(p?.levels?.muralha||1)>=2;
 export const storageCapacity=p=>p?storageCapacityAt(p.levels.armazem):0;
 export const sailorCapacity=populationCapacity;

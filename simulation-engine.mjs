@@ -1,26 +1,27 @@
-import{walletState}from'./wallet-state.mjs?v=0.24.0';
-import{rollFinalReward,finalSecretSlots,publicFinalDiscoveries}from'./final-rewards.mjs?v=0.24.0';
-import{inventoryCapacity,inventoryExpansion,expansionOrder}from'./inventory-capacity.mjs?v=0.24.0';
-import{DAILY_GAME_LIMIT,GAME_BUDGET_CAP,spendingBudget,syncAllowance,startAllowance,chargeAllowance,validateAllowance}from'./spending-budget.mjs?v=0.24.0';
-export{DAILY_GAME_LIMIT,GAME_BUDGET_CAP,spendingBudget}from'./spending-budget.mjs?v=0.24.0';
-import{combatLoadout,battleParticipants}from'./battle-loadout.mjs?v=0.24.0';
-import{assertParticipation,sidePlayers,MAX_BATTLE_PLAYERS}from'./combat-party.mjs?v=0.24.0';
-import{ensureAdventure,bossAlive,bossAccess,bossUnits,bossFormation,refreshBosses,report}from'./adventure.mjs?v=0.24.0';
-import{equipmentOrder,equipmentBonuses,equipmentTypes,partySynergy,applyFleetEquipment,rollItem,dismantleYield,itemName}from'./equipment.mjs?v=0.24.0';
-import{npcFlag,npcProfile,standardizeNpcFlags}from'./npc-flags.mjs?v=0.24.0';
+import{gameRunning,combatWindow,noteAttack,sessionProtected}from'./game-session.mjs?v=0.25.0';
+import{walletState}from'./wallet-state.mjs?v=0.25.0';
+import{rollFinalReward,finalSecretSlots,publicFinalDiscoveries}from'./final-rewards.mjs?v=0.25.0';
+import{inventoryCapacity,inventoryExpansion,expansionOrder}from'./inventory-capacity.mjs?v=0.25.0';
+import{DAILY_GAME_LIMIT,GAME_BUDGET_CAP,spendingBudget,syncAllowance,startAllowance,chargeAllowance,validateAllowance,allowanceDay,migrateStreamAllowance,registerStreamAllowance}from'./spending-budget.mjs?v=0.25.0';
+export{DAILY_GAME_LIMIT,GAME_BUDGET_CAP,spendingBudget}from'./spending-budget.mjs?v=0.25.0';
+import{combatLoadout,battleParticipants}from'./battle-loadout.mjs?v=0.25.0';
+import{assertParticipation,sidePlayers,MAX_BATTLE_PLAYERS}from'./combat-party.mjs?v=0.25.0';
+import{ensureAdventure,bossAlive,bossAccess,bossUnits,bossFormation,refreshBosses,report}from'./adventure.mjs?v=0.25.0';
+import{equipmentOrder,equipmentBonuses,equipmentTypes,partySynergy,applyFleetEquipment,rollItem,dismantleYield,itemName}from'./equipment.mjs?v=0.25.0';
+import{npcFlag,npcProfile,standardizeNpcFlags}from'./npc-flags.mjs?v=0.25.0';
 import{emitActivity}from'./activity-hooks.mjs';
-import{ECONOMY_VERSION,INITIAL_RESOURCES,buildingCost,requiredWarehouse}from'./economy.mjs?v=0.24.0';
-import{hasWall,storageCapacity,sailorState,defendingTroops,migrateHarbor}from'./harbor.mjs?v=0.24.0';
-import{defaultFlag,normalizeFlag}from'./flags.mjs?v=0.24.0';
-import{NPC_MAX,NPC_LEVEL_RANGE,NAVAL_ROUND_SECONDS,npcShipCount,seaFields,npcRoute,makeNpcFleet,navalUnits,rollNavalRound,distributeSeaLoot,createWreck,battleSnapshot,npcAccess,botPoint,interceptionPoint,fleetPoint,wreckPoint,routeLootBonus,resourceTotal}from'./sea-system.mjs?v=0.24.0';
-import{recordOrder,recordReturn,recordJobCompletion}from'./onboarding.mjs?v=0.24.0';
-import {DEFAULT_SLOTS,waterPoint,seaRoute,routePoint,routeLength,harbor,coastPoint,nearestWater} from './navigation.mjs?v=0.24.0';
-import {WORKER_POOL,WORK_SHIFT_SECONDS,PRODUCTION_MODEL,workerCount,workerCapacity,workerState,workOrder,productionBetween} from './workers.mjs?v=0.24.0';
-export {WORKER_POOL,WORK_SHIFT_SECONDS,workerState} from './workers.mjs?v=0.24.0';
-import{populationState}from'./population.mjs?v=0.24.0';
-import{maxBuildingLevel,queueDelay,researchSpec}from'./progression.mjs?v=0.24.0';
-export{maxBuildingLevel,queueDelay}from'./progression.mjs?v=0.24.0';
-import{MIN_CREW_PER_SHIP,PERMIT_BANK_MAX,PERMIT_DAILY_MAX,PERMIT_RECHARGE,PERMIT_CATCHUP_RECHARGE,PERMIT_CATCHUP_GAP,licenseCost,plannedWarehouse,spawnAnchor}from'./pace-rules.mjs?v=0.24.0';
+import{ECONOMY_VERSION,INITIAL_RESOURCES,buildingCost,requiredWarehouse}from'./economy.mjs?v=0.25.0';
+import{hasWall,storageCapacity,sailorState,defendingTroops,migrateHarbor}from'./harbor.mjs?v=0.25.0';
+import{defaultFlag,normalizeFlag}from'./flags.mjs?v=0.25.0';
+import{NPC_MAX,NPC_LEVEL_RANGE,NAVAL_ROUND_SECONDS,npcShipCount,seaFields,npcRoute,makeNpcFleet,navalUnits,rollNavalRound,distributeSeaLoot,createWreck,battleSnapshot,npcAccess,botPoint,interceptionPoint,fleetPoint,wreckPoint,routeLootBonus,resourceTotal}from'./sea-system.mjs?v=0.25.0';
+import{recordOrder,recordReturn,recordJobCompletion}from'./onboarding.mjs?v=0.25.0';
+import {DEFAULT_SLOTS,waterPoint,seaRoute,routePoint,routeLength,harbor,coastPoint,nearestWater} from './navigation.mjs?v=0.25.0';
+import {WORKER_POOL,WORK_SHIFT_SECONDS,PRODUCTION_MODEL,workerCount,workerCapacity,workerState,workOrder,productionBetween} from './workers.mjs?v=0.25.0';
+export {WORKER_POOL,WORK_SHIFT_SECONDS,workerState} from './workers.mjs?v=0.25.0';
+import{populationState}from'./population.mjs?v=0.25.0';
+import{maxBuildingLevel,queueDelay,researchSpec}from'./progression.mjs?v=0.25.0';
+export{maxBuildingLevel,queueDelay}from'./progression.mjs?v=0.25.0';
+import{MIN_CREW_PER_SHIP,PERMIT_BANK_MAX,PERMIT_DAILY_MAX,PERMIT_RECHARGE,PERMIT_CATCHUP_RECHARGE,PERMIT_CATCHUP_GAP,licenseCost,plannedWarehouse,spawnAnchor}from'./pace-rules.mjs?v=0.25.0';
 export const BUILDINGS=['sede','serraria','pedreira','armazem','estaleiro','muralha','academia'];
 export const SHIPS={pesqueiro:{wood:80,stone:20,minutes:5,slots:1,capacity:20,cargo:20,speed:1},cargueiro:{wood:120,stone:60,minutes:7,slots:2,capacity:60,cargo:350,speed:.85},explorador:{wood:100,stone:40,minutes:6,slots:1,capacity:15,cargo:30,speed:1.35},combate:{wood:180,stone:120,minutes:10,slots:4,capacity:40,cargo:80,speed:1}};
 export const SHIP_UNLOCKS={pesqueiro:1,cargueiro:1,explorador:5,combate:8};
@@ -33,7 +34,7 @@ export const NAMES=['Brisa Rubra','Vento Sul','Gaivota Negra','Dente de Ferro','
 const copy=x=>structuredClone(x),sum=x=>Object.values(x).reduce((a,b)=>a+b,0), clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
 const ok=(v,msg)=>{if(!v)throw new Error(msg);};
 const int=(v,min=0,max=1e5)=>{ok(Number.isInteger(v)&&v>=min&&v<=max,'Quantidade inválida.');return v;};
-export function world(seed=(globalThis.crypto.getRandomValues(new Uint32Array(1))[0]>>>0)||1,layout){const w={version:5,economyVersion:ECONOMY_VERSION,seaVersion:2,wrecks:[],battleHistory:[],clock:0,wall:Date.now(),live:false,streamId:'',date:'',liveDays:0,rng:seed,serial:0,players:{},alliances:{},missions:[],encounters:{},jobs:[],bots:[],events:[],exposure:Array(30).fill(0),nextSpawn:0,slots:structuredClone(layout||DEFAULT_SLOTS)};ensureAdventure(w);return w;}
+export function world(seed=(globalThis.crypto.getRandomValues(new Uint32Array(1))[0]>>>0)||1,layout){const w={version:5,economyVersion:ECONOMY_VERSION,seaVersion:2,wrecks:[],battleHistory:[],clock:0,wall:Date.now(),live:false,streamEpoch:0,creditStreams:[],streamId:'',date:'',liveDays:0,rng:seed,serial:0,players:{},alliances:{},missions:[],encounters:{},jobs:[],bots:[],events:[],exposure:Array(30).fill(0),nextSpawn:0,slots:structuredClone(layout||DEFAULT_SLOTS)};ensureAdventure(w);return w;}
 function rnd(w){if(w.secureRandom)return globalThis.crypto.getRandomValues(new Uint32Array(1))[0]/4294967296;let t=w.rng=(w.rng+0x6D2B79F5)>>>0;t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return ((t^t>>>14)>>>0)/4294967296;}
 const uid=(w,p)=>p+(++w.serial).toString(36).toUpperCase();
 function event(w,text,details={}){w.events.push({at:w.clock,text,...details});if(w.events.length>500)w.events.shift();}
@@ -47,7 +48,7 @@ export function travel(w,p,a,b,fleet){const types=Object.keys(fleet).filter(k=>f
 function lootBaseline(p){p.dayBase??={};p.lost??={wood:0,stone:0,food:0};for(const k of ['wood','stone','food'])p.dayBase[k]=Math.max(p.dayBase[k]||0,p.resources[k]+(p.lost[k]||0));}
 function add(p,resources){const cap=storageCapacity(p);let overflow=0;for(const [k,n]of Object.entries(resources)){const v=p.resources[k]+n;if(p.resources[k]>=cap){overflow+=n;}else{p.resources[k]=Math.min(cap,v);overflow+=Math.max(0,v-cap);}}lootBaseline(p);return overflow;}
 function pay(p,res){for(const[k,v]of Object.entries(res))ok(p.resources[k]>=v,'Recursos insuficientes.');for(const[k,v]of Object.entries(res))p.resources[k]-=v;}
-function shielded(w,p){return p.protectedUntil>w.wall||p.shieldUntil>w.wall||p.liveShield===w.streamId;}
+function shielded(w,p){return p.protectedUntil>w.wall||p.shieldUntil>w.wall||sessionProtected(w,p);}
 function validPvp(w,a,b){ok(level(a)>=4&&level(b)>=4,'PvP desbloqueia na sede nível 4.');ok(a.id!==b.id&&!same(w,a,b),'Esse destino pertence à tua aliança.');ok(Math.abs(level(a)-level(b))<=3,'Diferença de sede superior a 3.');ok(!shielded(w,a)&&!shielded(w,b),'Proteção ativa.');ok((a.repeat[b.id]||0)<=w.wall,'Ainda não podes repetir esse alvo.');}
 function target(w,raw){const q=String(raw||'').trim().toLocaleLowerCase('pt');const all=[...(w.bosses||[]).map(b=>({type:'boss',id:b.id,name:b.name,...harbor(w.slots,b)})),...activePlayers(w).map(p=>({type:'player',id:p.id,name:p.islandName,...home(w,p)})),...w.bots.map(b=>({type:'bot',id:b.id,name:b.name,...botPosition(w,b)})),...(w.wrecks||[]).map(r=>({type:'wreck',id:r.id,name:r.name,...wreckPoint(w,r)}))];let hits=all.filter(t=>t.id.toLowerCase()===q||t.name.toLocaleLowerCase('pt')===q);ok(hits.length===1,'Destino inexistente ou ambíguo. Seleciona-o no mapa.');return hits[0];}
 export function botPosition(w,b){return botPoint(w,b);}
@@ -105,8 +106,8 @@ export function quote(w,id,request){ensureAdventure(w);const p=w.players[id];con
 }
 function fleetSlots(p){return Object.entries(p.fleet).reduce((n,[k,v])=>n+SHIPS[k].slots*v,0)+Object.values(p.reserved||{}).reduce((n,v)=>n+v,0);}
 export function execute(w,id,name,request,wall=Date.now()){
- ok(w.live,'O jogo só aceita ordens durante a transmissão.');migrateHarbor(w);ensureAdventure(w);w.wall=wall;const q=quote(w,id,request);let p=w.players[id];const v=q.payload;
- if(q.kind==='entrar'){p={id,name,flag:v.flag,islandName:'Ilha de '+name,slot:allocSlot(w,1,true),levels:Object.fromEntries(BUILDINGS.map(k=>[k,k==='academia'?0:1])),damage:Object.fromEntries(BUILDINGS.map(k=>[k,0])),tech:{navegacao:0,logistica:0,artilharia:0},resources:{...INITIAL_RESOURCES},fleet:{pesqueiro:2,cargueiro:1,explorador:0,combate:0},reserved:{},workers:WORKER_POOL,troops:20,garrison:0,alliance:null,protectedUntil:wall+72*3600000,shieldUntil:0,liveShield:'',attacks:0,repeat:{},farmUntil:0,permits:6,submitted:0,spent:0,dailySpent:0};startAllowance(p,wall);w.players[id]=p;for(const a of Object.values(w.alliances)){a.invites??={};a.invites[id]=invitation();refreshInvites(w,a);}ensureAdventure(w);report(w,p,'ilha','A tua ilha está pronta');event(w,name+' fundou uma ilha.',{user:id});}
+ ok(gameRunning(w),'Servidor desligado. Tenta quando estiver ligado.');migrateHarbor(w);ensureAdventure(w);w.wall=wall;syncLootDay(w,wall);const q=quote(w,id,request);let p=w.players[id];const v=q.payload;
+ if(q.kind==='entrar'){p={id,name,flag:v.flag,islandName:'Ilha de '+name,slot:allocSlot(w,1,true),levels:Object.fromEntries(BUILDINGS.map(k=>[k,k==='academia'?0:1])),damage:Object.fromEntries(BUILDINGS.map(k=>[k,0])),tech:{navegacao:0,logistica:0,artilharia:0},resources:{...INITIAL_RESOURCES},fleet:{pesqueiro:2,cargueiro:1,explorador:0,combate:0},reserved:{},workers:WORKER_POOL,troops:20,garrison:0,alliance:null,protectedUntil:wall+72*3600000,shieldUntil:0,liveShield:'',attacks:0,repeat:{},farmUntil:0,permits:6,submitted:0,spent:0,dailySpent:0};startAllowance(p,wall,w.streamEpoch||0);w.players[id]=p;for(const a of Object.values(w.alliances)){a.invites??={};a.invites[id]=invitation();refreshInvites(w,a);}ensureAdventure(w);report(w,p,'ilha','A tua ilha está pronta');event(w,name+' fundou uma ilha.',{user:id});}
  else if(q.kind==='construcoes'){
   if(q.permits){ok(p.permits>=q.permits&&p.submitted<PERMIT_DAILY_MAX,'Limite de projetos desta data.');p.permits-=q.permits;p.submitted++;}
   pay(p,v.resources);const last=w.clock+queueDelay(w,id,q.action);w.jobs.push({id:uid(w,'O'),user:id,action:q.action,payload:v,start:last,end:last+q.seconds});
@@ -122,12 +123,11 @@ export function execute(w,id,name,request,wall=Date.now()){
  }
  if(q.kind!=='entrar')chargeAllowance(w,p,q.cost,wall);recordOrder(p,q);p.lastActiveLiveDay=w.liveDays||1;p.spent+=q.cost;if(q.kind!=='entrar')p.dailySpent=(p.dailySpent||0)+q.cost;return{ok:true,cost:q.cost,description:q.description};
 }
+function syncLootDay(w,wall){const date=allowanceDay(wall);w.lootDate??=w.date||date;if(date>w.lootDate){for(const p of Object.values(w.players)){p.dayBase={...p.resources};p.lost={wood:0,stone:0,food:0};}w.lootDate=date;}}
 export function setLive(w,live,streamId,wall=Date.now()){
- const date=new Date(wall).toLocaleDateString('en-CA',{timeZone:'Europe/Lisbon'});for(const p of Object.values(w.players))syncAllowance(w,p,wall);
- if(live&&date!==w.date){w.liveDays=(w.liveDays||0)+1;const reference=Math.max(1,...activePlayers(w).map(p=>level(p)));for(const p of Object.values(w.players)){p.lastActiveLiveDay??=w.liveDays;p.permits=Math.min(PERMIT_BANK_MAX,(p.permits||0)+(reference-level(p)>=PERMIT_CATCHUP_GAP?PERMIT_CATCHUP_RECHARGE:PERMIT_RECHARGE));p.submitted=0;p.dayBase={...p.resources};p.lost={wood:0,stone:0,food:0};}w.date=date;}
- if(live&&!w.liveDays){w.liveDays=1;for(const p of Object.values(w.players))p.lastActiveLiveDay??=1;}
- if(live&&streamId!==w.streamId){w.streamId=streamId;for(const p of Object.values(w.players))p.attacks=0;}
- w.live=!!live;w.wall=wall;hibernateInactive(w);
+ w.wall=wall;migrateStreamAllowance(w);for(const p of Object.values(w.players))if(p.attacks&&p.attackWindow===undefined&&w.streamId){p.attackWindows??={};p.attackWindows[w.streamId]??=p.attacks;p.attackWindow=w.streamId;}const date=allowanceDay(wall),id=String(streamId||'');
+ if(live){registerStreamAllowance(w,id);if(date>w.date){w.liveDays=(w.liveDays||0)+1;const reference=Math.max(1,...activePlayers(w).map(p=>level(p)));for(const p of Object.values(w.players)){p.lastActiveLiveDay??=w.liveDays;p.permits=Math.min(PERMIT_BANK_MAX,(p.permits||0)+(reference-level(p)>=PERMIT_CATCHUP_GAP?PERMIT_CATCHUP_RECHARGE:PERMIT_RECHARGE));p.submitted=0;}w.date=date;}if(!w.liveDays){w.liveDays=1;for(const p of Object.values(w.players))p.lastActiveLiveDay??=1;}w.streamId=id;}
+ w.live=!!live;syncLootDay(w,wall);for(const p of Object.values(w.players))p.attacks=p.attackWindows?.[combatWindow(w)]??(p.attackWindow===combatWindow(w)?p.attacks:0);hibernateInactive(w);
 }
 export function hibernateInactive(w){
  if(!w.live)return 0;let count=0;
@@ -170,7 +170,7 @@ function armedShips(w,e,side){let count=0;if(side==='defesa'&&e.homeTroops>0)cou
 
 function finish(w,e,won){if(e.type==='boss')return finishBoss(w,e,won);if(e.type==='bot')return finishNaval(w,e,won);archiveBattle(w,e,won?'attack':'defense');
  const participants=w.missions.filter(m=>m.encounter===e.id);const targetP=e.type==='player'?w.players[e.target]:null;
- if(targetP){report(w,targetP,'defesa',won?'A tua ilha foi saqueada':'A defesa venceu',{battle:e.id,attackers:[...new Set(participants.filter(m=>m.role==='ataque').map(m=>m.user))],rounds:e.round});targetP.garrison=e.homeTroops;if(e.attackers.length){const significant=won||((e.attackingTroopsCommitted||0)>=20&&(e.defenderLosses||0)>=Math.max(5,Math.ceil((e.initialDefenders||0)*.2)));if(significant){targetP.attacks++;targetP.shieldUntil=w.wall+2*3600000;if(targetP.attacks>=3)targetP.liveShield=w.streamId;}
+ if(targetP){report(w,targetP,'defesa',won?'A tua ilha foi saqueada':'A defesa venceu',{battle:e.id,attackers:[...new Set(participants.filter(m=>m.role==='ataque').map(m=>m.user))],rounds:e.round});targetP.garrison=e.homeTroops;if(e.attackers.length){const significant=won||((e.attackingTroopsCommitted||0)>=20&&(e.defenderLosses||0)>=Math.max(5,Math.ceil((e.initialDefenders||0)*.2)));if(significant){noteAttack(w,targetP);targetP.shieldUntil=w.wall+2*3600000;}
   for(const m of participants.filter(m=>m.role==='ataque')){w.players[m.user].repeat[targetP.id]=w.wall+2*3600000;}
   if(won){for(const k of BUILDINGS)if((k!=='muralha'||hasWall(targetP))&&(k!=='academia'||targetP.levels.academia>0))targetP.damage[k]=Math.min(80,targetP.damage[k]+5+Math.floor(rnd(w)*11));}}
  }else w.bots=w.bots.filter(b=>b.id!==e.target);
@@ -203,7 +203,7 @@ function combat(w,e){if(e.type==='boss')return combatBoss(w,e);if(e.type==='bot'
  }
 }
 export function advance(w,seconds,wall=Date.now()){
- migrateSea(w);migrateHarbor(w);ensureAdventure(w);w.wall=wall;for(const p of Object.values(w.players))syncAllowance(w,p,wall);if(!w.live||seconds<=0)return;ok(seconds<=3600,'Avanço máximo de uma hora por chamada.');
+ migrateSea(w);migrateHarbor(w);ensureAdventure(w);w.wall=wall;for(const p of Object.values(w.players))syncAllowance(w,p,wall);syncLootDay(w,wall);if(!gameRunning(w)||seconds<=0)return;ok(seconds<=3600,'Avanço máximo de uma hora por chamada.');
  for(let remaining=seconds;remaining>0;){const dt=Math.min(5,remaining);remaining-=dt;w.clock+=dt;refreshBosses(w);
   for(const p of Object.values(w.players)){if(p.hibernating)continue;const produced=productionBetween(p,w.clock-dt,w.clock),before={...p.resources};add(p,produced);for(const resource of ['wood','stone'])if(produced[resource]>0)emitActivity(w,'production.batch','player',p.id,{resource,attempted:produced[resource],credited:p.resources[resource]-before[resource],overflow:produced[resource]-(p.resources[resource]-before[resource]),from:w.clock-dt,to:w.clock,model:p.work?.model||'legacy',workers:p.work?.[resource+'Workers']??10},[p.id]);if(p.work){p.work.gathered.wood+=p.resources.wood-before.wood;p.work.gathered.stone+=p.resources.stone-before.stone;if(!p.work.completed&&p.work.until<=w.clock){p.work.completed=true;report(w,p,'trabalhadores','Os trabalhadores regressaram',{resources:p.work.gathered,building:'serraria'});event(w,`${p.name}: os trabalhadores regressaram. É preciso resgatar um novo turno.`,{user:p.id});}}}
   for(const m of w.missions)if(m.role==='ataque'&&['muralha','batalha','loot'].includes(m.phase))m.contribution=(m.contribution||0)+m.troops*dt;
@@ -219,7 +219,7 @@ export function advance(w,seconds,wall=Date.now()){
  hibernateInactive(w);validate(w);
 }
 export function validate(w){const used=new Set();for(const p of Object.values(w.players)){validateAllowance(p);inventoryExpansion(p);if(p.hibernating)ok(p.slot===null,'Ilha em hibernação não pode ocupar posição.');else{ok(Number.isInteger(p.slot)&&p.slot>=0&&p.slot<w.slots.length,'Posição inválida.');ok(!used.has(p.slot),'Posição repetida.');used.add(p.slot);}ok(p.troops>=p.garrison&&p.garrison>=0,'Guarnição inválida.');for(const n of Object.values(p.resources))ok(Number.isFinite(n)&&n>=0,'Recursos inválidos.');if(p.workers!==undefined)int(p.workers,WORKER_POOL,100000);if(p.work){int(p.work.woodWorkers,0,workerCount(p));int(p.work.stoneWorkers,0,workerCount(p));ok(p.work.woodWorkers+p.work.stoneWorkers<=workerCount(p),'Trabalhadores acima da capacidade.');}for(const n of Object.values(p.fleet))ok(Number.isInteger(n)&&n>=0,'Frota inválida.');}for(const a of Object.values(w.alliances))ok(a.members.length<=3,'Aliança com mais de 3.');for(const target of new Set(w.missions.filter(m=>m.phase!=='regresso'&&m.targetType!=='wreck').map(m=>m.target)))for(const side of ['ataque','defesa'])ok(sidePlayers(w,target,side).size<=MAX_BATTLE_PLAYERS,'Encontro com mais de 3 jogadores por lado.');}
-export function publicState(w,user=null){const safe=copy(w);delete safe.wallets;if(user)safe.wallet=walletState(w,user);delete safe.rng;safe.finalDiscoveries=publicFinalDiscoveries(w);safe.finalSecretSlots=finalSecretSlots(w);delete safe.secureRandom;delete safe.exposure;delete safe.nextSpawn;delete safe.npcCoverage;delete safe.coverageRetryAt;for(const a of Object.values(safe.alliances)){delete a.invite;delete a.invites;}for(const p of Object.values(safe.players)){delete p.repeat;if(p.id!==user){delete p.onboarding;delete p.allianceInvite;delete p.allianceInvites;delete p.lastActiveLiveDay;delete p.dailySpent;delete p.actionAllowance;delete p.dayBase;delete p.lost;delete p.work;delete p.farmUntil;delete p.workers;delete p.resources;delete p.fleet;delete p.troops;delete p.garrison;delete p.spent;delete p.uniqueLoot;delete p.finalLootDay;delete p.finalLootReceipt;delete p.pendingUniqueItem;delete p.inventory;delete p.inventoryTier;delete p.inventoryProgress;delete p.equipmentRevision;delete p.equipment;delete p.reports;delete p.reportSerial;}}for(const e of Object.values(safe.encounters||{}))e.participants=battleParticipants(w,w.encounters[e.target]);for(const m of safe.missions){if(m.user!==user){delete m.pendingReward;delete m.gear;delete m.gearItems;}}for(const e of Object.values(safe.encounters||{}))if(e.target!==user){delete e.homeGear;delete e.homeGearItems;}return safe;}
+export function publicState(w,user=null){const safe=copy(w);delete safe.wallets;delete safe.creditStreams;if(user)safe.wallet=walletState(w,user);delete safe.rng;safe.finalDiscoveries=publicFinalDiscoveries(w);safe.finalSecretSlots=finalSecretSlots(w);delete safe.secureRandom;delete safe.exposure;delete safe.nextSpawn;delete safe.npcCoverage;delete safe.coverageRetryAt;for(const a of Object.values(safe.alliances)){delete a.invite;delete a.invites;}for(const p of Object.values(safe.players)){delete p.repeat;if(p.id!==user){delete p.onboarding;delete p.allianceInvite;delete p.allianceInvites;delete p.lastActiveLiveDay;delete p.dailySpent;delete p.actionAllowance;delete p.attackWindows;delete p.attackWindow;delete p.dayBase;delete p.lost;delete p.work;delete p.farmUntil;delete p.workers;delete p.resources;delete p.fleet;delete p.troops;delete p.garrison;delete p.spent;delete p.uniqueLoot;delete p.finalLootDay;delete p.finalLootReceipt;delete p.pendingUniqueItem;delete p.inventory;delete p.inventoryTier;delete p.inventoryProgress;delete p.equipmentRevision;delete p.equipment;delete p.reports;delete p.reportSerial;}}for(const e of Object.values(safe.encounters||{}))e.participants=battleParticipants(w,w.encounters[e.target]);for(const m of safe.missions){if(m.user!==user){delete m.pendingReward;delete m.gear;delete m.gearItems;}}for(const e of Object.values(safe.encounters||{}))if(e.target!==user){delete e.homeGear;delete e.homeGearItems;}return safe;}
 export function regroup(w){hibernateInactive(w);return false;}
 export function redistributeIslands(w){ok(!w.missions.length&&!Object.keys(w.encounters).length,'Há viagens ou batalhas em curso.');const players=activePlayers(w),before=players.map(p=>({user:p.id,from:p.slot}));for(const p of players)p.slot=-1;for(const p of players)p.slot=allocSlot(w,level(p),true,before.find(x=>x.user===p.id).from);event(w,'As ilhas foram distribuídas pelo arquipélago.');return before.map(x=>({...x,to:w.players[x.user].slot}));}
 
