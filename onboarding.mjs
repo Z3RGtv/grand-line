@@ -1,5 +1,5 @@
-import{workerState}from'./workers.mjs?v=0.18.0';
-import{buildingCost}from'./economy.mjs?v=0.18.0';
+import{workerState}from'./workers.mjs?v=0.19.0';
+import{buildingCost}from'./economy.mjs?v=0.19.0';
 export const MISSIONS=[
  {id:'island',title:'A tua ilha está pronta',short:'Conhece o teu porto.',icon:'shield',view:'ilha',body:'Seleciona um edifício para começar.',target:'.island-stage'},
  {id:'work',title:'Põe a ilha a trabalhar',short:'Envia um turno de trabalhadores.',icon:'workers',view:'ilha',body:'Na serraria, atribui 10 trabalhadores à madeira e 10 à pedra.',target:'[data-build="serraria"]',cost:100},

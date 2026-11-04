@@ -1,21 +1,23 @@
+import{BOSS_SITES}from'./adventure.mjs?v=0.19.0';
 // Shared sea geometry. Paths use water corridors, never island centres.
 export const MAP_WIDTH=3000,MAP_HEIGHT=2000;
 export const LAND_RX=.058,LAND_RY=.064;
 const positions=[[.13,.14],[.30,.12],[.20,.29],[.095,.43],[.36,.36],[.25,.49],[.12,.64],[.32,.69],[.17,.83],[.38,.89],[.48,.10],[.66,.12],[.85,.11],[.56,.27],[.78,.28],[.46,.44],[.65,.44],[.89,.45],[.57,.60],[.79,.61],[.47,.77],[.64,.75],[.86,.76],[.53,.91],[.70,.91],[.89,.91],[.93,.285],[.95,.61],[.085,.93],[.39,.545]];
 export const DEFAULT_SLOTS=positions.map(([x,y],i)=>({id:['west','north','east'][Math.floor(i/10)]+'-'+String(i%10+1).padStart(2,'0'),x,y,width:230+(i*7)%24})).sort((a,b)=>a.x-b.x||a.y-b.y);
+const obstacles=slots=>slots[0]?.adventureSea?[...slots.map(s=>({...s,rx:.047,ry:.050})),...BOSS_SITES]:slots;
 const length=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
 export const routeLength=route=>route.slice(1).reduce((n,p,i)=>n+length(route[i],p),0);
-export function waterPoint(slots,p){return p.x>=.035&&p.x<=.965&&p.y>=.075&&p.y<=.945&&slots.every(s=>((p.x-s.x)/LAND_RX)**2+((p.y-s.y)/LAND_RY)**2>=1.00001);}
+export function waterPoint(slots,p){return p.x>=.035&&p.x<=.965&&p.y>=.075&&p.y<=.945&&obstacles(slots).every(s=>((p.x-s.x)/(s.rx||LAND_RX))**2+((p.y-s.y)/(s.ry||LAND_RY))**2>=1.00001);}
 export function clearLeg(slots,a,b){
  const dx=b.x-a.x,dy=b.y-a.y;
- return slots.every(s=>{const ax=(a.x-s.x)/LAND_RX,ay=(a.y-s.y)/LAND_RY,bx=dx/LAND_RX,by=dy/LAND_RY;const den=bx*bx+by*by,t=den?Math.max(0,Math.min(1,-(ax*bx+ay*by)/den)):0;return (ax+t*bx)**2+(ay+t*by)**2>=.999999;});
+ return obstacles(slots).every(s=>{const rx=s.rx||LAND_RX,ry=s.ry||LAND_RY,ax=(a.x-s.x)/rx,ay=(a.y-s.y)/ry,bx=dx/rx,by=dy/ry;const den=bx*bx+by*by,t=den?Math.max(0,Math.min(1,-(ax*bx+ay*by)/den)):0;return (ax+t*bx)**2+(ay+t*by)**2>=.999999;});
 }
 export function coastPoint(slots,s,angle=Math.PI/2){
- for(let ring=0;ring<5;ring++)for(let k=0;k<32;k++){const a=angle+(k%2?1:-1)*Math.ceil(k/2)*Math.PI/16,p={x:s.x+Math.cos(a)*(.078+ring*.012),y:s.y+Math.sin(a)*(.082+ring*.012)};if(waterPoint(slots,p))return p;}
+ for(let ring=0;ring<5;ring++)for(let k=0;k<32;k++){const a=angle+(k%2?1:-1)*Math.ceil(k/2)*Math.PI/16,p={x:s.x+Math.cos(a)*((s.rx?s.rx+.012:.078)+ring*.012),y:s.y+Math.sin(a)*((s.ry?s.ry+.012:.082)+ring*.012)};if(waterPoint(slots,p))return p;}
  throw Error('Não foi encontrada uma entrada de porto navegável.');
 }
 export const harbor=(slots,s)=>coastPoint(slots,s,Math.PI/2);
-export function nearestWater(slots,p){if(waterPoint(slots,p))return{x:p.x,y:p.y};const s=[...slots].sort((a,b)=>length(a,p)-length(b,p))[0];return coastPoint(slots,s,Math.atan2(p.y-s.y,p.x-s.x));}
+export function nearestWater(slots,p){if(waterPoint(slots,p))return{x:p.x,y:p.y};const s=[...obstacles(slots)].sort((a,b)=>length(a,p)-length(b,p))[0];return coastPoint(slots,s,Math.atan2(p.y-s.y,p.x-s.x));}
 export function routePoint(route,fraction){
  if(!route?.length)return{x:0,y:0,angle:0};if(route.length===1)return{...route[0],angle:0};
  const total=routeLength(route);let left=Math.max(0,Math.min(1,fraction))*total;
@@ -24,7 +26,7 @@ export function routePoint(route,fraction){
 class Heap{constructor(){this.a=[];}push(id,f){const a=this.a;let i=a.length;a.push({id,f});while(i){const p=(i-1)>>1;if(a[p].f<=f)break;a[i]=a[p];i=p;}a[i]={id,f};}pop(){const a=this.a,first=a[0],last=a.pop();if(a.length){let i=0;while(i*2+1<a.length){let c=i*2+1;if(c+1<a.length&&a[c+1].f<a[c].f)c++;if(a[c].f>=last.f)break;a[i]=a[c];i=c;}a[i]=last;}return first;}get size(){return this.a.length;}}
 const cache=new Map(),NX=73,NY=49;
 function grid(slots){
- const key=slots.map(s=>s.x+','+s.y).join(';');if(cache.has(key))return cache.get(key);
+ const key=(slots[0]?.adventureSea?'boss1;':'')+slots.map(s=>s.x+','+s.y).join(';');if(cache.has(key))return cache.get(key);
  const points=Array.from({length:NX*NY},(_,i)=>({x:.012+(i%NX)/(NX-1)*.976,y:.012+Math.floor(i/NX)/(NY-1)*.976}));
  const free=points.map(p=>waterPoint(slots,p)),edges=points.map(()=>[]);
  for(let i=0;i<points.length;i++)if(free[i])for(const[dx,dy]of[[1,0],[0,1],[1,1],[-1,1]]){const x=i%NX+dx,y=Math.floor(i/NX)+dy,j=y*NX+x;if(x<0||x>=NX||y>=NY||!free[j]||!clearLeg(slots,points[i],points[j]))continue;const d=length(points[i],points[j]);edges[i].push([j,d]);edges[j].push([i,d]);}
