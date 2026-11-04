@@ -1,4 +1,4 @@
-import{coinIcon,walletView}from'./wallet-view.mjs?v=0.24.0';
+import{coinIcon,walletView}from'./wallet-view.mjs?v=0.24.0&rev=wallet2';
 import './boss-idle.mjs?v=0.24.0';
 import{itemDetailsView,discoveryDetailsView}from'./item-details.mjs?v=0.24.0';
 import{inventoryExpansion,inventoryCapacity}from'./inventory-capacity.mjs?v=0.24.0';
@@ -34,7 +34,7 @@ import {WORKER_POOL,workerCount,workerCapacity,workerState,workerRates,productio
 const LOCAL_TESTS=['127.0.0.1','localhost'].includes(location.hostname);const TRAIN=LOCAL_TESTS&&location.pathname.endsWith('/treino.html');const LAB=TRAIN||LOCAL_TESTS&&location.pathname.endsWith('/demo.html');
 let trainingConfig,trainingState,trainingPlan,trainingExecute,trainingAdvance,trainingNextDay,trainingNextWait,resetTraining,restoreTraining,setTrainingLayout;if(TRAIN)({trainingConfig,trainingState,trainingPlan,trainingExecute,trainingAdvance,trainingNextDay,trainingNextWait,resetTraining,restoreTraining,setTrainingLayout}=await import('./training.mjs?v=0.24.0'));
 let labConfig,labState,labPlan,labExecute,labAdvance,nextDay,seedLab,scenario,setLabLayout,setLabPopulation,labTopUp;if(LAB&&!TRAIN){const lab=await import('./lab.mjs?v=0.24.0');({labConfig,labState,labPlan,labExecute,labAdvance,nextDay,seedLab,scenario,setLabLayout,setLabPopulation,labTopUp}=lab);const catalog=await fetch('/api/demo/final-catalog',{cache:'no-store'});if(!catalog.ok)throw Error('O catálogo de teste exige acesso privado local.');lab.configureLabRewards(await catalog.json());}
-import {setupGithub,githubState,githubPlan,loginGithub,logoutGithub,githubFound,githubOwner,githubSpend,githubWallet,githubRetrySpend} from './github-client.mjs?v=0.24.0&rev=entry1';
+import {setupGithub,githubState,githubPlan,loginGithub,logoutGithub,githubFound,githubOwner,githubSpend,githubWallet,githubRetrySpend} from './github-client.mjs?v=0.24.0&rev=wallet2';
 const GITHUB=!LAB&&(!['127.0.0.1','localhost'].includes(location.hostname)||new URLSearchParams(location.search).has('github'));
 const OWNER_TEST=GITHUB&&(new URLSearchParams(location.search).get('teste')==='1'||location.hash.includes('access_token')&&sessionStorage.getItem('grand-line-preview-login')==='1');
 const BASE=new URL('.',document.baseURI).pathname.replace(/\/$/,'');
@@ -348,7 +348,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&awaitingL
 function updateConsultationNotice(){const node=$('#notice');if(!node||!state)return;if(config.ownerPreview||config.demo){node.hidden=true;return;}if(writeRestriction(state)){node.hidden=false;const at=state.snapshotAt||state.publishedAt;node.textContent=state.consultationSource&&state.consultationSource!=='server'?'Só consulta · sincronizado em '+new Date(at).toLocaleString('pt-PT',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}):'Só consulta · transmissão offline';}else if(config.github&&!config.launchEnabled){node.hidden=false;node.textContent='Partida ainda não aberta';}else node.hidden=true;}
 
 function updateWalletButton(){if(!state)return;let b=$('#wallet-button');if(!b){b=document.createElement('button');b.id='wallet-button';b.dataset.walletOpen='1';b.className='wallet-button';$('.header-tools').prepend(b);}b.title='Carteira · '+num(walletBalance())+' moedas';b.setAttribute('aria-label','Carteira');b.innerHTML=coinIcon()+'<b>'+num(walletBalance())+'</b><span>＋</span>';}
-async function inspectWallet(){const id='wallet';selected={id};if($('#inspector-title'))$('#inspector-title').textContent='Carteira';document.body.classList.add('inspector-open');const data=await api('/api/wallet');if(selected?.id!==id)return;$('#detail').innerHTML=walletView(data,{demo:config.demo||config.ownerPreview,readOnly:!!writeRestriction(state),pack:config.coinPack||500});}
+async function inspectWallet(){const id='wallet';selected={id};if($('#inspector-title'))$('#inspector-title').textContent='Carteira';document.body.classList.add('inspector-open');const data=await api('/api/wallet');if(selected?.id!==id)return;$('#detail').innerHTML=walletView(data,{demo:config.demo||config.ownerPreview,readOnly:!!writeRestriction(state)||data.offline,pack:config.coinPack||500});}
 async function spendCoins(request,button=actionButton){
  clearInlineOrder();if(button?.dataset.orderBusy)return;const label=button?.textContent;let reason=writeRestriction(state);
  try{if(!reason)quoteRule(state.world,state.user.id,request);if(!reason)reason=walletRequirement(request);}catch(e){reason=e.message;}
