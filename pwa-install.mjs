@@ -1,0 +1,9 @@
+export function standalone(win){return !!(win.navigator?.standalone||win.matchMedia?.('(display-mode: standalone)')?.matches);}
+export function installAppControls(win,doc){let prompt=null;const button=doc.createElement('button');button.type='button';button.id='install-grand-line';button.textContent='Instalar app';button.hidden=standalone(win);doc.querySelector('.help-options')?.append(button);
+ const dialog=doc.createElement('dialog');dialog.className='install-dialog';dialog.innerHTML='<button class="install-close" aria-label="Fechar">×</button><img src="assets/ui/app-icon-192.png" alt=""><h2>Grand Line no telefone</h2><p>No Chrome: menu <b>⋮ → Instalar aplicação</b> ou <b>Adicionar ao ecrã principal</b>.</p><p>No iPhone: <b>Partilhar → Adicionar ao ecrã principal</b>.</p><button class="primary install-done">Entendido</button>';doc.body.append(dialog);
+ for(const b of dialog.querySelectorAll('button'))b.addEventListener('click',()=>dialog.close());
+ win.addEventListener('beforeinstallprompt',event=>{event.preventDefault();prompt=event;if(!standalone(win))button.hidden=false;});win.addEventListener('appinstalled',()=>{button.hidden=true;prompt=null;if(dialog.open)dialog.close();});
+ button.addEventListener('click',async event=>{event.preventDefault();event.stopPropagation();if(prompt){const p=prompt;prompt=null;await p.prompt();await p.userChoice;}else dialog.showModal();});
+ if(win.navigator?.serviceWorker){const register=()=>win.navigator.serviceWorker.register(new URL('service-worker.js',doc.baseURI),{scope:new URL('./',doc.baseURI).pathname,updateViaCache:'none'}).catch(()=>{});if(doc.readyState==='complete')register();else win.addEventListener('load',register,{once:true});}return{button,dialog};
+}
+if(typeof window!=='undefined'&&typeof document!=='undefined')installAppControls(window,document);

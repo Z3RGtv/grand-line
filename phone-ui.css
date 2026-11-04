@@ -10,3 +10,5 @@ html.phone-device.phone-landscape .resource-bar{grid-template-columns:repeat(6,m
 
 /* Enlarge touch targets without changing the island's current composition. */
 html.phone-device .build-marker::before{content:'';position:absolute;left:50%;top:50%;width:max(44px,100%);height:max(44px,100%);transform:translate(-50%,-50%);border-radius:50%}
+
+.install-dialog{position:fixed;max-width:min(400px,calc(100vw - 40px));padding:28px;color:#493c27;background:#e8dabb;border:2px solid #a88b50;border-radius:6px;box-sizing:border-box;font:17px/1.5 Source,system-ui,sans-serif;text-align:center}.install-dialog::backdrop{background:#03141fcc}.install-dialog>img{width:96px;height:96px;border-radius:12px}.install-dialog>h2{font-size:25px}.install-dialog>p{text-align:left}.install-dialog .install-close{position:absolute;right:8px;top:8px;min-width:44px;min-height:44px;padding:0;font-size:30px}.install-dialog .install-done{min-height:44px;width:100%}

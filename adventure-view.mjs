@@ -1,7 +1,7 @@
-import{ITEM_TYPES,RARITIES,EQUIPMENT_SLOTS,equipmentBonuses,itemBonus,itemName,dismantleYield,STAT_NAMES,ITEM_SETS,equipmentSets,equippedItems,bestSetSlots,incompatibility,lootPool,DROP_TABLES}from'./equipment.mjs?v=0.20.1';
-import{bossAlive,bossAccess}from'./adventure.mjs?v=0.20.1';
-import{workerState}from'./workers.mjs?v=0.20.1';
-import{maxBuildingLevel}from'./progression.mjs?v=0.20.1';
+import{ITEM_TYPES,RARITIES,EQUIPMENT_SLOTS,equipmentBonuses,itemBonus,itemName,dismantleYield,STAT_NAMES,ITEM_SETS,equipmentSets,equippedItems,bestSetSlots,incompatibility,lootPool,DROP_TABLES}from'./equipment.mjs?v=0.21.0';
+import{bossAlive,bossAccess}from'./adventure.mjs?v=0.21.0';
+import{workerState}from'./workers.mjs?v=0.21.0';
+import{maxBuildingLevel}from'./progression.mjs?v=0.21.0';
 const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const names={sede:'Casa principal',serraria:'Serraria',pedreira:'Pedreira',armazem:'Armazém',estaleiro:'Estaleiro',muralha:'Muralha',academia:'Academia Náutica'};
 const image=i=>'<img class="equipment-art" src="assets/items/'+i.type+'.png" alt="'+itemName(i)+'">';
