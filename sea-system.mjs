@@ -1,7 +1,7 @@
-import{npcFlag,npcProfile}from'./npc-flags.mjs?v=0.19.2';
-import{seaRoute,routePoint,routeLength,coastPoint,waterPoint,clearLeg,nearestWater}from'./navigation.mjs?v=0.19.2';
+import{npcFlag,npcProfile}from'./npc-flags.mjs?v=0.19.3';
+import{seaRoute,routePoint,routeLength,coastPoint,waterPoint,waterCircle,clearLeg,nearestWater}from'./navigation.mjs?v=0.19.3';
 
-import{MIN_CREW_PER_SHIP}from'./pace-rules.mjs?v=0.19.2';
+import{MIN_CREW_PER_SHIP}from'./pace-rules.mjs?v=0.19.3';
 export const NPC_MAX=8,NPC_MIN_SECONDS=840,NPC_MAX_SECONDS=1560,NAVAL_ROUND_SECONDS=12,NPC_LEVEL_RANGE=3;
 export const HULLS={pesqueiro:{hp:90,attack:42,capacity:20,cargo:20,slots:1},cargueiro:{hp:140,attack:46,capacity:60,cargo:350,slots:2},explorador:{hp:85,attack:52,capacity:15,cargo:30,slots:1},combate:{hp:170,attack:95,capacity:40,cargo:80,slots:4}};
 export const npcShipCount=w=>(w.bots||[]).reduce((n,b)=>n+Object.values(b.fleet||{}).reduce((a,v)=>a+v,0),0);
@@ -10,7 +10,7 @@ export function seaFields(w){w.wrecks??=[];w.battleHistory??=[];w.seaVersion??=1
 export function botPoint(w,b,t=w.clock){return routePoint(b.route,(t-b.start)/(b.end-b.start));}
 export function wreckPoint(w,r,t=w.clock){return routePoint(r.route||[r.position],Math.max(0,Math.min(1,(t-r.start)/(r.end-r.start))));}
 export function interceptionPoint(w,b,t){const p=botPoint(w,b,t);if(waterPoint(w.slots,p))return p;return t<(b.start+b.end)/2?b.entryGate||nearestWater(w.slots,p):b.exitGate||nearestWater(w.slots,p);}
-function orbit(w,anchor,t,seed=0,radius=.004){const angle=t/14+seed*2.399;for(const scale of[1,.5,.2]){const p={x:anchor.x+Math.cos(angle)*radius*scale,y:anchor.y+Math.sin(angle)*radius*scale*.8,angle:angle+Math.PI/2};if(waterPoint(w.slots,p)&&clearLeg(w.slots,anchor,p))return p;}return{...anchor,angle};}
+function orbit(w,anchor,t,seed=0,radius=.004){const origin=waterPoint(w.slots,anchor)?anchor:nearestWater(w.slots,anchor),angle=t/14+seed*2.399,inward=Math.atan2(.5-origin.y,.5-origin.x);for(const scale of[1,.5,.2,.05,.01,.002,.0004]){const r=radius*scale;for(let i=-1;i<17;i++){const a=i===0?inward:i*Math.PI/8,center=i<0?origin:{x:origin.x+Math.cos(a)*r*1.5,y:origin.y+Math.sin(a)*r*1.5};if(!waterCircle(w.slots,center,r,r*.8)||!clearLeg(w.slots,origin,center))continue;return{x:center.x+Math.cos(angle)*r,y:center.y+Math.sin(angle)*r*.8,angle:angle+Math.PI/2};}}return{...origin,angle};}
 export function battlePoint(w,e,t=w.clock){const b=w.bots.find(b=>b.id===e.target),r=w.wrecks?.find(r=>r.id===e.wreckId);return b?botPoint(w,b,t):r?wreckPoint(w,r,t):e.position||w.missions.find(m=>m.encounter===e.id)?.to||{x:.5,y:.5};}
 export function fleetPoint(w,m,t=w.clock){
  if(['ida','regresso'].includes(m.phase)){if(t<=m.arrive)return routePoint(m.route||[m.from,m.to],(t-m.depart)/(m.arrive-m.depart));const target=m.phase==='ida'&&m.targetType==='bot'?w.bots.find(b=>b.id===m.target):null;return orbit(w,target?interceptionPoint(w,target,t):m.to,t,[...m.id].reduce((n,c)=>n+c.charCodeAt(0),0),.0035);}

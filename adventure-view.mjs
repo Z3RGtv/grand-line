@@ -1,7 +1,7 @@
-import{ITEM_TYPES,RARITIES,EQUIPMENT_SLOTS,equipmentBonuses,itemBonus,itemName,dismantleYield,STAT_NAMES}from'./equipment.mjs?v=0.19.2';
-import{bossAlive,bossAccess}from'./adventure.mjs?v=0.19.2';
-import{workerState}from'./workers.mjs?v=0.19.2';
-import{maxBuildingLevel}from'./progression.mjs?v=0.19.2';
+import{ITEM_TYPES,RARITIES,EQUIPMENT_SLOTS,equipmentBonuses,itemBonus,itemName,dismantleYield,STAT_NAMES}from'./equipment.mjs?v=0.19.3';
+import{bossAlive,bossAccess}from'./adventure.mjs?v=0.19.3';
+import{workerState}from'./workers.mjs?v=0.19.3';
+import{maxBuildingLevel}from'./progression.mjs?v=0.19.3';
 const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const names={sede:'Casa principal',serraria:'Serraria',pedreira:'Pedreira',armazem:'Armazém',estaleiro:'Estaleiro',muralha:'Muralha',academia:'Academia Náutica'};
 const image=i=>'<img class="equipment-art" src="assets/items/'+i.type+'.png" alt="'+itemName(i)+'">';

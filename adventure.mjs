@@ -4,11 +4,17 @@ export const BOSS_SITES=[
 {id:'I-CORSARIO',name:'Enseada dos Saqueadores',boss:'captain',bossName:'Capitão Ferrugem',level:6,x:.74,y:.45,width:205,rx:.036,ry:.035,respawn:10800,grade:1},
 {id:'I-CAVEIRA',name:'Cova da Bandeira Rubra',boss:'captain',bossName:'Almirante da Cinza',level:6,x:.37,y:.20,width:205,rx:.036,ry:.035,respawn:10800,grade:1},
 {id:'I-BASALTO',name:'Bastião de Basalto',boss:'golem',bossName:'Guardião da Âncora',level:9,x:.72,y:.82,width:230,rx:.040,ry:.037,respawn:14400,grade:2},
-{id:'I-COROA',name:'Coroa do Abismo',boss:'leviathan',bossName:'Soberano do Abismo',level:12,x:.515,y:.52,width:300,rx:.051,ry:.047,respawn:21600,grade:3,final:true}];
+{id:'I-COROA',name:'Coroa do Abismo',boss:'leviathan',bossName:'Soberano do Abismo',level:12,x:.515,y:.52,width:600,rx:.102,ry:.094,respawn:21600,grade:3,final:true}];
+export const FINAL_BOSS_CLEARING={"east-10":{"from":{"x":0.39,"y":0.545},"to":{"x":0.355,"y":0.48}},"north-06":{"from":{"x":0.46,"y":0.44},"to":{"x":0.465,"y":0.33}},"north-07":{"from":{"x":0.65,"y":0.44},"to":{"x":0.65,"y":0.38}},"north-09":{"from":{"x":0.57,"y":0.6},"to":{"x":0.55,"y":0.69}}};
+export const LEGACY_BOSS_SITES=BOSS_SITES.map(s=>s.final?{...s,width:300,rx:.051,ry:.047}:s);
+
 export function ensureAdventure(w){
 for(const p of Object.values(w.players||{})){p.inventory??=[];p.equipment??={};p.reports??=[];p.reportSerial??=0;}
 if(!w.adventureVersion&&(w.missions?.length||Object.keys(w.encounters||{}).length))return false;
-if(!w.adventureVersion)w.bots=[];w.adventureVersion=1;w.bosses??=BOSS_SITES.map(s=>({...s,life:1,respawnAt:0}));if(w.slots?.length)w.slots[0].adventureSea=1;return true;
+if(!w.adventureVersion)w.bots=[];w.adventureVersion=1;w.bosses??=BOSS_SITES.map(s=>({...s,life:1,respawnAt:0}));
+// Change coastlines only after every player voyage and encounter is over.
+if(w.adventureGeometryVersion!==2&&!w.missions?.length&&!Object.keys(w.encounters||{}).length){for(const slot of w.slots||[]){const move=FINAL_BOSS_CLEARING[slot.id];if(move&&Math.abs(slot.x-move.from.x)<1e-8&&Math.abs(slot.y-move.from.y)<1e-8)Object.assign(slot,move.to);}for(const b of w.bosses){const site=BOSS_SITES.find(s=>s.id===b.id);if(site?.final)Object.assign(b,{width:site.width,rx:site.rx,ry:site.ry});}w.bots=[];w.nextSpawn=w.clock;w.mapVersion=6;w.adventureGeometryVersion=2;}
+if(w.slots?.length)w.slots[0].adventureSea=w.adventureGeometryVersion===2?2:1;return true;
 }
 export const bossAlive=(w,b)=>!!b&&!(b.respawnAt>w.clock);
 export function maxedCaptain(p){return !!p&&['sede','serraria','pedreira','armazem','estaleiro','muralha'].every(k=>p.levels[k]>=12)&&p.levels.academia>=4&&Object.values(p.tech).every(n=>n>=4);}

@@ -1,6 +1,6 @@
 {
   "name": "Grand Line · arquipélago e canais navegáveis",
-  "version": 5,
+  "version": 6,
   "capacity": 30,
   "canvas": {
     "width": 3000,
@@ -131,8 +131,8 @@
     },
     {
       "id": "east-10",
-      "x": 0.39,
-      "y": 0.545,
+      "x": 0.355,
+      "y": 0.48,
       "width": 241,
       "region": "east",
       "port": {
@@ -142,8 +142,8 @@
     },
     {
       "id": "north-06",
-      "x": 0.46,
-      "y": 0.44,
+      "x": 0.465,
+      "y": 0.33,
       "width": 239,
       "region": "north",
       "port": {
@@ -197,8 +197,8 @@
     },
     {
       "id": "north-09",
-      "x": 0.57,
-      "y": 0.6,
+      "x": 0.55,
+      "y": 0.69,
       "width": 236,
       "region": "north",
       "port": {
@@ -220,7 +220,7 @@
     {
       "id": "north-07",
       "x": 0.65,
-      "y": 0.44,
+      "y": 0.38,
       "width": 246,
       "region": "north",
       "port": {
