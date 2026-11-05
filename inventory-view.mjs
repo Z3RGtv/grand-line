@@ -1,13 +1,13 @@
-import{EQUIPMENT_SLOTS,ITEM_TYPES,ITEM_SETS,RARITIES,STAT_NAMES,equippedItems,equipmentBonuses,equipmentSets,bestSetSlots,itemName,itemArt,dismantleYield}from'./equipment.mjs?v=0.25.1';
+import{EQUIPMENT_SLOTS,ITEM_TYPES,ITEM_SETS,RARITIES,MAX_EQUIPPED,equippedItems,equipmentSets,itemName,itemArt,dismantleYield}from'./equipment.mjs?v=0.25.1';
 import{inventoryExpansion}from'./inventory-capacity.mjs?v=0.25.1';
 import{createEquipmentDraft,draftChanged}from'./equipment-draft.mjs?v=0.25.1&rev=inventory1';
 const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const image=i=>'<button class="item-art-button" data-item-id="'+esc(i.id)+'" aria-label="Ver '+esc(itemName(i))+'"><img class="equipment-art" src="'+itemArt(i)+'" alt=""></button>';
-const bonusText=b=>Object.entries(b).map(([k,n])=>'+'+n+'% '+STAT_NAMES[k]).join(' · ');
 
 export function inventoryView(p, selection=new Set(), {draft=createEquipmentDraft(p)}={}) {
  const bag = p.inventory || [];
  const preview = {...p,equipment:draft.slots};
+ const completeSet = equipmentSets(preview).find(set => set.count === MAX_EQUIPPED);
  const dirty = draftChanged(draft);
  const savedIds = Object.values(p.equipment || {});
  const expansion = inventoryExpansion(p);
@@ -31,54 +31,63 @@ export function inventoryView(p, selection=new Set(), {draft=createEquipmentDraf
 
  const tiles = bag.slice().sort((a,b) => b.rarity-a.rarity || a.type.localeCompare(b.type)).map(item => {
   const type = ITEM_TYPES[item.type];
+  const set = ITEM_SETS[type.set];
   const title = esc(itemName(item));
   const chosen = draft.slots[type.slot] === item.id;
-  return `<article class="equipment-tile${chosen ? ' chosen' : ''}" style="--set-color:${ITEM_SETS[type.set].color}">
+  return `<article class="equipment-tile${chosen ? ' chosen' : ''}${selection.has(item.id) ? ' salvage-marked' : ''}" style="--set-color:${set.color}">
    <button class="equipment-piece" data-equip="${esc(item.id)}" data-drag-slot="${type.slot}"
     aria-label="Selecionar ${title} para ${EQUIPMENT_SLOTS[type.slot]}" aria-pressed="${chosen}" title="${title}">
+    <span class="equipment-set-emblem" aria-hidden="true">${set.emblem}</span>
     <img src="${itemArt(item)}" alt="" draggable="false">
     ${chosen ? `<span class="equipment-mark" aria-hidden="true">${savedIds.includes(item.id) ? '✓' : '●'}</span>` : ''}
    </button>
-   <button class="equipment-details" data-item-id="${esc(item.id)}" aria-label="Ver ${title}" title="${title}"><span>${title}</span></button>
+   <button class="equipment-details" data-item-id="${esc(item.id)}" aria-label="Ver ${title} · ${set.name}" title="${title} · ${set.name}"><span>${title}</span></button>
   </article>`;
  }).join('');
 
+ const vacancies = Math.max(0, expansion.capacity - bag.length);
+ const emptyTiles = '<div class="equipment-vacancy" aria-hidden="true"></div>'.repeat(Math.max(0,vacancies-Number(!expansion.max)));
+ const plusTile = expansion.max ? '' : `<button class="equipment-vacancy inventory-add" data-inventory-expansion="1" aria-label="Expandir inventário">
+  <span aria-hidden="true">+</span>${expansion.paid ? `<small>${expansion.paid}/${expansion.required}</small>` : ''}
+ </button>`;
  const dismantle = bag.filter(item => !savedIds.includes(item.id) && !ITEM_TYPES[item.type].unique);
  const selected = dismantle.filter(item => selection.has(item.id));
  const yieldTotal = selected.reduce((total,item) => {
   const resources = dismantleYield(item);
   return {wood:total.wood+resources.wood,stone:total.stone+resources.stone};
  },{wood:0,stone:0});
- const manage = `<details class="equipment-extra"${selected.length ? ' open' : ''}>
-  <summary>Gerir inventário</summary>
-  ${expansionView(expansion)}
-  ${p.pendingUniqueItem ? '<p class="inventory-full">Uma relíquia única aguarda um lugar livre.</p>' : ''}
-  ${bag.length>=expansion.capacity ? '<p class="inventory-full">Inventário cheio: os novos drops são desmontados em recursos.</p>' : ''}
-  ${dismantle.length ? `<div class="equipment-salvage"><h4>Desmontar itens</h4>
-   ${dismantle.map(i => `<label class="dismantle-select"><input type="checkbox" data-salvage-item="${esc(i.id)}"
-    ${selection.has(i.id) ? 'checked' : ''}> ${esc(itemName(i))}</label>`).join('')}
-   ${selected.length ? `<div class="dismantle-panel"><span id="dismantle-yield">${yieldTotal.wood} madeira · ${yieldTotal.stone} pedra</span>
-    <button data-dismantle="1">Desmontar ${selected.length} · 100 moedas</button></div>` : ''}
-  </div>` : ''}
- </details>`;
-
  return `<h2>Equipamento <small>${equippedItems(preview).length}/4</small></h2>
   <section class="equipment-editor" data-form-revision="${draft.revision}">
    ${status}
-   <div class="equipment-slots">${slots}</div>
+   <div class="equipment-selection"${completeSet ? ` data-complete-set="${completeSet.id}" style="--set-color:${completeSet.color}"` : ''}>
+    <div class="equipment-slots">${slots}</div>
+    ${completeSet ? `<span class="equipment-set-complete" role="status">${completeSet.emblem} ${completeSet.name} · Bónus de conjunto</span>` : ''}
+   </div>
    ${dirty ? `<div class="equipment-confirm-panel">
     <button class="primary wide equipment-confirm-callout" data-action="confirm-equipment">Confirmar configuração · 100 moedas</button>
     <button class="equipment-reset" data-equipment-reset="1">Repor</button>
    </div>` : ''}
    <h3>Itens <small>${bag.length}/${expansion.capacity}</small></h3>
-   ${bag.length ? `<p class="equipment-hint">Arrasta ou toca na imagem para selecionar.</p><div class="equipment-bag">${tiles}</div>`
-    : '<p class="equipment-hint">Ainda não tens itens. <button data-tab="mundo">Ver ilhas hostis →</button></p>'}
-   <details class="equipment-extra" data-building-section="equipment-sets"><summary>Conjuntos e bónus</summary>
-    <div class="equipment-totals" aria-label="${dirty ? 'Bónus previstos' : 'Bónus ativos'}">${Object.entries(equipmentBonuses(preview)).filter(([,n]) => n).map(([k,n]) => '<span>+'+n+'% '+STAT_NAMES[k]+'</span>').join('')}</div>
-    ${setView(preview)}
-   </details>
-   ${manage}
+   ${bag.length ? '<p class="equipment-hint">Arrasta ou toca na imagem para selecionar.</p>' : ''}
+   <div class="equipment-bag">${tiles}${emptyTiles}${plusTile}</div>
+   ${p.pendingUniqueItem ? '<p class="inventory-full">Uma relíquia única aguarda um lugar livre.</p>' : ''}
+   ${bag.length>=expansion.capacity ? '<p class="inventory-full">Inventário cheio. Novos itens são convertidos em recursos.</p>' : ''}
+   ${selected.length ? `<div class="dismantle-panel"><span>+${yieldTotal.wood} madeira · +${yieldTotal.stone} pedra</span>
+    <button data-dismantle="1">Desmontar ${selected.length} · 100 moedas</button>
+    <button data-clear-salvage="1">Limpar seleção</button>
+   </div>` : ''}
   </section>`;
+}
+
+export function inventoryExpansionView(p) {
+ const e = inventoryExpansion(p);
+ return `<button class="item-back" data-adventure="inventory">← Inventário</button>
+  <h2>Expandir inventário</h2>
+  ${e.max ? '<p>Capacidade máxima · 12 lugares</p>' : `<div class="inventory-expansion">
+   <strong>${e.capacity} → ${e.next} lugares</strong>
+   ${e.required>1 ? `<span>Prestação ${e.paid+1}/${e.required}</span>` : ''}
+   <button class="primary wide" data-action="expand-inventory">Confirmar · 100 moedas</button>
+  </div>`}`;
 }
 
 export function bindEquipmentDrag(panel, {canEdit,onEquip,onInvalid}) {
@@ -158,5 +167,3 @@ export function bindEquipmentDrag(panel, {canEdit,onEquip,onInvalid}) {
  },true);
  return {get active(){return !!drag;},cancel};
 }
-function expansionView(e){if(e.max)return '<div class="inventory-expansion"><small>Capacidade máxima</small></div>';return '<section class="inventory-expansion"><div><strong>'+e.capacity+' → '+e.next+' lugares</strong><span>'+e.paid+'/'+e.required+' pagamentos</span></div><progress value="'+e.paid+'" max="'+e.required+'" aria-label="Expansão do inventário"></progress><button data-action="expand-inventory">'+(e.required===1?'Expandir':'Pagar '+(e.paid+1)+'/'+e.required)+' · 100 moedas</button></section>';}
-function setView(p){return '<div class="equipment-sets">'+equipmentSets(p).map(s=>{const slots=bestSetSlots(p,s.id),active=s.count===4;return '<details class="equipment-set" '+(s.count?'open':'')+' style="--set-color:'+s.color+'"><summary>'+s.name+' <b>'+s.count+'/4</b></summary><small class="'+(active?'set-active':'')+'">4 peças: '+bonusText(s.bonus)+'</small>'+(['bastiao','aurora'].includes(s.id)?'<small>Incompatível com '+(s.id==='bastiao'?'Aurora':'Bastião')+'</small>':'<small>Combina com todos os conjuntos</small>')+(slots&&!active?'<button data-equip-set="'+s.id+'">Selecionar conjunto</button>':'')+'</details>';}).join('')+'</div>';}
