@@ -8,7 +8,13 @@ export function selectEquipment(d,p,{item,slot,set,reset}={}){
  let slots={...d.slots};
  if(reset)slots=equipmentSlots(p.equipment);
  else if(set){const best=bestSetSlots(p,set);if(!best)throw Error('Ainda não tens as quatro peças deste conjunto.');slots=equipmentSlots(best);}
- else if(item){const i=p.inventory.find(i=>i.id===item);if(!i)throw Error('Esse item já não está disponível.');slots[ITEM_TYPES[i.type].slot]=i.id;}
+ else if(item){
+  const i=p.inventory.find(i=>i.id===item);
+  if(!i)throw Error('Esse item já não está disponível.');
+  const compatibleSlot=ITEM_TYPES[i.type].slot;
+  if(slot && slot!==compatibleSlot)throw Error('Este item encaixa em '+EQUIPMENT_SLOTS[compatibleSlot]+'.');
+  slots[compatibleSlot]=i.id;
+ }
  else if(Object.hasOwn(EQUIPMENT_SLOTS,slot))slots[slot]=null;
  else throw Error('Seleção inválida.');
  return{...d,slots,pending:null,confirmed:equipmentSignature(slots)===d.base};

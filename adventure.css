@@ -133,3 +133,113 @@
 #detail .readiness-panel > button i {
   color: inherit;
 }
+
+/* Equipment and the bag share the same grid so pieces stay close to their slots. */
+#detail .equipment-editor .equipment-slots,
+.equipment-bag {
+ display:grid;
+ grid-template-columns:repeat(4,minmax(0,1fr));
+ gap:6px;
+}
+#detail .equipment-slot {
+ position:relative;
+ min-height:86px;
+ min-width:0;
+ padding:8px 2px 4px;
+ gap:2px;
+}
+#detail .equipment-slot>small {
+ font-size:clamp(9px,2.7vw,11px);
+ letter-spacing:0;
+ overflow-wrap:anywhere;
+}
+#detail .equipment-slot .empty-slot {font-size:29px}
+#detail .equipment-slot .item-art-button,
+#detail .equipment-slot .item-art-button>img {
+ width:100%;
+ height:45px;
+ margin:0;
+}
+#detail .equipment-slot.has-item {padding-bottom:24px}
+#detail .equipment-slot .equipment-remove {
+ position:absolute;
+ right:0;
+ bottom:0;
+ min-height:27px;
+ min-width:30px;
+ margin:0;
+ padding:0;
+ font-size:18px;
+ line-height:1;
+ background:none;
+ border:0;
+ box-shadow:none;
+ color:#f8e7c4;
+}
+#detail .equipment-slot.equipment-drop-ready {outline:2px dashed #bd8a3d;outline-offset:2px}
+#detail .equipment-slot.equipment-drop-active {outline-style:solid;background:#285f51}
+.equipment-tile {
+ position:relative;
+ min-width:0;
+ background:color-mix(in srgb,var(--set-color) 12%,#f6ecd5);
+ border:1px solid #bba980;
+ border-top:3px solid var(--set-color);
+ border-radius:5px;
+}
+.equipment-tile.chosen {box-shadow:inset 0 0 0 1px #477960;background:#dce6c9}
+#detail .equipment-tile>button {
+ width:100%;
+ min-height:0;
+ margin:0;
+ border:0;
+ background:none;
+ box-shadow:none;
+ color:#4b3821;
+}
+#detail .equipment-tile .equipment-piece {
+ position:relative;
+ display:grid;
+ place-items:center;
+ height:56px;
+ padding:3px;
+ cursor:grab;
+ touch-action:none;
+ user-select:none;
+}
+.equipment-piece>img {width:100%;height:49px;object-fit:contain;pointer-events:none}
+.equipment-mark {
+ position:absolute;
+ top:3px;
+ right:4px;
+ color:#31553a;
+ font-size:13px;
+ line-height:1;
+}
+#detail .equipment-tile .equipment-details {
+ display:block;
+ min-height:34px;
+ padding:2px 3px;
+ font-size:11px;
+ line-height:1.15;
+ white-space:normal;
+}
+.equipment-details>span {display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
+.equipment-drag-source {opacity:.55}
+.equipment-drag-ghost {
+ position:fixed;
+ z-index:2300;
+ width:62px;
+ height:62px;
+ object-fit:contain;
+ transform:translate(-50%,-65%);
+ pointer-events:none;
+ filter:drop-shadow(0 4px 6px #0008);
+}
+#detail .equipment-editor h3 {margin:16px 0 4px}
+.equipment-editor h3 small {opacity:.75;font-size:.75em}
+.equipment-hint {margin:0 0 9px;color:#5e4d31;font-size:13px}
+#detail .equipment-confirm-panel {position:static;padding:7px;margin:9px 0;box-shadow:none}
+#detail .equipment-confirm-panel .equipment-reset {display:block;margin:0 auto;color:#5e4d31}
+.equipment-extra {margin-top:12px;border-top:1px solid #ad976e70}
+.equipment-extra>summary {padding:10px 0;font-weight:700;cursor:pointer}
+.equipment-salvage label {padding:6px 0}
