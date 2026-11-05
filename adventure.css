@@ -91,3 +91,45 @@
   outline: 2px solid #f0d288;
   outline-offset: 3px;
 }
+
+.resource-bar .hud-wallet {
+  padding-bottom: 19px !important;
+}
+.hud-wallet > .coin-icon {
+  flex: none;
+}
+.hud-wallet > .wallet-hud-limit {
+  position: absolute;
+  right: 8px;
+  bottom: 5px;
+  left: 8px;
+  color: #604b29;
+  text-align: right;
+  font-size: 10px;
+  white-space: nowrap;
+}
+.hud-wallet > .wallet-hud-limit.limit-hit,
+.wallet-budget.limit-hit > strong {
+  color: #962d20;
+}
+.wallet-budget {
+  margin: 12px 0;
+  padding: 12px;
+  border: 1px solid #b7a075;
+  background: #f0e5c5;
+  color: #463721;
+}
+.wallet-budget h3 {
+  margin: 0 0 6px;
+}
+.wallet-budget > small {
+  display: block;
+  margin-top: 4px;
+}
+#detail .readiness-panel > button {
+  color: #463721;
+}
+#detail .readiness-panel > button b,
+#detail .readiness-panel > button i {
+  color: inherit;
+}
