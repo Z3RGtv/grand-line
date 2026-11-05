@@ -1,4 +1,4 @@
-import{gameRunning}from'./game-session.mjs?v=0.25.1';
+import{gameRunning}from'./game-session.mjs?v=0.26.0';
 export function canReadFallback(error){return !error?.authRequired&&(!error?.status||[408,429].includes(error.status)||error.status>=500);}
 export function consultationState(data,user,source='snapshot'){
  if(!data?.world||!data.world.players||!Number.isFinite(data.publishedAt))throw Error('Cópia de consulta inválida.');

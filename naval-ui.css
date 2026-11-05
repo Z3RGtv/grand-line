@@ -10,7 +10,7 @@
 .flag-editor-fields label:has([data-flag-symbol]){grid-column:1/-1}
 .flag-editor-fields select:disabled{opacity:.55}
 .inspector .flag-editor,html.phone-device body .flag-editor{grid-template-columns:minmax(0,1fr)}
-.inspector .flag-preview .captain-flag,html.phone-device body .flag-preview .captain-flag{width:120px;height:80px}
+.inspector .flag-preview .captain-flag,html.phone-device body .flag-preview .captain-flag{width:120px;height:80px}
 .vessel-flag{position:absolute;width:30px;height:20px;top:-4px;right:-7px;z-index:3;filter:drop-shadow(0 1px 2px #0009);transform-origin:5% 50%;animation:flag-sail 3.1s ease-in-out infinite alternate;pointer-events:none}
 .ship-level{display:inline-flex;justify-content:center;align-items:center;gap:3px;min-width:34px;height:25px;padding:2px 5px;border:1px solid #d2b472;border-radius:3px;background:#122b35eb;color:#ffdf9b;font-size:14px;font-weight:800;font-variant-numeric:tabular-nums;box-shadow:0 2px 5px #0007;white-space:nowrap}
 .ship-level.allowed{color:#c6ecbb;border-color:#8aa87a;background:#183c32ed}.ship-level.blocked{color:#ffb0a6;border-color:#b66a63;background:#4b292ded}.ship-level.neutral{color:#eadcb6;border-color:#a18c66}

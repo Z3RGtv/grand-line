@@ -1,13 +1,13 @@
-import{nextLearningStep}from'./mission-plan.mjs?v=0.25.1';
-import{workerState}from'./workers.mjs?v=0.25.1';
-import{buildingCost}from'./economy.mjs?v=0.25.1';
+import{nextLearningStep}from'./mission-plan.mjs?v=0.26.0';
+import{workerState}from'./workers.mjs?v=0.26.0';
+import{buildingCost}from'./economy.mjs?v=0.26.0';
 export const MISSIONS=[
  {id:'island',title:'A tua ilha está pronta',short:'Conhece o teu porto.',icon:'shield',view:'ilha',body:'Seleciona um edifício para começar.',target:'.island-stage'},
  {id:'work',title:'Põe a ilha a trabalhar',short:'Envia um turno de trabalhadores.',icon:'workers',view:'ilha',body:'Na serraria, distribui os trabalhadores pela madeira e pela pedra.',target:'[data-build="serraria"]',cost:100},
  {id:'storage',title:'Melhora o armazém primeiro',short:'Conclui o armazém N2.',icon:'treasure',view:'ilha',body:'Melhora o armazém para N2 para desbloquear as próximas construções.',target:'[data-build="armazem"]',cost:350},
  {id:'headquarters',title:'Faz crescer a casa principal',short:'Conclui a casa principal N2.',icon:'scroll',view:'ilha',body:'Seleciona a casa principal e melhora para N2.',target:'[data-build="sede"]',cost:350},
  {id:'fishing',title:'Abastece a tripulação',short:'Manda os pesqueiros buscar comida.',icon:'food',view:'ilha',body:'No estaleiro, envia os pesqueiros e espera pelo regresso.',target:'.fishing-card',cost:100},
- {id:'crew',title:'Prepara a primeira expedição',short:'Recruta 10 marinheiros.',icon:'crew',view:'ilha',body:'Na sede, recruta 10 marinheiros.',target:'[data-action="train"]',cost:350},
+ {id:'crew',title:'Prepara a primeira expedição',short:'Recruta 10 marinheiros.',icon:'crew',view:'ilha',body:'Na sede, recruta 10 marinheiros.',target:'[data-action="train"]',cost:100},
  {id:'expedition',title:'Larga as amarras',short:'Envia uma frota a um corsário.',icon:'compass',view:'mundo',body:'No mapa, procura um corsário de carga próximo do teu nível. Envia um cargueiro com até 20 marinheiros.',target:'.map-scroll',cost:200},
  {id:'return',title:'Acompanha o regresso',short:'Espera pela tua primeira frota.',icon:'treasure',view:'viagens',body:'Acompanha a frota em Mar e frotas → Expedições.',target:'.expedition-list'}
 ];

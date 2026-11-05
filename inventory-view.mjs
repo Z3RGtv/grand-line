@@ -1,6 +1,9 @@
-import{EQUIPMENT_SLOTS,ITEM_TYPES,ITEM_SETS,RARITIES,MAX_EQUIPPED,equippedItems,equipmentSets,itemName,itemArt,dismantleYield}from'./equipment.mjs?v=0.25.1';
-import{inventoryExpansion}from'./inventory-capacity.mjs?v=0.25.1';
-import{createEquipmentDraft,draftChanged}from'./equipment-draft.mjs?v=0.25.1&rev=inventory1';
+import{coinIcon}from'./wallet-view.mjs?v=0.26.0';
+import{EXCLUSIVE_ITEMS}from'./equipment.mjs?v=0.26.0';
+import{FRAGMENTS_REQUIRED}from'./balance-policy.mjs?v=0.26.0';
+import{EQUIPMENT_SLOTS,ITEM_TYPES,ITEM_SETS,RARITIES,MAX_EQUIPPED,equippedItems,equipmentSets,itemName,itemArt,dismantleYield}from'./equipment.mjs?v=0.26.0';
+import{inventoryExpansion}from'./inventory-capacity.mjs?v=0.26.0';
+import{createEquipmentDraft,draftChanged}from'./equipment-draft.mjs?v=0.26.0&rev=inventory1';
 const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const image=i=>'<button class="item-art-button" data-item-id="'+esc(i.id)+'" aria-label="Ver '+esc(itemName(i))+'"><img class="equipment-art" src="'+itemArt(i)+'" alt=""></button>';
 
@@ -71,7 +74,8 @@ export function inventoryView(p, selection=new Set(), {draft=createEquipmentDraf
    ${bag.length ? '<p class="equipment-hint">Arrasta ou toca na imagem para selecionar.</p>' : ''}
    <div class="equipment-bag">${tiles}${emptyTiles}${plusTile}</div>
    ${p.pendingUniqueItem ? '<p class="inventory-full">Uma relíquia única aguarda um lugar livre.</p>' : ''}
-   ${bag.length>=expansion.capacity ? '<p class="inventory-full">Inventário cheio. Novos itens são convertidos em recursos.</p>' : ''}
+   ${bag.length>=expansion.capacity?'<small class="inventory-full">Inventário cheio</small>':''}
+   ${pendingLootView(p)}
    ${selected.length ? `<div class="dismantle-panel"><span>+${yieldTotal.wood} madeira · +${yieldTotal.stone} pedra</span>
     <button data-dismantle="1">Desmontar ${selected.length} · 100 moedas</button>
     <button data-clear-salvage="1">Limpar seleção</button>
@@ -166,4 +170,9 @@ export function bindEquipmentDrag(panel, {canEdit,onEquip,onInvalid}) {
   event.stopImmediatePropagation();
  },true);
  return {get active(){return !!drag;},cancel};
+}
+
+export function pendingLootView(p){
+ const stash=p.lootStash||[],fragments=Object.entries(EXCLUSIVE_ITEMS).filter(([,boss])=>(p.fragments?.[boss]||0)>0);
+ return (stash.length?'<h3>Espólio <small>'+stash.length+'</small></h3><div class="pending-loot-grid">'+stash.map(i=>'<button data-claim-loot="'+esc(i.id)+'" title="Recolher '+esc(itemName(i))+' · 100 moedas" aria-label="Recolher '+esc(itemName(i))+' por 100 moedas"><img src="'+itemArt(i)+'" alt=""><span class="loot-price">'+coinIcon()+'100</span></button>').join('')+'</div>':'')+(fragments.length?'<h3>Fragmentos</h3><div class="pending-loot-grid">'+fragments.map(([type,boss])=>'<button data-craft-boss="'+boss+'" title="Criar '+esc(ITEM_TYPES[type].name)+' raro · 10 fragmentos e 100 moedas" aria-label="Criar '+esc(ITEM_TYPES[type].name)+' raro por 10 fragmentos e 100 moedas"><img src="'+itemArt({type})+'" alt=""><span>'+p.fragments[boss]+'/'+FRAGMENTS_REQUIRED+'</span><span class="loot-price">'+coinIcon()+'100</span></button>').join('')+'</div>':'');
 }

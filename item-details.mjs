@@ -1,5 +1,5 @@
-import{ITEM_TYPES,ITEM_SETS,RARITIES,EQUIPMENT_SLOTS,STAT_NAMES,itemName,itemArt,itemBonus,lootOdds,EXCLUSIVE_ITEMS}from'./equipment.mjs?v=0.25.1';
-import{BOSS_SITES}from'./adventure.mjs?v=0.25.1';
+import{ITEM_TYPES,ITEM_SETS,RARITIES,EQUIPMENT_SLOTS,STAT_NAMES,itemName,itemArt,itemBonus,equipmentBonuses,lootOdds,EXCLUSIVE_ITEMS}from'./equipment.mjs?v=0.26.0';
+import{BOSS_SITES}from'./adventure.mjs?v=0.26.0';
 const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const percent=n=>(n*100).toLocaleString('pt-PT',{maximumFractionDigits:2})+'%';
 export function itemDetailsView(item,p,{catalog=false,marked=false}={}){
@@ -16,6 +16,7 @@ export function itemDetailsView(item,p,{catalog=false,marked=false}={}){
   </div>
   <h2>${esc(itemName(item))}</h2><div class="item-slot-label">${EQUIPMENT_SLOTS[type.slot]}</div>
   ${statistics}
+  ${owned?comparisonView(item,p):''}
   ${type.stat==='rareFind'?'<p class="item-explanation">Aumenta a hipótese de Raro ou melhor nas ilhas normais. Não altera as probabilidades da ilha final.</p>':''}
   <section class="item-set-detail" style="--set-color:${set.color}">
    <h3>Conjunto ${set.name}</h3><p><strong>Bónus com 4 peças</strong> · ${bonuses}</p>
@@ -27,3 +28,5 @@ export function itemDetailsView(item,p,{catalog=false,marked=false}={}){
    sources.length?`<h3>Onde encontrar</h3><div class="item-source-list">${sources.map(s=>`<button data-item-source="${s.id}"><span>${esc(s.name)}${EXCLUSIVE_ITEMS[item.type]?' · Exclusivo':''}</span><b>${percent(s.chance)}</b></button>`).join('')}</div>`:''}`;
 }
 export function discoveryDetailsView(record){return '<button class="item-back" data-item-back="1">← Voltar</button><div class="item-detail-hero"><img src="'+esc(record.art)+'" alt=""></div><h2>'+esc(record.name)+'</h2><p class="item-exclusive-note">'+(record.global?'Tesouro único · conquistado por ':'Primeiro descobridor: ')+esc(record.playerName)+'</p>';}
+
+function comparisonView(item,p){const type=ITEM_TYPES[item.type],before=equipmentBonuses(p),after=equipmentBonuses({...p,equipment:{...p.equipment,[type.slot]:item.id}});return '<div class="item-comparison">'+Object.keys(after).filter(k=>after[k]!==before[k]).map(k=>{const d=after[k]-before[k];return '<span class="'+(d>0?'stat-up':'stat-down')+'">'+(d>0?'+':'')+d+'% '+STAT_NAMES[k]+'</span>';}).join('')+'</div>';}

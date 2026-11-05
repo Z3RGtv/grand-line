@@ -302,3 +302,7 @@
 }
 #detail .item-set-detail h3,
 #detail .item-set-detail p {margin:0 0 5px}
+
+.pending-loot-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}.pending-loot-grid button{display:grid;justify-items:center;gap:4px;padding:6px;min-width:0}.pending-loot-grid img{width:100%;max-width:70px;aspect-ratio:1;object-fit:contain}.pending-loot-grid span{font-size:12px}.item-comparison{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}.stat-up{color:#76bf80}.stat-down{color:#e78b8b}
+
+.pending-loot-grid .action-requirement{position:absolute;width:1px;height:1px;padding:0;margin:0;overflow:hidden;clip-path:inset(50%);white-space:nowrap}.pending-loot-grid .loot-price{display:flex;align-items:center;gap:4px}.pending-loot-grid .coin-icon{width:15px;height:15px}

@@ -15,6 +15,7 @@ export const LEGACY_BOSS_SITES=EXPANDED_BOSS_SITES.map(s=>s.final?{...s,width:30
 
 export function ensureAdventure(w){
 for(const p of Object.values(w.players||{})){p.inventory??=[];p.equipment??={};p.equipmentRevision??=0;p.inventoryTier??=0;p.inventoryProgress??=0;p.reports??=[];p.reportSerial??=0;}
+if(!w.bossQualificationVersion){for(const p of Object.values(w.players||{})){const wins=[...new Set(p.reports.filter(r=>r.type==='boss'&&BOSS_SITES.some(b=>b.id===r.target&&r.title===b.bossName+' derrotado')).map(r=>r.target))];if(wins.length&&!p.bossWins)p.bossWins=wins;}w.bossQualificationVersion=1;}
 if(!w.adventureVersion&&(w.missions?.length||Object.keys(w.encounters||{}).length))return false;
 if(!w.adventureVersion)w.bots=[];w.adventureVersion=1;w.bosses??=BOSS_SITES.map(s=>({...s,life:1,respawnAt:0}));
 // Change coastlines only after every player voyage and encounter is over.
@@ -23,14 +24,22 @@ if(w.slots?.length)w.slots[0].adventureSea=w.adventureGeometryVersion>=2?w.adven
 }
 export const bossAlive=(w,b)=>!!b&&!(b.respawnAt>w.clock);
 export function maxedCaptain(p){return !!p&&['sede','serraria','pedreira','armazem','estaleiro','muralha'].every(k=>p.levels[k]>=12)&&p.levels.academia>=4&&Object.values(p.tech).every(n=>n>=4);}
-export function bossAccess(w,p,b){
+export function bossAccess(w,p,b,{arrival=false}={}){
 if(!p)return{ok:false,label:'Cria a ilha',kind:'blocked'};
+if(!arrival&&!w.live)return{ok:false,label:'Durante a live',kind:'blocked'};
+if(b?.final){
+ if(p.levels.sede<10)return{ok:false,label:'Requer N10',kind:'blocked'};
+ if(!(p.bossWins?.some(id=>BOSS_SITES.some(site=>site.id===id&&site.level===9))))return{ok:false,label:'Vence uma ilha N9',kind:'blocked'};
+ if(p.levels.sede<12&&!w.missions.some(m=>m.target===b.id&&m.phase!=='regresso'&&w.players[m.user]?.levels.sede>=12))return{ok:false,label:'Requer capitão N12',kind:'blocked'};
+}
 if(!bossAlive(w,b))return{ok:false,label:'A recuperar',kind:'cooldown'};
 if(w.encounters?.[b.id]?.phase==='loot')return{ok:false,label:'Saque em curso',kind:'cooldown'};
 const delta=b.level-p.levels.sede;return{ok:true,label:delta>=3?'Desafio difícil':delta>0?'Desafio':'Atacar',kind:delta>0?'hard':'ok'};
 }
-export function bossFormation(w,e,ms){const users=new Set(ms.filter(m=>m.troops>0&&Object.values(m.fleet).some(n=>n>0)).map(m=>m.user));return users.size>0&&users.size<=3;}
+export function bossFormation(w,e,ms){const users=new Set(ms.filter(m=>m.troops>0&&Object.values(m.fleet).some(n=>n>0)).map(m=>m.user));if(!(users.size>0&&users.size<=3))return false;
+ if(!w.bosses?.find(b=>b.id===e.target)?.final)return true;
+ const party=[...users].map(id=>w.players[id]);return party.every(p=>p?.levels.sede>=10&&p.bossWins?.some(id=>BOSS_SITES.some(b=>b.id===id&&b.level===9)))&&party.some(p=>p.levels.sede>=12);}
 
-export function bossUnits(b){const v=[{hp:260,attack:75,count:1},{hp:420,attack:115,count:2},{hp:600,attack:155,count:3},{hp:760,attack:210,count:5}][b.grade];return Array.from({length:v.count},(_,i)=>({id:b.id+'-boss-'+i,type:'boss',sprite:i&&b.boss==='captain'?'guard':i&&b.boss==='leviathan'?'tentacle':b.boss,name:i?(b.boss==='leviathan'?'Tentáculo '+i:b.boss==='golem'?'Sentinela '+i:'Guarda '+i):b.bossName,owner:'boss',level:b.level,hp:v.hp,maxHP:v.hp,attack:v.attack,crew:100,initialCrew:100,capacity:100}));}
+export function bossUnits(b){const v=[{hp:220,attack:60,count:1},{hp:420,attack:115,count:2},{hp:600,attack:155,count:3},{hp:720,attack:200,count:5}][b.grade];return Array.from({length:v.count},(_,i)=>({id:b.id+'-boss-'+i,type:'boss',sprite:i&&b.boss==='captain'?'guard':i&&b.boss==='leviathan'?'tentacle':b.boss,name:i?(b.boss==='leviathan'?'Tentáculo '+i:b.boss==='golem'?'Sentinela '+i:'Guarda '+i):b.bossName,owner:'boss',level:b.level,hp:v.hp,maxHP:v.hp,attack:v.attack,crew:100,initialCrew:100,capacity:100}));}
 export function refreshBosses(w){for(const b of w.bosses||[])if(b.respawnAt&&b.respawnAt<=w.clock&&!w.encounters[b.id]){b.respawnAt=0;b.life++;}}
 export function report(w,p,type,title,details={}){if(!p)return null;p.reports??=[];p.reportSerial=(p.reportSerial||0)+1;const r={id:p.reportSerial,at:w.clock,type,title,...structuredClone(details)};p.reports.push(r);p.reports=p.reports.slice(-200);return r;}

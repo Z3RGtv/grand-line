@@ -1,6 +1,6 @@
-import{gameRunning}from'./game-session.mjs?v=0.25.1';
-import{workerState,workProgress}from'./workers.mjs?v=0.25.1';
-import{storageCapacity}from'./harbor.mjs?v=0.25.1';
+import{gameRunning}from'./game-session.mjs?v=0.26.0';
+import{workerState,workProgress}from'./workers.mjs?v=0.26.0';
+import{storageCapacity}from'./harbor.mjs?v=0.26.0';
 const clamp=n=>Math.max(0,Math.min(1,n));
 // Navigation lives in world.missions. The local queue contains jobs and paid resource shifts only.
 export function productionEntries(w,id,clock=w.clock){

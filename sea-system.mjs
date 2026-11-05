@@ -1,10 +1,10 @@
-import{battleParticipants}from'./battle-loadout.mjs?v=0.25.1';
-import{npcFlag,npcProfile}from'./npc-flags.mjs?v=0.25.1';
-import{seaRoute,routePoint,routeLength,coastPoint,waterPoint,waterCircle,clearLeg,nearestWater}from'./navigation.mjs?v=0.25.1';
+import{battleParticipants}from'./battle-loadout.mjs?v=0.26.0';
+import{npcFlag,npcProfile}from'./npc-flags.mjs?v=0.26.0';
+import{seaRoute,routePoint,routeLength,coastPoint,waterPoint,waterCircle,clearLeg,nearestWater}from'./navigation.mjs?v=0.26.0';
 
-import{MIN_CREW_PER_SHIP}from'./pace-rules.mjs?v=0.25.1';
+import{MIN_CREW_PER_SHIP}from'./pace-rules.mjs?v=0.26.0';
 export const NPC_MAX=8,NPC_MIN_SECONDS=840,NPC_MAX_SECONDS=1560,NAVAL_ROUND_SECONDS=12,NPC_LEVEL_RANGE=3;
-export const HULLS={pesqueiro:{hp:90,attack:42,capacity:20,cargo:20,slots:1},cargueiro:{hp:140,attack:46,capacity:60,cargo:350,slots:2},explorador:{hp:85,attack:52,capacity:15,cargo:30,slots:1},combate:{hp:170,attack:95,capacity:40,cargo:80,slots:4}};
+export const HULLS={pesqueiro:{hp:90,attack:12,capacity:20,cargo:20,slots:1},cargueiro:{hp:140,attack:20,capacity:60,cargo:350,slots:2},explorador:{hp:85,attack:26,capacity:15,cargo:30,slots:1},combate:{hp:260,attack:140,capacity:40,cargo:80,slots:4}};
 export const npcShipCount=w=>(w.bots||[]).reduce((n,b)=>n+Object.values(b.fleet||{}).reduce((a,v)=>a+v,0),0);
 export const resourceTotal=r=>Object.values(r||{}).reduce((a,b)=>a+b,0);
 export function seaFields(w){w.wrecks??=[];w.battleHistory??=[];w.seaVersion??=1;}
@@ -28,7 +28,12 @@ export function npcRoute(w,near,rng){const entrySide=Math.floor(rng()*4),exitSid
 export function makeNpcFleet(level,variant=.5){const cargo=variant<.35;return level<=2?{pesqueiro:1}:level<=4?cargo?{cargueiro:1}:{explorador:1,pesqueiro:1}:level<=7?cargo?{cargueiro:1,explorador:1}:{combate:1,explorador:1}:level<=10?cargo?{cargueiro:2,explorador:1}:{combate:1,explorador:1,cargueiro:1}:cargo?{cargueiro:2,explorador:1}:{combate:2,cargueiro:1};}
 export function navalUnits(fleet,troops,level,prefix,owner){const units=[];for(const[type,count]of Object.entries(fleet))for(let i=0;i<count;i++){const h=HULLS[type];if(!h)continue;units.push({id:prefix+'-'+type+'-'+i,type,owner,level,hp:Math.round(h.hp*(1+.025*(level-1))),maxHP:Math.round(h.hp*(1+.025*(level-1))),attack:Math.round(h.attack*(1+.035*(level-1))),capacity:h.capacity,crew:0,initialCrew:0});}const base=units.length?Math.min(MIN_CREW_PER_SHIP,Math.floor(troops/units.length)):0;let remaining=troops-base*units.length;for(let i=0;i<units.length;i++){const u=units[i],capacityAfter=units.slice(i).reduce((n,x)=>n+x.capacity-base,0),extra=i===units.length-1?remaining:Math.min(u.capacity-base,Math.round(remaining*(u.capacity-base)/capacityAfter));u.crew=u.initialCrew=base+extra;remaining-=extra;}return units;}
 export function rollNavalRound(attackers,defenders,rng,round=0,modifiers={}){const live=x=>x.filter(u=>u.hp>0),a=live(attackers),d=live(defenders),all=[...a,...d],rolls=all.map(u=>{const dice=[1+Math.floor(rng()*6),1+Math.floor(rng()*6)];return{unit:u.id,owner:u.owner,type:u.type,dice,total:dice[0]+dice[1]};}),byId=new Map(rolls.map(r=>[r.unit,r])),hits=[];const pending=new Map();
- for(const[own,enemies,side]of[[a,d,'attack'],[d,a,'defense']])for(let i=0;i<own.length&&enemies.length;i++){const u=own[i],target=enemies[(i+round)%enemies.length],r=byId.get(u.id),opposed=byId.get(target.id),difference=Math.max(0,r.total-opposed.total),percent=difference*10,synergy=side==='attack'?(modifiers.attack||0):(modifiers.defense||0),opponentBonus=side==='attack'?(modifiers.defense||0):(modifiers.attack||0),levelFactor=modifiers.bossLevel?(u.type==='boss'?Math.max(1,(modifiers.bossLevel+3)/((target.level||1)+3)):Math.min(1,((u.level||1)+3)/(modifiers.bossLevel+3))):1,damage=u.crew>0?Math.round(u.attack*(.6+.4*Math.min(1,u.crew/u.capacity))*percent/100*(1+synergy/100)/(1+opponentBonus/100)*levelFactor):0;hits.push({from:u.id,to:target.id,side,percent,damage});pending.set(target.id,(pending.get(target.id)||0)+damage);}
+ for(const[own,enemies,side]of[[a,d,'attack'],[d,a,'defense']])for(let i=0;i<own.length&&enemies.length;i++){const u=own[i],target=enemies[(i+round)%enemies.length],r=byId.get(u.id),opposed=byId.get(target.id),difference=Math.max(0,r.total-opposed.total),percent=difference*10,synergy=side==='attack'?(modifiers.attack||0):(modifiers.defense||0),opponentBonus=side==='attack'?(modifiers.defense||0):(modifiers.attack||0),levelFactor=modifiers.bossLevel?(u.type==='boss'?Math.max(1,(modifiers.bossLevel+3)/((target.level||1)+3)):Math.min(1,((u.level||1)+3)/(modifiers.bossLevel+3))):1,damage=u.crew>0?Math.round(u.attack*(.2+.8*Math.min(1,u.crew/u.capacity))*percent/100*(1+synergy/100)/(1+opponentBonus/100)*levelFactor):0;hits.push({from:u.id,to:target.id,side,percent,damage});pending.set(target.id,(pending.get(target.id)||0)+damage);}
+ // A telegraphed broadside every third boss round discourages fragile swarms.
+ if(modifiers.bossLevel>=6&&round%3===2)for(const u of d.filter(u=>u.type==='boss'&&u.crew>0)){
+  const r=byId.get(u.id);for(let i=0;i<Math.min(5,a.length);i++){const target=a[(round+i+d.indexOf(u)*5)%a.length],damage=Math.round(u.attack*.12*(target.type==='combate'?1:1.6)*(r.total/7)*Math.max(1,(modifiers.bossLevel+3)/(target.level+3)));
+   hits.push({from:u.id,to:target.id,side:'defense',percent:12,damage,area:true});pending.set(target.id,(pending.get(target.id)||0)+damage);}
+ }
  for(const u of all){u.hp=Math.max(0,u.hp-(pending.get(u.id)||0));u.crew=Math.min(u.crew,Math.max(0,Math.floor(u.initialCrew*u.hp/u.maxHP)));}
  return{round:round+1,synergy:{attack:modifiers.attack||0,defense:modifiers.defense||0},rolls,hits,attackHP:a.reduce((n,u)=>n+u.hp,0),defenseHP:d.reduce((n,u)=>n+u.hp,0)};
 }

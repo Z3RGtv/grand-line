@@ -2,7 +2,7 @@ export const BUILDING_CAPS={sede:12,serraria:12,pedreira:12,armazem:12,estaleiro
 export const academyAtHeadquarters=n=>Math.min(4,Math.floor(n/3));
 export const maxBuildingLevel=key=>BUILDING_CAPS[key]||12;
 export const buildingTier=(key,level)=>key==='academia'?Math.min(3,Math.max(1,level)):Math.min(3,Math.ceil(Math.max(1,level)/4));
-export const jobLane=action=>action==='pesquisa'?'academia':['tropas','trabalhadores'].includes(action)?'sede':action==='navios'?'estaleiro':action==='pescar'?'pesca':'obras';
+export const jobLane=action=>action.startsWith('recuperar')?'recuperacao':action==='pesquisa'?'academia':['tropas','trabalhadores'].includes(action)?'sede':action==='navios'?'estaleiro':action==='pescar'?'pesca':'obras';
 export function queueDelay(w,id,action){return Math.max(0,...(w.jobs||[]).filter(j=>j.user===id&&jobLane(j.action)===jobLane(action)).map(j=>j.end-w.clock));}
 export function researchSpec(key,level){
  if(!['navegacao','logistica','artilharia'].includes(key)||!Number.isInteger(level)||level<1||level>4)return null;
