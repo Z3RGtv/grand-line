@@ -1,9 +1,9 @@
-import{coinIcon}from'./wallet-view.mjs?v=0.26.0';
-import{EXCLUSIVE_ITEMS}from'./equipment.mjs?v=0.26.0';
-import{FRAGMENTS_REQUIRED}from'./balance-policy.mjs?v=0.26.0';
-import{EQUIPMENT_SLOTS,ITEM_TYPES,ITEM_SETS,RARITIES,MAX_EQUIPPED,equippedItems,equipmentSets,itemName,itemArt,dismantleYield}from'./equipment.mjs?v=0.26.0';
-import{inventoryExpansion}from'./inventory-capacity.mjs?v=0.26.0';
-import{createEquipmentDraft,draftChanged}from'./equipment-draft.mjs?v=0.26.0&rev=inventory1';
+import{coinIcon}from'./wallet-view.mjs?v=0.26.1';
+import{EXCLUSIVE_ITEMS}from'./equipment.mjs?v=0.26.1';
+import{FRAGMENTS_REQUIRED}from'./balance-policy.mjs?v=0.26.1';
+import{EQUIPMENT_SLOTS,ITEM_TYPES,ITEM_SETS,RARITIES,MAX_EQUIPPED,equippedItems,equipmentSets,itemName,itemArt,dismantleYield}from'./equipment.mjs?v=0.26.1';
+import{inventoryExpansion}from'./inventory-capacity.mjs?v=0.26.1';
+import{createEquipmentDraft,draftChanged}from'./equipment-draft.mjs?v=0.26.1&rev=inventory1';
 const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const image=i=>'<button class="item-art-button" data-item-id="'+esc(i.id)+'" aria-label="Ver '+esc(itemName(i))+'"><img class="equipment-art" src="'+itemArt(i)+'" alt=""></button>';
 
@@ -53,7 +53,7 @@ export function inventoryView(p, selection=new Set(), {draft=createEquipmentDraf
  const plusTile = expansion.max ? '' : `<button class="equipment-vacancy inventory-add" data-inventory-expansion="1" aria-label="Expandir inventário">
   <span aria-hidden="true">+</span>${expansion.paid ? `<small>${expansion.paid}/${expansion.required}</small>` : ''}
  </button>`;
- const dismantle = bag.filter(item => !savedIds.includes(item.id) && !ITEM_TYPES[item.type].unique);
+ const dismantle = [...bag,...(p.lootStash||[])].filter(item => !savedIds.includes(item.id) && !ITEM_TYPES[item.type].unique);
  const selected = dismantle.filter(item => selection.has(item.id));
  const yieldTotal = selected.reduce((total,item) => {
   const resources = dismantleYield(item);
@@ -75,7 +75,7 @@ export function inventoryView(p, selection=new Set(), {draft=createEquipmentDraf
    <div class="equipment-bag">${tiles}${emptyTiles}${plusTile}</div>
    ${p.pendingUniqueItem ? '<p class="inventory-full">Uma relíquia única aguarda um lugar livre.</p>' : ''}
    ${bag.length>=expansion.capacity?'<small class="inventory-full">Inventário cheio</small>':''}
-   ${pendingLootView(p)}
+   ${pendingLootView(p,selection)}
    ${selected.length ? `<div class="dismantle-panel"><span>+${yieldTotal.wood} madeira · +${yieldTotal.stone} pedra</span>
     <button data-dismantle="1">Desmontar ${selected.length} · 100 moedas</button>
     <button data-clear-salvage="1">Limpar seleção</button>
@@ -172,7 +172,7 @@ export function bindEquipmentDrag(panel, {canEdit,onEquip,onInvalid}) {
  return {get active(){return !!drag;},cancel};
 }
 
-export function pendingLootView(p){
+export function pendingLootView(p,selection=new Set()){
  const stash=p.lootStash||[],fragments=Object.entries(EXCLUSIVE_ITEMS).filter(([,boss])=>(p.fragments?.[boss]||0)>0);
- return (stash.length?'<h3>Espólio <small>'+stash.length+'</small></h3><div class="pending-loot-grid">'+stash.map(i=>'<button data-claim-loot="'+esc(i.id)+'" title="Recolher '+esc(itemName(i))+' · 100 moedas" aria-label="Recolher '+esc(itemName(i))+' por 100 moedas"><img src="'+itemArt(i)+'" alt=""><span class="loot-price">'+coinIcon()+'100</span></button>').join('')+'</div>':'')+(fragments.length?'<h3>Fragmentos</h3><div class="pending-loot-grid">'+fragments.map(([type,boss])=>'<button data-craft-boss="'+boss+'" title="Criar '+esc(ITEM_TYPES[type].name)+' raro · 10 fragmentos e 100 moedas" aria-label="Criar '+esc(ITEM_TYPES[type].name)+' raro por 10 fragmentos e 100 moedas"><img src="'+itemArt({type})+'" alt=""><span>'+p.fragments[boss]+'/'+FRAGMENTS_REQUIRED+'</span><span class="loot-price">'+coinIcon()+'100</span></button>').join('')+'</div>':'');
+ return (stash.length?'<h3>Espólio <small>'+stash.length+'</small></h3><div class="pending-loot-grid">'+stash.map(i=>'<article class="pending-loot-item '+(selection.has(i.id)?'salvage-marked':'')+'"><button data-item-id="'+esc(i.id)+'" title="Ver '+esc(itemName(i))+'" aria-label="Ver '+esc(itemName(i))+'"><img src="'+itemArt(i)+'" alt=""></button><button data-claim-loot="'+esc(i.id)+'" title="Recolher '+esc(itemName(i))+' · 100 moedas" aria-label="Recolher '+esc(itemName(i))+' por 100 moedas"><span class="loot-price">↓ '+coinIcon()+'100</span></button></article>').join('')+'</div>':'')+(fragments.length?'<h3>Fragmentos</h3><div class="pending-loot-grid">'+fragments.map(([type,boss])=>'<button data-craft-boss="'+boss+'" title="Criar '+esc(ITEM_TYPES[type].name)+' raro · 10 fragmentos e 100 moedas" aria-label="Criar '+esc(ITEM_TYPES[type].name)+' raro por 10 fragmentos e 100 moedas"><img src="'+itemArt({type})+'" alt=""><span>'+p.fragments[boss]+'/'+FRAGMENTS_REQUIRED+'</span><span class="loot-price">'+coinIcon()+'100</span></button>').join('')+'</div>':'');
 }

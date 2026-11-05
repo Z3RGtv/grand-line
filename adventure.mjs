@@ -1,3 +1,4 @@
+import{bossParty,partyAllows}from'./boss-party.mjs?v=0.26.1';
 export const BOSS_SITES=[
 {id:'I-CORAL',name:'Recife Escarlate',boss:'crab',bossName:'Pinça Rubra',level:3,x:.20,y:.17,width:155,rx:.027,ry:.028,respawn:7200,grade:0,lootSet:'brisa'},
 {id:'I-GARRA',name:'Ilhéu das Garras',boss:'crab',bossName:'Casco de Coral',level:3,x:.30,y:.57,width:155,rx:.027,ry:.028,respawn:7200,grade:0,lootSet:'corsario'},
@@ -27,6 +28,9 @@ export function maxedCaptain(p){return !!p&&['sede','serraria','pedreira','armaz
 export function bossAccess(w,p,b,{arrival=false}={}){
 if(!p)return{ok:false,label:'Cria a ilha',kind:'blocked'};
 if(!arrival&&!w.live)return{ok:false,label:'Durante a live',kind:'blocked'};
+const minimum=b?.final?10:Math.max(1,(b?.level||1)-3);
+if(p.levels.sede<minimum)return{ok:false,label:'Requer N'+minimum,kind:'blocked'};
+if(!partyAllows(bossParty(w,b.id),p.id))return{ok:false,label:'Grupo por convite',kind:'blocked'};
 if(b?.final){
  if(p.levels.sede<10)return{ok:false,label:'Requer N10',kind:'blocked'};
  if(!(p.bossWins?.some(id=>BOSS_SITES.some(site=>site.id===id&&site.level===9))))return{ok:false,label:'Vence uma ilha N9',kind:'blocked'};
@@ -37,7 +41,8 @@ if(w.encounters?.[b.id]?.phase==='loot')return{ok:false,label:'Saque em curso',k
 const delta=b.level-p.levels.sede;return{ok:true,label:delta>=3?'Desafio difícil':delta>0?'Desafio':'Atacar',kind:delta>0?'hard':'ok'};
 }
 export function bossFormation(w,e,ms){const users=new Set(ms.filter(m=>m.troops>0&&Object.values(m.fleet).some(n=>n>0)).map(m=>m.user));if(!(users.size>0&&users.size<=3))return false;
- if(!w.bosses?.find(b=>b.id===e.target)?.final)return true;
+ const site=w.bosses?.find(b=>b.id===e.target);if(!site||![...users].every(id=>w.players[id]?.levels.sede>=(site.final?10:Math.max(1,site.level-3))&&partyAllows(e.bossParty||bossParty(w,e.target),id)))return false;
+ if(!site.final)return true;
  const party=[...users].map(id=>w.players[id]);return party.every(p=>p?.levels.sede>=10&&p.bossWins?.some(id=>BOSS_SITES.some(b=>b.id===id&&b.level===9)))&&party.some(p=>p.levels.sede>=12);}
 
 export function bossUnits(b){const v=[{hp:220,attack:60,count:1},{hp:420,attack:115,count:2},{hp:600,attack:155,count:3},{hp:720,attack:200,count:5}][b.grade];return Array.from({length:v.count},(_,i)=>({id:b.id+'-boss-'+i,type:'boss',sprite:i&&b.boss==='captain'?'guard':i&&b.boss==='leviathan'?'tentacle':b.boss,name:i?(b.boss==='leviathan'?'Tentáculo '+i:b.boss==='golem'?'Sentinela '+i:'Guarda '+i):b.bossName,owner:'boss',level:b.level,hp:v.hp,maxHP:v.hp,attack:v.attack,crew:100,initialCrew:100,capacity:100}));}
