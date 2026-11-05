@@ -21,7 +21,7 @@ export function walletOrderMessage(message, budget) {
   : 'Esta ação excede o teu limite de gasto.';
 }
 
-export function entryWalletView({balance, cost, paid, canLoad, pack, demo}) {
+export function entryWalletView({balance, cost, paid, canLoad, pack, demo, welcome=false}) {
  const needsCoins = !paid && balance < cost;
  let funding = '<span class="entry-availability">Só durante a transmissão</span>';
  if (demo) {
@@ -33,6 +33,7 @@ export function entryWalletView({balance, cost, paid, canLoad, pack, demo}) {
   <div>
    <h2>Criar a tua ilha</h2>
    <p class="entry-balance">${coinIcon()} <span>Saldo</span> <strong>${num(balance)} moedas</strong></p>
+   ${welcome ? '<small class="entry-availability">Inclui 500 moedas de boas-vindas</small>' : ''}
    ${needsCoins ? `<div class="entry-step" id="entry-funding" tabindex="-1">
     <b aria-hidden="true">1</b><div><strong>Grand Line · Moedas</strong><small>${num(pack)} pontos → ${num(pack)} moedas</small></div>${funding}
    </div>` : ''}
@@ -61,7 +62,9 @@ export function walletView(wallet, {demo=false, readOnly=false, canLoad=true, pa
   ${!readOnly && !wallet.offline ? '<button class="primary wide" data-wallet-retry="1">Verificar / reenviar a mesma ordem</button>' : '<small>Verifica quando o servidor voltar.</small>'}
  </section>` : '';
  const moves = (wallet.transactions || []).map(t => {
-  const label = t.kind === 'credit' ? 'Carregamento' : t.request?.kind === 'entrar' ? 'Criar ilha' : labels[t.request?.action] || 'Ação';
+  const label = t.kind === 'credit'
+   ? ({welcome:'Bónus de boas-vindas','reset-refund':'Devolução do reset'}[t.request?.kind]||'Carregamento')
+   : t.request?.kind === 'entrar' ? 'Criar ilha' : labels[t.request?.action] || 'Ação';
   const date = new Date(t.created).toLocaleString('pt-PT', {day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
   return `<div><span><b>${esc(label)}</b><small>${date}</small></span>
    <strong class="${t.delta > 0 ? 'credit' : 'debit'}">${t.delta > 0 ? '+' : '−'}${num(Math.abs(t.delta))}</strong></div>`;
