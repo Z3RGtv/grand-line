@@ -33,3 +33,61 @@
 .purchase-inline{display:none}.game-shell.inspector-open>#purchase-status{display:none}.game-shell.inspector-open .purchase-inline:not([hidden]){display:flex;margin:10px 12px}.purchase-inline strong{font-size:15px}.purchase-inline small{font-size:13px}.purchase-inline button{padding:7px;font-size:12px}
 .game-shell.inspector-open .purchase-inline:not([hidden]){position:sticky;top:58px;z-index:29;box-shadow:0 3px 12px #172a3855}
 .purchase-feedback-open .mission-cue-pointer{display:none!important}
+
+.entry-port > div {
+  width: min(100%, 470px);
+}
+.entry-port .entry-balance {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 12px 0 20px;
+}
+.entry-balance .coin-icon {
+  width: 26px;
+  height: 26px;
+}
+.entry-balance strong {
+  color: #f0d288;
+}
+.entry-step {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 0;
+  border-top: 1px solid #b9a06b63;
+}
+.entry-step > b {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border: 1px solid #b9a06b;
+  border-radius: 50%;
+  color: #f0d288;
+}
+.entry-step small {
+  display: block;
+  margin-top: 3px;
+  color: #cbd4ca;
+}
+.entry-step .primary, .entry-step .entry-create {
+  min-height: 42px;
+  padding: 9px 13px;
+  font: inherit;
+  text-decoration: none;
+}
+.entry-step a.primary {
+  display: inline-flex;
+  align-items: center;
+}
+.entry-availability {
+  color: #cbd4ca;
+  font-size: .9em;
+}
+.entry-step:focus, .entry-step [data-entry-load]:focus {
+  outline: 2px solid #f0d288;
+  outline-offset: 3px;
+}

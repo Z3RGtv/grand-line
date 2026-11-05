@@ -1,5 +1,29 @@
 const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 export const coinIcon=()=>'<svg class="coin-icon" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="14" fill="#c18b2b" stroke="#f5d982" stroke-width="2"/><circle cx="16" cy="16" r="10.5" fill="#e4b54d" stroke="#92601f"/><path d="M16 11v13m-6-8H7c0 5 4 8 9 8s9-3 9-8h-3M12 15h8" fill="none" stroke="#704a1d" stroke-width="2.3" stroke-linecap="round"/><circle cx="16" cy="8" r="2.5" fill="none" stroke="#704a1d" stroke-width="2"/></svg>';
+
+export function entryWalletView({balance, cost, paid, canLoad, pack, demo}) {
+ const num = value => value.toLocaleString('pt-PT');
+ const needsCoins = !paid && balance < cost;
+ let funding = '<span class="entry-availability">Durante a stream</span>';
+ if (demo) {
+  funding = '<button class="primary" data-wallet-open="1" data-entry-load>Carregar carteira</button>';
+ } else if (canLoad) {
+  funding = '<a class="primary" href="https://www.twitch.tv/z3rgtv" target="_blank" rel="noopener" data-entry-load>Resgatar na Twitch ↗</a>';
+ }
+ return `<section class="welcome-port entry-port">
+  <div>
+   <h2>Criar a tua ilha</h2>
+   <p class="entry-balance">${coinIcon()} <span>Saldo</span> <strong>${num(balance)} moedas</strong></p>
+   ${needsCoins ? `<div class="entry-step" id="entry-funding" tabindex="-1">
+    <b aria-hidden="true">1</b><div><strong>Grand Line · Moedas</strong><small>${num(pack)} pontos → ${num(pack)} moedas</small></div>${funding}
+   </div>` : ''}
+   <div class="entry-step">
+    ${needsCoins ? '<b aria-hidden="true">2</b>' : ''}
+    <button class="${needsCoins ? 'entry-create' : 'primary'}" data-action="found">Criar ilha${paid ? '' : ' · '+num(cost)+' moedas'}</button>
+   </div>
+  </div>
+ </section>`;
+}
 const labels={trabalhar:'Produção',produzir:'Produção',edificio:'Edifício',navios:'Barcos',trabalhadores:'Trabalhadores',tropas:'Marinheiros',pesquisa:'Pesquisa',pescar:'Pesca',enviar:'Expedição',guarnicao:'Defesa',bandeira:'Bandeira',equipar:'Equipamento',desmontar:'Desmontar itens','ampliar-inventario':'Inventário',regressar:'Regresso ao mapa',criar:'Aliança',sair:'Aliança'};
 export function walletView(wallet,{demo=false,readOnly=false,canLoad=true,pack=500}={}){
  const num=n=>Number(n||0).toLocaleString('pt-PT');
