@@ -11,7 +11,7 @@
     "gestao": 100
   },
   "launchEnabled": true,
-  "apiOrigin": "https://accounting-bottles-composed-salvador.trycloudflare.com",
+  "apiOrigin": "https://virtual-phillips-bridge-rhode.trycloudflare.com",
   "paymentMode": "wallet",
   "coinPack": 500
 }
