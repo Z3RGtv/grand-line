@@ -1,5 +1,5 @@
-import{equippedItems,validItem,EQUIPMENT_CAPS}from'./equipment.mjs?v=0.27.0';
-import{defaultFlag}from'./flags.mjs?v=0.27.0';
+import{equippedItems,validItem,EQUIPMENT_CAPS}from'./equipment.mjs?v=0.27.1';
+import{defaultFlag}from'./flags.mjs?v=0.27.1';
 export function combatLoadout(p){return equippedItems(p).map(({type,rarity,value,displayName})=>({type,rarity,value,...(displayName?{displayName}:{})}));}
 const items=list=>(list||[]).filter(validItem).slice(0,4).map(({type,rarity,value,displayName})=>({type,rarity,value,...(displayName?{displayName}:{})}));
 const stats=gear=>Object.fromEntries(Object.entries(EQUIPMENT_CAPS).map(([key,cap])=>[key,Math.min(cap,Math.max(0,Number(gear?.[key])||0))]));

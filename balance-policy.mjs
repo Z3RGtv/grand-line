@@ -1,5 +1,5 @@
 // Prices are server-authoritative; channel-point loads remain 500 for 500 coins.
-export const BALANCE_RELEASE='0.27.0';
+export const BALANCE_RELEASE='0.27.1';
 export const WORK_PRICE=90;
 export function actionPrice(kind,action,v={}){
  if(kind==='gestao'&&['trabalhar','produzir'].includes(action)&&v.redistribution)return 0;

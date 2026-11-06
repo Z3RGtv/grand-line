@@ -1,4 +1,4 @@
-import{bossParty,partyAllows}from'./boss-party.mjs?v=0.27.0';
+import{bossParty,partyAllows}from'./boss-party.mjs?v=0.27.1';
 export const BOSS_SITES=[
 {id:'I-CORAL',name:'Recife Escarlate',boss:'crab',bossName:'Pinça Rubra',level:3,x:.20,y:.17,width:155,rx:.027,ry:.028,respawn:7200,grade:0,lootSet:'brisa'},
 {id:'I-GARRA',name:'Ilhéu das Garras',boss:'crab',bossName:'Casco de Coral',level:3,x:.30,y:.57,width:155,rx:.027,ry:.028,respawn:7200,grade:0,lootSet:'corsario'},

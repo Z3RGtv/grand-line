@@ -1,5 +1,5 @@
-import{civilianCount,populationCapacity}from'./population.mjs?v=0.27.0';
-import{productionBatch,storageCapacityAt}from'./economy.mjs?v=0.27.0';
+import{civilianCount,populationCapacity}from'./population.mjs?v=0.27.1';
+import{productionBatch,storageCapacityAt}from'./economy.mjs?v=0.27.1';
 export const WORKER_POOL=20; // Starting civilians; separate from sailors.
 export const WORK_SHIFT_SECONDS=15*60;
 export const PRODUCTION_MODEL='batches-v2';

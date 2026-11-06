@@ -1,30 +1,30 @@
-import{actionPrice,RECOVERY_SECONDS,RECOVERY_RATE,STASH_LIMIT,FRAGMENTS_REQUIRED}from'./balance-policy.mjs?v=0.27.0';
-import{EXCLUSIVE_ITEMS}from'./loot-tables.mjs?v=0.27.0';
-import{gameRunning,combatWindow,noteAttack,sessionProtected}from'./game-session.mjs?v=0.27.0';
-import{walletState}from'./wallet-state.mjs?v=0.27.0';
-import{rollFinalReward,finalSecretSlots,publicFinalDiscoveries}from'./final-rewards.mjs?v=0.27.0';
-import{inventoryCapacity,inventoryExpansion,expansionOrder}from'./inventory-capacity.mjs?v=0.27.0';
-import{DAILY_GAME_LIMIT,GAME_BUDGET_CAP,spendingBudget,syncAllowance,startAllowance,chargeAllowance,validateAllowance,allowanceDay,migrateStreamAllowance,registerStreamAllowance}from'./spending-budget.mjs?v=0.27.0';
-export{DAILY_GAME_LIMIT,GAME_BUDGET_CAP,spendingBudget}from'./spending-budget.mjs?v=0.27.0';
-import{combatLoadout,battleParticipants}from'./battle-loadout.mjs?v=0.27.0';
-import{assertParticipation,sidePlayers,MAX_BATTLE_PLAYERS}from'./combat-party.mjs?v=0.27.0';
-import{bossParty,bossPartyOrder}from'./boss-party.mjs?v=0.27.0';
-import{ensureAdventure,bossAlive,bossAccess,bossUnits,bossFormation,refreshBosses,report}from'./adventure.mjs?v=0.27.0';
-import{equipmentOrder,equipmentBonuses,equipmentTypes,partySynergy,applyFleetEquipment,rollItem,dismantleYield,itemName}from'./equipment.mjs?v=0.27.0';
-import{npcFlag,npcProfile,standardizeNpcFlags}from'./npc-flags.mjs?v=0.27.0';
+import{actionPrice,RECOVERY_SECONDS,RECOVERY_RATE,STASH_LIMIT,FRAGMENTS_REQUIRED}from'./balance-policy.mjs?v=0.27.1';
+import{EXCLUSIVE_ITEMS}from'./loot-tables.mjs?v=0.27.1';
+import{gameRunning,combatWindow,noteAttack,sessionProtected}from'./game-session.mjs?v=0.27.1';
+import{walletState}from'./wallet-state.mjs?v=0.27.1';
+import{rollFinalReward,finalSecretSlots,publicFinalDiscoveries}from'./final-rewards.mjs?v=0.27.1';
+import{inventoryCapacity,inventoryExpansion,expansionOrder}from'./inventory-capacity.mjs?v=0.27.1';
+import{DAILY_GAME_LIMIT,GAME_BUDGET_CAP,spendingBudget,syncAllowance,startAllowance,chargeAllowance,validateAllowance,allowanceDay,migrateStreamAllowance,registerStreamAllowance}from'./spending-budget.mjs?v=0.27.1';
+export{DAILY_GAME_LIMIT,GAME_BUDGET_CAP,spendingBudget}from'./spending-budget.mjs?v=0.27.1';
+import{combatLoadout,battleParticipants}from'./battle-loadout.mjs?v=0.27.1';
+import{assertParticipation,sidePlayers,MAX_BATTLE_PLAYERS}from'./combat-party.mjs?v=0.27.1';
+import{bossParty,bossPartyOrder}from'./boss-party.mjs?v=0.27.1';
+import{ensureAdventure,bossAlive,bossAccess,bossUnits,bossFormation,refreshBosses,report}from'./adventure.mjs?v=0.27.1';
+import{equipmentOrder,equipmentBonuses,equipmentTypes,partySynergy,applyFleetEquipment,rollItem,dismantleYield,itemName}from'./equipment.mjs?v=0.27.1';
+import{npcFlag,npcProfile,standardizeNpcFlags}from'./npc-flags.mjs?v=0.27.1';
 import{emitActivity}from'./activity-hooks.mjs';
-import{ECONOMY_VERSION,INITIAL_RESOURCES,buildingCost,requiredWarehouse}from'./economy.mjs?v=0.27.0';
-import{hasWall,storageCapacity,sailorState,defendingTroops,migrateHarbor}from'./harbor.mjs?v=0.27.0';
-import{defaultFlag,normalizeFlag}from'./flags.mjs?v=0.27.0';
-import{NPC_MAX,NPC_LEVEL_RANGE,NAVAL_ROUND_SECONDS,npcShipCount,seaFields,npcRoute,makeNpcFleet,navalUnits,rollNavalRound,distributeSeaLoot,createWreck,battleSnapshot,npcAccess,botPoint,interceptionPoint,fleetPoint,wreckPoint,routeLootBonus,resourceTotal}from'./sea-system.mjs?v=0.27.0';
-import{recordOrder,recordReturn,recordJobCompletion}from'./onboarding.mjs?v=0.27.0';
-import {DEFAULT_SLOTS,waterPoint,seaRoute,routePoint,routeLength,harbor,coastPoint,nearestWater} from './navigation.mjs?v=0.27.0';
-import {WORKER_POOL,WORK_SHIFT_SECONDS,PRODUCTION_MODEL,workerCount,workerCapacity,workerState,workOrder,productionBetween} from './workers.mjs?v=0.27.0';
-export {WORKER_POOL,WORK_SHIFT_SECONDS,workerState} from './workers.mjs?v=0.27.0';
-import{populationState}from'./population.mjs?v=0.27.0';
-import{MAX_LEVEL,MAX_RESEARCH_LEVEL,buildingSeconds,maxBuildingLevel,queueDelay,researchSpec}from'./progression.mjs?v=0.27.0';
-export{maxBuildingLevel,queueDelay}from'./progression.mjs?v=0.27.0';
-import{MIN_CREW_PER_SHIP,PERMIT_BANK_MAX,PERMIT_DAILY_MAX,PERMIT_RECHARGE,PERMIT_CATCHUP_RECHARGE,PERMIT_CATCHUP_GAP,licenseCost,plannedWarehouse,spawnAnchor}from'./pace-rules.mjs?v=0.27.0';
+import{ECONOMY_VERSION,INITIAL_RESOURCES,buildingCost,requiredWarehouse}from'./economy.mjs?v=0.27.1';
+import{hasWall,storageCapacity,sailorState,defendingTroops,migrateHarbor}from'./harbor.mjs?v=0.27.1';
+import{defaultFlag,normalizeFlag}from'./flags.mjs?v=0.27.1';
+import{NPC_MAX,NPC_LEVEL_RANGE,NAVAL_ROUND_SECONDS,npcShipCount,seaFields,npcRoute,makeNpcFleet,navalUnits,rollNavalRound,distributeSeaLoot,createWreck,battleSnapshot,npcAccess,botPoint,interceptionPoint,fleetPoint,wreckPoint,routeLootBonus,resourceTotal}from'./sea-system.mjs?v=0.27.1';
+import{recordOrder,recordReturn,recordJobCompletion}from'./onboarding.mjs?v=0.27.1';
+import {DEFAULT_SLOTS,waterPoint,seaRoute,routePoint,routeLength,harbor,coastPoint,nearestWater} from './navigation.mjs?v=0.27.1';
+import {WORKER_POOL,WORK_SHIFT_SECONDS,PRODUCTION_MODEL,workerCount,workerCapacity,workerState,workOrder,productionBetween} from './workers.mjs?v=0.27.1';
+export {WORKER_POOL,WORK_SHIFT_SECONDS,workerState} from './workers.mjs?v=0.27.1';
+import{populationState}from'./population.mjs?v=0.27.1';
+import{MAX_LEVEL,MAX_RESEARCH_LEVEL,buildingSeconds,maxBuildingLevel,queueDelay,researchSpec}from'./progression.mjs?v=0.27.1';
+export{maxBuildingLevel,queueDelay}from'./progression.mjs?v=0.27.1';
+import{MIN_CREW_PER_SHIP,PERMIT_BANK_MAX,PERMIT_DAILY_MAX,PERMIT_RECHARGE,PERMIT_CATCHUP_RECHARGE,PERMIT_CATCHUP_GAP,licenseCost,plannedWarehouse,spawnAnchor}from'./pace-rules.mjs?v=0.27.1';
 export const BUILDINGS=['sede','serraria','pedreira','armazem','estaleiro','muralha','academia'];
 export const SHIPS={pesqueiro:{wood:80,stone:20,minutes:5,slots:1,capacity:20,cargo:20,speed:1},cargueiro:{wood:120,stone:60,minutes:7,slots:2,capacity:60,cargo:350,speed:.85},explorador:{wood:100,stone:40,minutes:6,slots:1,capacity:15,cargo:30,speed:1.35},combate:{wood:180,stone:120,minutes:10,slots:4,capacity:40,cargo:80,speed:1}};
 export const SHIP_UNLOCKS={pesqueiro:1,cargueiro:1,explorador:5,combate:8};
@@ -108,7 +108,7 @@ export function quote(w,id,request){ensureAdventure(w);const p=w.players[id];con
   if(t.type==='bot'){const b=w.bots.find(b=>b.id===t.id),intercept=interceptNpc(w,p,b,v.fleet);ok(!intercept.mayEscape,'Este corsário sai antes da chegada da tua frota. Escolhe outro alvo.');destination=intercept.destination;q.seconds=intercept.seconds;v.mayEscape=false;}
   if(t.type==='bot'){const b=w.bots.find(b=>b.id===t.id);v.targetExpires=b.end;v.mayEscape=!!v.mayEscape||w.clock+q.seconds>=b.end;}if(t.type==='wreck'){const r=w.wrecks.find(r=>r.id===t.id);destination=wreckPoint(w,r,w.clock+q.seconds);v.targetExpires=r.end;v.mayEscape=w.clock+q.seconds+90>=r.end;ok(!v.mayEscape,'Os destroços desaparecem antes de conseguires recolher. Escolhe outro alvo.');}v.destination=nearestWater(w.slots,destination);v.route=seaRoute(w.slots,home(w,p),v.destination);q.description=`Navegar para ${t.name}`;q.role=choice.role;if(t.type==='player')q.description=(q.role==='defesa'?'Defender ':'Atacar ')+t.name;
  }
- q.cost=actionPrice(kind,q.action,v);ok(spendingBudget(w,p).remaining>=q.cost,'Limite disponível insuficiente: +4.000 por stream, até 7.000.');return q;
+ q.cost=actionPrice(kind,q.action,v);ok(spendingBudget(w,p).remaining>=q.cost,'Limite disponível insuficiente: +4.000 por stream, até 8.000.');return q;
 }
 function fleetSlots(p){return Object.entries(p.fleet).reduce((n,[k,v])=>n+SHIPS[k].slots*v,0)+Object.values(p.reserved||{}).reduce((n,v)=>n+v,0);}
 export function execute(w,id,name,request,wall=Date.now()){

@@ -1,4 +1,4 @@
-import{allowanceDay}from'./spending-budget.mjs?v=0.27.0';
+import{allowanceDay}from'./spending-budget.mjs?v=0.27.1';
 let secrets=[],ledger={hasUnique:()=>false,hasDaily:()=>false};
 export function configureFinalCatalog(catalog){secrets=catalog.map(v=>Object.freeze({...v}));}
 export function configureFinalLedger(value){ledger=value;}
