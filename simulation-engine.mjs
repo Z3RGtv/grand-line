@@ -15,7 +15,7 @@ import{npcFlag,npcProfile,standardizeNpcFlags}from'./npc-flags.mjs?v=0.27.2';
 import{emitActivity}from'./activity-hooks.mjs';
 import{ECONOMY_VERSION,INITIAL_RESOURCES,buildingCost,requiredWarehouse}from'./economy.mjs?v=0.27.2';
 import{hasWall,storageCapacity,sailorState,defendingTroops,migrateHarbor}from'./harbor.mjs?v=0.27.2';
-import{defaultFlag,normalizeFlag}from'./flags.mjs?v=0.27.2';
+import{defaultFlag,normalizeFlag,sameFlag}from'./flags.mjs?v=0.27.2&rev=flag3';
 import{NPC_MAX,NPC_LEVEL_RANGE,NAVAL_ROUND_SECONDS,npcShipCount,seaFields,npcRoute,makeNpcFleet,navalUnits,rollNavalRound,distributeSeaLoot,createWreck,battleSnapshot,npcAccess,botPoint,interceptionPoint,fleetPoint,wreckPoint,routeLootBonus,resourceTotal,wreckSalvagePlan}from'./sea-system.mjs?v=0.27.2';
 import{recordOrder,recordReturn,recordJobCompletion}from'./onboarding.mjs?v=0.27.2';
 import {DEFAULT_SLOTS,waterPoint,seaRoute,routePoint,routeLength,harbor,coastPoint,nearestWater} from './navigation.mjs?v=0.27.2';
@@ -92,7 +92,7 @@ export function quote(w,id,request){ensureAdventure(w);const p=w.players[id];con
   else
   if(['equipar','desmontar'].includes(q.action)){if(q.action==='equipar')ok(!w.missions.some(m=>m.user===id)&&!w.encounters[id],'Espera pelo regresso das frotas ou pelo fim da defesa para mudar o equipamento.');Object.assign(v,equipmentOrder(p,q.action,v));q.description=q.action==='equipar'?'Atualizar equipamento':'Desmontar '+v.items.length+' itens';}
   else if(q.action==='ampliar-inventario'){const expansion=expansionOrder(p,v);Object.assign(v,expansion);q.description=expansion.complete?'Inventário ampliado para '+expansion.capacity+' lugares.':'Expansão do inventário: '+expansion.paid+'/'+expansion.required+' resgates.';}
-  else if(q.action==='bandeira'){v.flag=normalizeFlag(v.flag,{strict:true});q.description='Atualizar a bandeira da tua ilha';}
+  else if(q.action==='bandeira'){v.flag=normalizeFlag(v.flag,{strict:true});ok(!sameFlag(p.flag??defaultFlag(id),v.flag),'A bandeira já está assim.');q.description='Atualizar a bandeira da tua ilha';}
   else if(q.action==='regressar'){ok(p.hibernating,'A tua ilha já está ativa.');v.slot=allocSlot(w,level(p));q.description='Regressar ao mapa com a ilha e o progresso guardados';}
   else if(q.action==='guarnicao'||q.action==='libertar-guarnicao'){
    ok(hasWall(p),'Constrói a muralha N2 antes de atribuir defensores.');

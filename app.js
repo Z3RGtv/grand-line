@@ -31,7 +31,7 @@ import{battleView,resolveBattle,seaMarkers,accessBadge}from'./naval-view.mjs?v=0
 import{islandArt,buildingArt,wallTier,WALL_NAMES}from'./island-art.mjs?v=0.27.2';
 import{missionProgress,missionWait}from'./onboarding.mjs?v=0.27.2';
 
-import {quote as quoteRule,SHIPS as SHIP_RULES,SHIP_UNLOCKS,fishingOrder} from './rules.mjs?v=0.27.2&rev=guard1';
+import {quote as quoteRule,SHIPS as SHIP_RULES,SHIP_UNLOCKS,fishingOrder} from './rules.mjs?v=0.27.2&rev=flag3';
 import {routePoint,waterPoint} from './navigation.mjs?v=0.27.2';
 import {WORKER_POOL,workerCount,workerCapacity,workerState,workerRates,productionCycle} from './workers.mjs?v=0.27.2';
 

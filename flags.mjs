@@ -21,6 +21,10 @@ export function normalizeFlag(raw,{strict=false}={}){
  }
  return flag;
 }
+export function sameFlag(left,right){
+ const a=normalizeFlag(left),b=normalizeFlag(right);
+ return a.field===b.field&&a.accent===b.accent&&a.symbol===b.symbol&&a.pattern===b.pattern&&(a.pattern==='plain'||a.stripe===b.stripe);
+}
 const ART={
  anchor:'<circle cx="60" cy="25" r="6" fill="none"/><path d="M60 31V63M45 40H75M39 50C39 68 81 68 81 50M32 54L39 47L46 54M74 54L81 47L88 54" fill="none"/>',
  skull:'<path d="M39 39C39 13 81 13 81 39C81 49 75 51 72 54V65H48V54C42 51 39 48 39 39Z"/><path d="M50 56V64M60 56V64M70 56V64" class="flag-cut"/><ellipse cx="50" cy="39" rx="5" ry="6" class="flag-hole"/><ellipse cx="70" cy="39" rx="5" ry="6" class="flag-hole"/><path d="M60 46L56 52H64Z" class="flag-hole"/>',
