@@ -11,7 +11,7 @@
     "gestao": 90
   },
   "launchEnabled": true,
-  "apiOrigin": "https://virtual-phillips-bridge-rhode.trycloudflare.com",
+  "apiOrigin": "https://hats-scoring-hart-thought.trycloudflare.com",
   "paymentMode": "wallet",
   "coinPack": 500
 }
