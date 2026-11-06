@@ -1,4 +1,4 @@
-import{bossParty,partyAllows}from'./boss-party.mjs?v=0.27.1';
+import{bossParty,bossMinimumLevel,partyAllows}from'./boss-party.mjs?v=0.27.2';
 export const BOSS_SITES=[
 {id:'I-CORAL',name:'Recife Escarlate',boss:'crab',bossName:'Pinça Rubra',level:3,x:.20,y:.17,width:155,rx:.027,ry:.028,respawn:7200,grade:0,lootSet:'brisa'},
 {id:'I-GARRA',name:'Ilhéu das Garras',boss:'crab',bossName:'Casco de Coral',level:3,x:.30,y:.57,width:155,rx:.027,ry:.028,respawn:7200,grade:0,lootSet:'corsario'},
@@ -30,7 +30,7 @@ export function maxedCaptain(p){return !!p&&['sede','serraria','pedreira','armaz
 export function bossAccess(w,p,b,{arrival=false}={}){
 if(!p)return{ok:false,label:'Cria a ilha',kind:'blocked'};
 if(!arrival&&!w.live)return{ok:false,label:'Durante a live',kind:'blocked'};
-const minimum=b?.final?b.level-2:Math.max(1,(b?.level||1)-3);
+const minimum=bossMinimumLevel(b);
 if(p.levels.sede<minimum)return{ok:false,label:'Requer N'+minimum,kind:'blocked'};
 if(!partyAllows(bossParty(w,b.id),p.id))return{ok:false,label:'Grupo por convite',kind:'blocked'};
 if(b?.final){
@@ -43,7 +43,7 @@ if(w.encounters?.[b.id]?.phase==='loot')return{ok:false,label:'Saque em curso',k
 const delta=b.level-p.levels.sede;return{ok:true,label:delta>=3?'Desafio difícil':delta>0?'Desafio':'Atacar',kind:delta>0?'hard':'ok'};
 }
 export function bossFormation(w,e,ms){const users=new Set(ms.filter(m=>m.troops>0&&Object.values(m.fleet).some(n=>n>0)).map(m=>m.user));if(!(users.size>0&&users.size<=3))return false;
- const site=w.bosses?.find(b=>b.id===e.target);if(!site||![...users].every(id=>w.players[id]?.levels.sede>=(site.final?site.level-2:Math.max(1,site.level-3))&&partyAllows(e.bossParty||bossParty(w,e.target),id)))return false;
+ const site=w.bosses?.find(b=>b.id===e.target);if(!site||![...users].every(id=>w.players[id]?.levels.sede>=bossMinimumLevel(site)&&partyAllows(e.bossParty||bossParty(w,e.target),id)))return false;
  if(!site.final)return true;
  const party=[...users].map(id=>w.players[id]);return party.every(p=>p?.levels.sede>=site.level-2&&p.bossWins?.some(id=>(w.bosses||BOSS_SITES).some(b=>b.id===id&&b.level===site.level-3)))&&party.some(p=>p.levels.sede>=site.level);}
 

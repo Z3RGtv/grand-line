@@ -1,4 +1,5 @@
 export const MAX_LEVEL=15,MAX_RESEARCH_LEVEL=5;
+export const SALVAGE_SPEED_PER_LEVEL=8;
 // Preserve the first four levels; spread the old upper resource curve over eleven steps.
 export const economyLevel=n=>n<=4?n:4+(n-4)*8/11;
 export const BUILDING_CAPS={sede:15,serraria:15,pedreira:15,armazem:15,estaleiro:15,muralha:15,academia:5};
@@ -15,5 +16,8 @@ export function researchSpec(key,level){
 }
 export function researchBenefits(key,level){
  const n=Math.min(MAX_RESEARCH_LEVEL,Math.max(0,level)),next=Math.min(MAX_RESEARCH_LEVEL,n+1),range=(factor,sign,suffix='%')=>n===MAX_RESEARCH_LEVEL?`${sign}${n*factor}${suffix}`:`${sign}${n*factor}${suffix} → ${sign}${next*factor}${suffix}`;
- return key==='navegacao'?[{label:'Tempo de viagem e pesca',value:range(7,'−')}]:key==='logistica'?[{label:'Carga e provisões da pesca',value:range(5,'+')}]:[{label:'Força no combate naval',value:range(5,'+')},{label:'Acerto no combate em ilhas',value:range(4,'+',' p.p.')}];
+ return key==='navegacao'?[{label:'Tempo de viagem e pesca',value:range(7,'−')}]:key==='logistica'?[
+  {label:'Carga e provisões da pesca',value:range(5,'+')},
+  {label:'Velocidade de recolha de destroços',value:range(SALVAGE_SPEED_PER_LEVEL,'+')},
+ ]:[{label:'Força no combate naval',value:range(5,'+')},{label:'Acerto no combate em ilhas',value:range(4,'+',' p.p.')}];
 }

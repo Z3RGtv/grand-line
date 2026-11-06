@@ -1,13 +1,27 @@
-import{MAX_LEVEL}from'./progression.mjs?v=0.27.1';
-import{battleParticipants}from'./battle-loadout.mjs?v=0.27.1';
-import{npcFlag,npcProfile}from'./npc-flags.mjs?v=0.27.1';
-import{seaRoute,routePoint,routeLength,coastPoint,waterPoint,waterCircle,clearLeg,nearestWater}from'./navigation.mjs?v=0.27.1';
+import{MAX_LEVEL,SALVAGE_SPEED_PER_LEVEL}from'./progression.mjs?v=0.27.2';
+import{battleParticipants}from'./battle-loadout.mjs?v=0.27.2';
+import{npcFlag,npcProfile}from'./npc-flags.mjs?v=0.27.2';
+import{seaRoute,routePoint,routeLength,coastPoint,waterPoint,waterCircle,clearLeg,nearestWater}from'./navigation.mjs?v=0.27.2';
 
-import{MIN_CREW_PER_SHIP}from'./pace-rules.mjs?v=0.27.1';
+import{MIN_CREW_PER_SHIP}from'./pace-rules.mjs?v=0.27.2';
 export const NPC_MAX=8,NPC_MIN_SECONDS=1200,NPC_MAX_SECONDS=2400,NAVAL_ROUND_SECONDS=12,NPC_LEVEL_RANGE=3;
 export const HULLS={pesqueiro:{hp:90,attack:12,capacity:20,cargo:20,slots:1},cargueiro:{hp:140,attack:20,capacity:60,cargo:350,slots:2},explorador:{hp:85,attack:26,capacity:15,cargo:30,slots:1},combate:{hp:260,attack:140,capacity:40,cargo:80,slots:4}};
 export const npcShipCount=w=>(w.bots||[]).reduce((n,b)=>n+Object.values(b.fleet||{}).reduce((a,v)=>a+v,0),0);
 export const resourceTotal=r=>Object.values(r||{}).reduce((a,b)=>a+b,0);
+const SALVAGE_SETUP_SECONDS=45;
+const SALVAGE_PER_MINUTE={pesqueiro:30,cargueiro:150,explorador:40,combate:72};
+function fleetCargoSpace(player,fleet,gear,shipRules){
+ const base=Object.entries(fleet).reduce((total,[ship,count])=>total+shipRules[ship].cargo*count,0);
+ return base*(1+.05*player.tech.logistica)*(1+(gear?.cargo||0)/100);
+}
+export function wreckSalvagePlan(player,fleet,gear,wreck,start){
+ const baseRate=Object.entries(fleet).reduce((total,[ship,count])=>total+SALVAGE_PER_MINUTE[ship]*count,0);
+ const rate=baseRate*(100+SALVAGE_SPEED_PER_LEVEL*player.tech.logistica);
+ // Leave a tick for the engine to settle the pickup before the wreck expires.
+ const loadingWindow=Math.max(0,wreck.end-start-SALVAGE_SETUP_SECONDS-5);
+ const amount=Math.min(resourceTotal(wreck.resources),Math.floor(fleetCargoSpace(player,fleet,gear,HULLS)),Math.floor(loadingWindow*rate/6000));
+ return {amount,seconds:amount>0?SALVAGE_SETUP_SECONDS+Math.ceil(amount*6000/rate):0};
+}
 export function seaFields(w){w.wrecks??=[];w.battleHistory??=[];w.seaVersion??=1;}
 export function botPoint(w,b,t=w.clock){return routePoint(b.route,(Math.min(t,b.engagedAt??t)-b.start)/(b.end-b.start));}
 export function wreckPoint(w,r,t=w.clock){return routePoint(r.route||[r.position],Math.max(0,Math.min(1,(t-r.start)/(r.end-r.start))));}
@@ -38,7 +52,7 @@ export function rollNavalRound(attackers,defenders,rng,round=0,modifiers={}){con
  for(const u of all){u.hp=Math.max(0,u.hp-(pending.get(u.id)||0));u.crew=Math.min(u.crew,Math.max(0,Math.floor(u.initialCrew*u.hp/u.maxHP)));}
  return{round:round+1,synergy:{attack:modifiers.attack||0,defense:modifiers.defense||0},rolls,hits,attackHP:a.reduce((n,u)=>n+u.hp,0),defenseHP:d.reduce((n,u)=>n+u.hp,0)};
 }
-export function distributeSeaLoot(w,missions,stock,shipRules){const capacities=new Map(missions.map(m=>[m.id,Math.max(0,Object.entries(m.fleet).reduce((n,[k,v])=>n+v*shipRules[k].cargo,0)*(1+.05*w.players[m.user].tech.logistica)*(1+(m.gear?.cargo||0)/100)-resourceTotal(m.cargo))]));const totalStock=resourceTotal(stock),budget=Math.min(totalStock,Math.floor([...capacities.values()].reduce((a,b)=>a+b,0))),pool={};let assigned=0;for(const k of ['wood','stone','food']){pool[k]=totalStock?Math.min(stock[k]||0,Math.floor(budget*(stock[k]||0)/totalStock)):0;assigned+=pool[k];}for(const k of ['wood','stone','food']){const extra=Math.min(budget-assigned,(stock[k]||0)-pool[k]);pool[k]+=extra;assigned+=extra;}for(const k of['wood','stone','food']){let left=pool[k],taken=0,active=missions.filter(m=>capacities.get(m.id)>=1);while(left>0&&active.length){const total=active.reduce((n,m)=>n+Math.max(1,m.contribution||0),0),available=left;for(const m of active){const n=Math.min(Math.max(1,Math.floor(available*Math.max(1,m.contribution||0)/total)),left,Math.floor(capacities.get(m.id)));m.cargo[k]=(m.cargo[k]||0)+n;left-=n;taken+=n;capacities.set(m.id,capacities.get(m.id)-n);}active=active.filter(m=>capacities.get(m.id)>=1);}stock[k]=Math.max(0,(stock[k]||0)-taken);}return stock;}
+export function distributeSeaLoot(w,missions,stock,shipRules,limit=Infinity){const capacities=new Map(missions.map(m=>[m.id,Math.max(0,fleetCargoSpace(w.players[m.user],m.fleet,m.gear,shipRules)-resourceTotal(m.cargo))]));const totalStock=resourceTotal(stock),budget=Math.min(limit,totalStock,Math.floor([...capacities.values()].reduce((a,b)=>a+b,0))),pool={};let assigned=0;for(const k of ['wood','stone','food']){pool[k]=totalStock?Math.min(stock[k]||0,Math.floor(budget*(stock[k]||0)/totalStock)):0;assigned+=pool[k];}for(const k of ['wood','stone','food']){const extra=Math.min(budget-assigned,(stock[k]||0)-pool[k]);pool[k]+=extra;assigned+=extra;}for(const k of['wood','stone','food']){let left=pool[k],taken=0,active=missions.filter(m=>capacities.get(m.id)>=1);while(left>0&&active.length){const total=active.reduce((n,m)=>n+Math.max(1,m.contribution||0),0),available=left;for(const m of active){const n=Math.min(Math.max(1,Math.floor(available*Math.max(1,m.contribution||0)/total)),left,Math.floor(capacities.get(m.id)));m.cargo[k]=(m.cargo[k]||0)+n;left-=n;taken+=n;capacities.set(m.id,capacities.get(m.id)-n);}active=active.filter(m=>capacities.get(m.id)>=1);}stock[k]=Math.max(0,(stock[k]||0)-taken);}return stock;}
 export function createWreck(w,bot,rng,id){seaFields(w);const position=interceptionPoint(w,bot,w.clock),angle=rng()*Math.PI*2;let destination={x:position.x+Math.cos(angle)*.025,y:position.y+Math.sin(angle)*.025};if(!waterPoint(w.slots,destination)||!clearLeg(w.slots,position,destination))destination=nearestWater(w.slots,position);const r={id,name:'Destroços de '+bot.name,sourceId:bot.id,level:bot.level,resources:structuredClone(bot.loot),start:w.clock,end:w.clock+1200,position,route:seaRoute(w.slots,position,destination),flag:npcFlag(bot),npcRole:npcProfile(bot).id};w.wrecks.push(r);if(w.wrecks.length>24)w.wrecks.shift();return r;}
 export function battleSnapshot(w,e){return{id:e.id,target:e.target,type:e.type,participants:battleParticipants(w,e),teams:e.teams?structuredClone(e.teams):null,boss:e.boss,name:e.name,lootEnd:e.lootEnd,phase:e.phase,round:e.round||0,next:e.next,position:battlePoint(w,e),started:e.started,attackers:e.attackers,defenders:e.defenders,homeTroops:e.homeTroops,wallHP:e.wallHP,naval:e.naval?structuredClone(e.naval):null,log:structuredClone((e.log||[]).slice(-10)),wreckId:e.wreckId};}
 
