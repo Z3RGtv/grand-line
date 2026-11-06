@@ -4,11 +4,11 @@
   "redirectUri": "https://z3rgtv.github.io/grand-line/",
   "stateUrl": "https://raw.githubusercontent.com/Z3RGtv/grand-line/state/world.json",
   "costs": {
-    "entrar": 500,
-    "construcoes": 350,
-    "navegar": 200,
-    "aliancas": 100,
-    "gestao": 100
+    "entrar": 450,
+    "construcoes": 315,
+    "navegar": 180,
+    "aliancas": 90,
+    "gestao": 90
   },
   "launchEnabled": true,
   "apiOrigin": "https://virtual-phillips-bridge-rhode.trycloudflare.com",

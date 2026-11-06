@@ -1,7 +1,7 @@
 // Spending allowance, separate from purchased coins. Only a distinct Twitch stream refills it.
-export const STREAM_GAME_CREDIT=3500;
+export const STREAM_GAME_CREDIT=4000;
 export const DAILY_GAME_LIMIT=STREAM_GAME_CREDIT;
-export const GAME_BUDGET_CAP=STREAM_GAME_CREDIT*2;
+export const GAME_BUDGET_CAP=7000;
 const datePattern=/^\d{4}-\d{2}-\d{2}$/;
 export function allowanceDay(wall){return new Date(wall).toLocaleDateString('en-CA',{timeZone:'Europe/Lisbon'});}
 function validDate(day){return typeof day==='string'&&datePattern.test(day)&&Number.isFinite(Date.parse(day))&&new Date(Date.parse(day)).toISOString().slice(0,10)===day;}
@@ -15,4 +15,4 @@ export function syncAllowance(w,p,wall=w.wall){const value=spendingBudget(w,p,wa
 export function migrateStreamAllowance(w){if(!Number.isSafeInteger(w.streamEpoch)){w.streamEpoch=0;w.creditStreams=w.streamId&&w.streamId!=='offline'?[String(w.streamId)]:[];}w.creditStreams??=[];for(const p of Object.values(w.players||{}))syncAllowance(w,p);}
 export function registerStreamAllowance(w,id){migrateStreamAllowance(w);id=String(id||'').slice(0,160);if(!id||w.creditStreams.includes(id))return false;w.creditStreams.push(id);w.streamEpoch++;for(const p of Object.values(w.players||{}))syncAllowance(w,p);return true;}
 export function startAllowance(p,wall,epoch=0){p.actionAllowance={epoch,remaining:STREAM_GAME_CREDIT};}
-export function chargeAllowance(w,p,cost,wall=w.wall){if(!Number.isInteger(cost)||cost<=0||cost>GAME_BUDGET_CAP)throw Error('Custo de ações inválido.');const value=syncAllowance(w,p,wall);if(value.remaining<cost)throw Error('Limite disponível insuficiente: +3.500 por stream, com reserva máxima de 7.000.');p.actionAllowance.remaining-=cost;}
+export function chargeAllowance(w,p,cost,wall=w.wall){if(!Number.isInteger(cost)||cost<=0||cost>GAME_BUDGET_CAP)throw Error('Custo de ações inválido.');const value=syncAllowance(w,p,wall);if(value.remaining<cost)throw Error('Limite disponível insuficiente: +4.000 por stream, com reserva máxima de 7.000.');p.actionAllowance.remaining-=cost;}

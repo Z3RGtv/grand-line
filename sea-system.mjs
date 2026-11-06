@@ -1,14 +1,15 @@
-import{battleParticipants}from'./battle-loadout.mjs?v=0.26.1';
-import{npcFlag,npcProfile}from'./npc-flags.mjs?v=0.26.1';
-import{seaRoute,routePoint,routeLength,coastPoint,waterPoint,waterCircle,clearLeg,nearestWater}from'./navigation.mjs?v=0.26.1';
+import{MAX_LEVEL}from'./progression.mjs?v=0.27.0';
+import{battleParticipants}from'./battle-loadout.mjs?v=0.27.0';
+import{npcFlag,npcProfile}from'./npc-flags.mjs?v=0.27.0';
+import{seaRoute,routePoint,routeLength,coastPoint,waterPoint,waterCircle,clearLeg,nearestWater}from'./navigation.mjs?v=0.27.0';
 
-import{MIN_CREW_PER_SHIP}from'./pace-rules.mjs?v=0.26.1';
-export const NPC_MAX=8,NPC_MIN_SECONDS=840,NPC_MAX_SECONDS=1560,NAVAL_ROUND_SECONDS=12,NPC_LEVEL_RANGE=3;
+import{MIN_CREW_PER_SHIP}from'./pace-rules.mjs?v=0.27.0';
+export const NPC_MAX=8,NPC_MIN_SECONDS=1200,NPC_MAX_SECONDS=2400,NAVAL_ROUND_SECONDS=12,NPC_LEVEL_RANGE=3;
 export const HULLS={pesqueiro:{hp:90,attack:12,capacity:20,cargo:20,slots:1},cargueiro:{hp:140,attack:20,capacity:60,cargo:350,slots:2},explorador:{hp:85,attack:26,capacity:15,cargo:30,slots:1},combate:{hp:260,attack:140,capacity:40,cargo:80,slots:4}};
 export const npcShipCount=w=>(w.bots||[]).reduce((n,b)=>n+Object.values(b.fleet||{}).reduce((a,v)=>a+v,0),0);
 export const resourceTotal=r=>Object.values(r||{}).reduce((a,b)=>a+b,0);
 export function seaFields(w){w.wrecks??=[];w.battleHistory??=[];w.seaVersion??=1;}
-export function botPoint(w,b,t=w.clock){return routePoint(b.route,(t-b.start)/(b.end-b.start));}
+export function botPoint(w,b,t=w.clock){return routePoint(b.route,(Math.min(t,b.engagedAt??t)-b.start)/(b.end-b.start));}
 export function wreckPoint(w,r,t=w.clock){return routePoint(r.route||[r.position],Math.max(0,Math.min(1,(t-r.start)/(r.end-r.start))));}
 export function interceptionPoint(w,b,t){const p=botPoint(w,b,t);if(waterPoint(w.slots,p))return p;return t<(b.start+b.end)/2?b.entryGate||nearestWater(w.slots,p):b.exitGate||nearestWater(w.slots,p);}
 function orbit(w,anchor,t,seed=0,radius=.004){const origin=waterPoint(w.slots,anchor)?anchor:nearestWater(w.slots,anchor),angle=t/14+seed*2.399,inward=Math.atan2(.5-origin.y,.5-origin.x);for(const scale of[1,.5,.2,.05,.01,.002,.0004]){const r=radius*scale;for(let i=-1;i<17;i++){const a=i===0?inward:i*Math.PI/8,center=i<0?origin:{x:origin.x+Math.cos(a)*r*1.5,y:origin.y+Math.sin(a)*r*1.5};if(!waterCircle(w.slots,center,r,r*.8)||!clearLeg(w.slots,origin,center))continue;return{x:center.x+Math.cos(angle)*r,y:center.y+Math.sin(angle)*r*.8,angle:angle+Math.PI/2};}}return{...origin,angle};}
@@ -18,7 +19,7 @@ export function fleetPoint(w,m,t=w.clock){
  const e=Object.values(w.encounters||{}).find(e=>e.id===m.encounter),r=w.wrecks?.find(r=>r.id===m.target),anchor=e?battlePoint(w,e,t):r?wreckPoint(w,r,t):m.to;
  return orbit(w,anchor,t,[...m.id].reduce((a,c)=>a+c.charCodeAt(0),0),.0045);
 }
-export function npcAccess(player,bot){if(!player)return{ok:false,kind:'login',label:'Cria a tua ilha'};const difference=bot.level-player.levels.sede;return Math.abs(difference)>NPC_LEVEL_RANGE?{ok:false,kind:difference>0?'high':'low',label:difference>0?'Nível demasiado alto':'Nível demasiado baixo',min:Math.max(1,bot.level-3),max:Math.min(12,bot.level+3)}:{ok:true,kind:difference>1?'hard':difference< -1?'easy':'near',label:difference>1?'Desafio difícil':difference< -1?'Alvo acessível':'Podes atacar'};}
+export function npcAccess(player,bot){if(!player)return{ok:false,kind:'login',label:'Cria a tua ilha'};const difference=bot.level-player.levels.sede;return Math.abs(difference)>NPC_LEVEL_RANGE?{ok:false,kind:difference>0?'high':'low',label:difference>0?'Nível demasiado alto':'Nível demasiado baixo',min:Math.max(1,bot.level-3),max:Math.min(MAX_LEVEL,bot.level+3)}:{ok:true,kind:difference>1?'hard':difference< -1?'easy':'near',label:difference>1?'Desafio difícil':difference< -1?'Alvo acessível':'Podes atacar'};}
 export function routeLootBonus(length,seconds){return 1+Math.max(0,Math.min(.65,(length/seconds/.0018-1)*.38));}
 function portal(slots,side,rng){for(let i=0;i<80;i++){const a=i<40?.1+rng()*.8:.1+(i-40)*.8/40;let gate,outside;if(side===0){gate={x:a,y:.075};outside={x:a,y:-.045};}else if(side===1){gate={x:.965,y:a};outside={x:1.045,y:a};}else if(side===2){gate={x:a,y:.945};outside={x:a,y:1.045};}else{gate={x:.035,y:a};outside={x:-.045,y:a};}if(waterPoint(slots,gate)&&clearLeg(slots,outside,gate))return{gate,outside,side};}throw Error('Margem sem passagem de água.');}
 export function npcRoute(w,near,rng){const entrySide=Math.floor(rng()*4),exitSide=(entrySide+1+Math.floor(rng()*3))%4,entry=portal(w.slots,entrySide,rng),exit=portal(w.slots,exitSide,rng);const stops=near.map(i=>coastPoint(w.slots,w.slots[i],rng()*Math.PI*2));

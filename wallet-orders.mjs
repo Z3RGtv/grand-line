@@ -23,7 +23,7 @@ export function createWalletOrders({read,save,clear,send,record=async()=>{},uuid
  return{submit};
 }
 export function purchaseFeedback(result){
- if(result?.status==='fulfilled')return{state:'confirmed',title:result.replayed?'Já efetuada · sem nova cobrança':'Compra confirmada · −'+Number(result.cost||0).toLocaleString('pt-PT')+' moedas',detail:Number.isSafeInteger(result.wallet?.balance)?'Saldo: '+result.wallet.balance.toLocaleString('pt-PT')+' moedas':''};
+ if(result?.status==='fulfilled')return{state:'confirmed',title:result.replayed?'Já efetuada · sem nova cobrança':result.cost===0?'Alteração confirmada · grátis':'Compra confirmada · −'+Number(result.cost||0).toLocaleString('pt-PT')+' moedas',detail:Number.isSafeInteger(result.wallet?.balance)?'Saldo: '+result.wallet.balance.toLocaleString('pt-PT')+' moedas':''};
  if(result?.status==='canceled'||result?.orderState==='not_sent')return{state:'rejected',title:'Não efetuada · 0 moedas gastas',detail:result.error||result.message||''};
  return{state:'pending',title:'A aguardar confirmação',detail:'Verifica o resultado na carteira antes de repetir.'};
 }

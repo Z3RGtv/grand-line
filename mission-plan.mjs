@@ -1,7 +1,8 @@
-import{workerState,workerCount,productionBetween}from'./workers.mjs?v=0.26.1';
-import{buildingCost}from'./economy.mjs?v=0.26.1';
-import{populationState}from'./population.mjs?v=0.26.1';
-import{defendingTroops,storageCapacity}from'./harbor.mjs?v=0.26.1';
+import{MAX_LEVEL}from'./progression.mjs?v=0.27.0';
+import{workerState,workerCount,productionBetween}from'./workers.mjs?v=0.27.0';
+import{buildingCost}from'./economy.mjs?v=0.27.0';
+import{populationState}from'./population.mjs?v=0.27.0';
+import{defendingTroops,storageCapacity}from'./harbor.mjs?v=0.27.0';
 const names={wood:'madeira',stone:'pedra',food:'provisões'},houses={sede:'casa principal',armazem:'armazém',estaleiro:'estaleiro'};
 const shortfall=(p,res)=>Object.fromEntries(Object.entries(res).map(([k,n])=>[k,Math.max(0,Math.ceil(n-(p.resources?.[k]||0)))]).filter(([,n])=>n>0));
 const list=missing=>Object.entries(missing).map(([k,n])=>n+' '+names[k]).join(' e ');
@@ -14,7 +15,7 @@ export function nextLearningStep(w,p,goal,{quote}={}){
  function check(result){if(!result?.request||!quote)return result;try{quote(w,p.id,result.request);return result;}catch(e){return step(result.id,'Requisito em falta',e.message,result.building,null,{blocked:e.message,waiting:{kind:'requirement',title:e.message,building:result.building,end:null}});}}
  function resources(res,next,depth=0){
   const missing=shortfall(p,res);if(!Object.keys(missing).length)return check(next);
-  const max=Math.max(...Object.values(res));if(max>storageCapacity(p)&&p.levels.armazem<12&&depth<12)return upgrade('armazem',p.levels.armazem+1,depth+1);
+  const max=Math.max(...Object.values(res));if(max>storageCapacity(p)&&p.levels.armazem<MAX_LEVEL&&depth<MAX_LEVEL)return upgrade('armazem',p.levels.armazem+1,depth+1);
   if(missing.food){const fishing=jobs.filter(j=>j.action==='pescar');if(fishing.length)return wait('Aguarda as provisões','Faltam '+list({food:missing.food})+'.','estaleiro',Math.min(...fishing.map(j=>j.end)),'resources');
    if(p.fleet.pesqueiro>0)return check(step('fishing','Recolhe provisões','Faltam '+list({food:missing.food})+'. Envia os pesqueiros.','estaleiro',{kind:'gestao',action:'pescar'}));
    const buildingBoat=jobs.find(j=>j.action==='navios'&&j.payload.ship==='pesqueiro');if(buildingBoat)return wait('Pesqueiro em construção','Aguarda o estaleiro.','estaleiro',buildingBoat.end);
@@ -23,7 +24,7 @@ export function nextLearningStep(w,p,goal,{quote}={}){
   }
   const kinds=['wood','stone'].filter(k=>missing[k]);
   if(work.active){
-   if(kinds.some(k=>!work[k+'Workers'])){const total=workerCount(p),both=kinds.length===2,woodWorkers=missing.wood?(both?Math.ceil(total/2):total):0,stoneWorkers=missing.stone?(both?Math.floor(total/2):total):0;return check(step('work','Redistribui os trabalhadores','Faltam '+list(missing)+'. Inicia um novo turno com a distribuição necessária.',kinds[0]==='stone'?'pedreira':'serraria',{kind:'gestao',action:'trabalhar',payload:{woodWorkers,stoneWorkers}},{missing}));}
+   if(kinds.some(k=>!work[k+'Workers'])){const total=workerCount(p),both=kinds.length===2,woodWorkers=missing.wood?(both?Math.ceil(total/2):total):0,stoneWorkers=missing.stone?(both?Math.floor(total/2):total):0;return check(step('work','Redistribui os trabalhadores','Faltam '+list(missing)+'. Ajusta a distribuição no turno atual.',kinds[0]==='stone'?'pedreira':'serraria',{kind:'gestao',action:'trabalhar',payload:{woodWorkers,stoneWorkers}},{missing}));}
    const allAssigned=kinds.every(k=>work[k+'Workers']>0),until=Math.max(w.clock,work.until);let end=until;
    const enough=t=>kinds.every(k=>productionBetween(p,w.clock,t)[k]>=missing[k]);
    if(allAssigned&&enough(until)){let lo=w.clock,hi=until;for(let i=0;i<30;i++){const mid=(lo+hi)/2;if(enough(mid))hi=mid;else lo=mid;}end=Math.ceil(hi-1e-6);}
@@ -33,7 +34,7 @@ export function nextLearningStep(w,p,goal,{quote}={}){
   return check(step('work',both?'Recolhe madeira e pedra':'Recolhe '+names[kinds[0]],'Faltam '+list(missing)+'. Envia os trabalhadores.',kinds[0]==='stone'?'pedreira':'serraria',{kind:'gestao',action:'trabalhar',payload:{woodWorkers,stoneWorkers}},{missing}));
  }
  function upgrade(building,to,depth=0){
-  if(depth>12)return wait('Requisito em falta','Verifica o nível dos edifícios.',building,null,'requirement');
+  if(depth>MAX_LEVEL)return wait('Requisito em falta','Verifica o nível dos edifícios.',building,null,'requirement');
   const pending=jobs.filter(j=>j.action==='edificio'&&j.payload.building===building&&j.payload.level>=to);if(pending.length)return wait('Construção em curso','Aguarda '+(houses[building]||building)+' N'+to+'.',building,Math.min(...pending.map(j=>j.end)));
   if(building!=='armazem'&&p.levels.armazem<to)return upgrade('armazem',p.levels.armazem+1,depth+1);
   if(building!=='sede'&&to>p.levels.sede+1)return upgrade('sede',p.levels.sede+1,depth+1);
@@ -47,7 +48,7 @@ export function nextLearningStep(w,p,goal,{quote}={}){
  if(goal.id==='crew'){
   const pending=jobs.filter(j=>j.action==='tropas');if(pending.length)return wait('Marinheiros a preparar','Aguarda o recrutamento.','sede',Math.min(...pending.map(j=>j.end)));
   const count=Math.max(1,10-(p.onboarding?.recruitedCompleted||0));
-  if(populationState(w,p).sailorRoom<count){if(p.levels.sede<12)return upgrade('sede',p.levels.sede+1);return wait('Sem alojamento livre','Não há vagas para recrutar mais marinheiros.','sede',null,'requirement');}
+  if(populationState(w,p).sailorRoom<count){if(p.levels.sede<MAX_LEVEL)return upgrade('sede',p.levels.sede+1);return wait('Sem alojamento livre','Não há vagas para recrutar mais marinheiros.','sede',null,'requirement');}
   return resources({wood:8*count,stone:5*count,food:3*count},step('crew',goal.title,goal.body,'sede',{kind:'construcoes',action:'tropas',payload:{count}},{count}));
  }
  if(goal.id==='expedition'){

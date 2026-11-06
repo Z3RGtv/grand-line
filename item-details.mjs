@@ -1,5 +1,5 @@
-import{ITEM_TYPES,ITEM_SETS,RARITIES,EQUIPMENT_SLOTS,STAT_NAMES,itemName,itemArt,itemBonus,equipmentBonuses,lootOdds,EXCLUSIVE_ITEMS}from'./equipment.mjs?v=0.26.1';
-import{BOSS_SITES}from'./adventure.mjs?v=0.26.1';
+import{ITEM_TYPES,ITEM_SETS,RARITIES,EQUIPMENT_SLOTS,STAT_NAMES,itemName,itemArt,itemBonus,equipmentBonuses,lootOdds,EXCLUSIVE_ITEMS}from'./equipment.mjs?v=0.27.0';
+import{BOSS_SITES}from'./adventure.mjs?v=0.27.0';
 const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const percent=n=>(n*100).toLocaleString('pt-PT',{maximumFractionDigits:2})+'%';
 export function itemDetailsView(item,p,{catalog=false,marked=false}={}){
@@ -23,7 +23,7 @@ export function itemDetailsView(item,p,{catalog=false,marked=false}={}){
    ${incompatible?'<small>Incompatível com '+incompatible+'</small>':''}
   </section>
   ${inBag?`<button class="primary wide" data-item-select="${esc(item.id)}">Selecionar para a configuração</button>`:''}
-  ${pending?`<button class="primary wide" data-claim-loot="${esc(item.id)}">Recolher · 100 moedas</button>`:''}
+  ${pending?`<button class="primary wide" data-claim-loot="${esc(item.id)}">Recolher · 90 moedas</button>`:''}
   ${canMark?`<button class="item-back" data-mark-salvage="${esc(item.id)}">${marked?'Desmarcar desmontagem':'Marcar para desmontar'}</button>`:''}
   ${type.unique?'<p class="item-exclusive-note">Único por capitão · não pode ser desmontado.</p>':
    sources.length?`<h3>Onde encontrar</h3><div class="item-source-list">${sources.map(s=>`<button data-item-source="${s.id}"><span>${esc(s.name)}${EXCLUSIVE_ITEMS[item.type]?' · Exclusivo':''}</span><b>${percent(s.chance)}</b></button>`).join('')}</div>`:''}`;

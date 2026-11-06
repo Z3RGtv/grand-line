@@ -1,4 +1,4 @@
-import{BOSS_MOTION,motionMesh,poseVertices}from'./boss-motion.mjs?v=0.26.1';
+import{BOSS_MOTION,motionMesh,poseVertices}from'./boss-motion.mjs?v=0.27.0';
 
 // One shared GPU surface, rather than a WebGL context per boss or per refresh.
 // Individual visible canvases retain their last frame while assets load.
