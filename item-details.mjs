@@ -1,5 +1,5 @@
-import{ITEM_TYPES,ITEM_SETS,RARITIES,EQUIPMENT_SLOTS,STAT_NAMES,itemName,itemArt,itemBonus,equipmentBonuses,lootOdds,EXCLUSIVE_ITEMS}from'./equipment.mjs?v=0.27.2&rev=world1';
-import{BOSS_SITES}from'./adventure.mjs?v=0.27.2&rev=world1';
+import{ITEM_TYPES,ITEM_SETS,RARITIES,EQUIPMENT_SLOTS,STAT_NAMES,itemName,itemArt,itemBonus,equipmentBonuses,lootOdds,EXCLUSIVE_ITEMS,FINAL_EQUIPMENT}from'./equipment.mjs?v=0.27.2&rev=world2';
+import{BOSS_SITES}from'./adventure.mjs?v=0.27.2&rev=world2';
 const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const percent=n=>(n*100).toLocaleString('pt-PT',{maximumFractionDigits:2})+'%';
 export function itemDetailsView(item,p,{catalog=false,marked=false}={}){
@@ -15,6 +15,7 @@ export function itemDetailsView(item,p,{catalog=false,marked=false}={}){
    <span class="item-set-badge">${set.emblem} ${set.name}</span>
   </div>
   <h2>${esc(itemName(item))}</h2><div class="item-slot-label">${EQUIPMENT_SLOTS[type.slot]}</div>
+  ${FINAL_EQUIPMENT.includes(item.type)?'<p class="item-exclusive-note">Até 3 no mundo · roubável na base, mesmo guardado.</p>':''}
   ${statistics}
   ${owned?comparisonView(item,pending?{...p,inventory:[...p.inventory,item]}:p):''}
   ${type.stat==='rareFind'?'<p class="item-explanation">Aumenta a hipótese de Raro ou melhor nas ilhas normais. Não altera as probabilidades da ilha final.</p>':''}

@@ -1,5 +1,5 @@
 import{MAX_LEVEL,SALVAGE_SPEED_PER_LEVEL}from'./progression.mjs?v=0.27.2';
-import{battleParticipants}from'./battle-loadout.mjs?v=0.27.2&rev=world1';
+import{battleParticipants}from'./battle-loadout.mjs?v=0.27.2&rev=world2';
 import{npcFlag,npcProfile}from'./npc-flags.mjs?v=0.27.2';
 import{seaRoute,routePoint,routeLength,coastPoint,waterPoint,waterCircle,clearLeg,nearestWater}from'./navigation.mjs?v=0.27.2';
 

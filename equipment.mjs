@@ -1,5 +1,5 @@
-import{sourceLoot,weightedPick,boostedRarities,FINAL_EQUIPMENT,EXCLUSIVE_ITEMS,SITE_LOOT}from'./loot-tables.mjs?v=0.27.2&rev=world1';
-export{FINAL_EQUIPMENT,EXCLUSIVE_ITEMS,SITE_LOOT}from'./loot-tables.mjs?v=0.27.2&rev=world1';
+import{sourceLoot,weightedPick,boostedRarities,FINAL_EQUIPMENT,EXCLUSIVE_ITEMS,SITE_LOOT}from'./loot-tables.mjs?v=0.27.2&rev=world2';
+export{FINAL_EQUIPMENT,EXCLUSIVE_ITEMS,SITE_LOOT}from'./loot-tables.mjs?v=0.27.2&rev=world2';
 export const MAX_EQUIPPED=4;
 export const EQUIPMENT_SLOTS={armamento:'Armamento',casco:'Casco',navegacao:'Navegação',ferramentas:'Ferramentas'};
 export const EQUIPMENT_CAPS={attack:24,hp:26,speed:16,production:20,cargo:26,rareFind:10};

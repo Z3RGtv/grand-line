@@ -1,4 +1,4 @@
-import{equippedItems,validItem,EQUIPMENT_CAPS}from'./equipment.mjs?v=0.27.2&rev=world1';
+import{equippedItems,validItem,EQUIPMENT_CAPS}from'./equipment.mjs?v=0.27.2&rev=world2';
 import{defaultFlag}from'./flags.mjs?v=0.27.2';
 export function combatLoadout(p,equipment=p?.equipment||{}){return equippedItems(p,equipment).map(({type,rarity,value,displayName})=>({type,rarity,value,...(displayName?{displayName}:{})}));}
 const items=list=>(list||[]).filter(validItem).slice(0,4).map(({type,rarity,value,displayName})=>({type,rarity,value,...(displayName?{displayName}:{})}));

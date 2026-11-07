@@ -1,6 +1,6 @@
-import{equippedItems,FINAL_EQUIPMENT}from'./equipment.mjs?v=0.27.2&rev=world1';
+import{equippedItems,FINAL_EQUIPMENT}from'./equipment.mjs?v=0.27.2&rev=world2';
 import{inventoryCapacity}from'./inventory-capacity.mjs?v=0.27.2';
-import{report}from'./adventure.mjs?v=0.27.2&rev=world1';
+import{report}from'./adventure.mjs?v=0.27.2&rev=world2';
 
 export const ABYSS_COPY_LIMIT=3;
 export const islandTheftChance=p=>.30-.03*Math.min(5,Math.max(0,p.levels?.academia||0));
@@ -38,7 +38,10 @@ export function stealIslandEquipment(w,p,attackers,random,battle){
  const candidates=attackers.filter(m=>m.troops>0&&Object.values(m.fleet||{}).some(n=>n>0));
  if(!candidates.length)return[];
  const stolen=[];
- for(const item of equippedItems(p))if(random()<islandTheftChance(p)){
+ const away=deployedEquipment(w,p.id),exposed=new Map(equippedItems(p).map(i=>[i.id,i]));
+ // A scarce relic cannot be made permanently unstealable by hoarding it in storage.
+ for(const item of[...(p.inventory||[]),...(p.lootStash||[])])if(FINAL_EQUIPMENT.includes(item.type)&&!away.has(item.id))exposed.set(item.id,item);
+ for(const item of exposed.values())if(random()<islandTheftChance(p)){
   const weight=candidates.reduce((n,m)=>n+Math.max(1,m.contribution||m.initialTroops||1),0);let pick=random()*weight;
   const recipient=candidates.find(m=>(pick-=Math.max(1,m.contribution||m.initialTroops||1))<0)||candidates.at(-1);
   const removed=removeItem(p,item.id);if(!removed)continue;

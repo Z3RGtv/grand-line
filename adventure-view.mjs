@@ -1,7 +1,7 @@
-import{relicHolders}from'./island-honours.mjs?v=0.27.2&rev=world1';
-import{FINAL_SECRET_SLOTS}from'./final-rewards.mjs?v=0.27.2&rev=world1';
-import{ITEM_TYPES,RARITIES,EQUIPMENT_SLOTS,equipmentBonuses,itemBonus,itemName,dismantleYield,STAT_NAMES,ITEM_SETS,equipmentSets,equippedItems,bestSetSlots,incompatibility,lootPool,lootOdds,rarityOdds,lootTable,itemArt,DROP_TABLES}from'./equipment.mjs?v=0.27.2&rev=world1';
-import{bossAlive,bossAccess}from'./adventure.mjs?v=0.27.2&rev=world1';
+import{relicHolders}from'./island-honours.mjs?v=0.27.2&rev=world2';
+import{FINAL_SECRET_SLOTS}from'./final-rewards.mjs?v=0.27.2&rev=world2';
+import{ITEM_TYPES,RARITIES,EQUIPMENT_SLOTS,equipmentBonuses,itemBonus,itemName,dismantleYield,STAT_NAMES,ITEM_SETS,equipmentSets,equippedItems,bestSetSlots,incompatibility,lootPool,lootOdds,rarityOdds,lootTable,itemArt,DROP_TABLES}from'./equipment.mjs?v=0.27.2&rev=world2';
+import{bossAlive,bossAccess}from'./adventure.mjs?v=0.27.2&rev=world2';
 import{workerState}from'./workers.mjs?v=0.27.2';
 import{maxBuildingLevel}from'./progression.mjs?v=0.27.2';
 const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -9,7 +9,7 @@ const names={sede:'Casa principal',serraria:'Serraria',pedreira:'Pedreira',armaz
 const image=i=>'<img class="equipment-art" src="'+itemArt(i)+'" alt="'+esc(itemName(i))+'">';
 const attributes=i=>Object.entries(itemBonus(i)).map(([key,value])=>'<b>+'+value+'% '+STAT_NAMES[key]+'</b>').join('');
 const quality=i=>'<span class="item-quality" style="color:'+RARITIES[i.rarity].color+'">'+RARITIES[i.rarity].name+' · N'+RARITIES[i.rarity].level+' · '+ITEM_SETS[ITEM_TYPES[i.type].set].name+'</span>';
-export{inventoryView}from'./inventory-view.mjs?v=0.27.2&rev=world1';
+export{inventoryView}from'./inventory-view.mjs?v=0.27.2&rev=world2';
 export function adventureReadiness(w,p,quote){if(!p||p.hibernating)return[];const out=[],work=workerState(p,w.clock);if(work.available>0)out.push({icon:'⚒',title:work.available+' trabalhadores livres',building:'serraria',section:'producao'});for(const building of Object.keys(names)){if(p.levels[building]>=maxBuildingLevel(building)||w.jobs.some(j=>j.user===p.id&&j.action==='edificio'&&j.payload.building===building))continue;try{const q=quote(w,p.id,{kind:'construcoes',action:'edificio',payload:{building}});out.push({icon:'⌂',title:names[building]+' → N'+q.payload.level,building});}catch{}}return out;}
 const reportIcons={ataque:'⚔',defesa:'⛨',batalha:'⚔',boss:'⚔',regresso:'⚓',trabalhadores:'⚒',ordem:'⌂',recompensa:'◆',reciclagem:'♻',equipamento:'◆',ilha:'⚑',expedicao:'⚓'};
 const mysteryItem='<span class="mystery-item" role="img" aria-label="Item por revelar">?</span>';

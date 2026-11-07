@@ -1,9 +1,9 @@
-import{itemArt,itemName}from'./equipment.mjs?v=0.27.2&rev=world1';
-import{battleParticipants}from'./battle-loadout.mjs?v=0.27.2&rev=world1';
-import{ITEM_TYPES,ITEM_SETS,EQUIPMENT_SLOTS,RARITIES,STAT_NAMES,itemBonus}from'./equipment.mjs?v=0.27.2&rev=world1';
+import{itemArt,itemName}from'./equipment.mjs?v=0.27.2&rev=world2';
+import{battleParticipants}from'./battle-loadout.mjs?v=0.27.2&rev=world2';
+import{ITEM_TYPES,ITEM_SETS,EQUIPMENT_SLOTS,RARITIES,STAT_NAMES,itemBonus}from'./equipment.mjs?v=0.27.2&rev=world2';
 import{npcFlag}from'./npc-flags.mjs?v=0.27.2';
 import{flagSVG,defaultFlag}from'./flags.mjs?v=0.27.2&rev=flag2';
-import{battlePoint,wreckPoint,npcAccess}from'./sea-system.mjs?v=0.27.2&rev=world1';
+import{battlePoint,wreckPoint,npcAccess}from'./sea-system.mjs?v=0.27.2&rev=world2';
 const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])),names={pesqueiro:'Pesqueiro',cargueiro:'Cargueiro',explorador:'Explorador',combate:'Navio de combate'};
 const dots={1:[5],2:[1,9],3:[1,5,9],4:[1,3,7,9],5:[1,3,5,7,9],6:[1,3,4,6,7,9]};
 export function diceFace(value){return `<span class="dice-face" aria-label="Dado ${value}">${(dots[value]||[]).map(p=>`<i class="dice-pip" style="grid-area:${Math.ceil(p/3)}/${(p-1)%3+1}"></i>`).join('')}</span>`;}
