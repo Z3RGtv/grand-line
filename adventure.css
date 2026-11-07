@@ -310,3 +310,9 @@
 #boss-invitees[hidden]{display:none}#boss-invitees{margin:10px 0;padding:10px;border:1px solid #6f6247;border-radius:8px;max-height:180px;overflow:auto}#boss-invitees label{display:flex;align-items:center;gap:8px;padding:5px 0}#boss-invitees input{width:18px;height:18px;margin:0}#boss-invitees small{margin-left:auto}.boss-party-status{margin:8px 0;color:#c8bda1}.pending-loot-item{min-width:0;border:1px solid transparent;border-radius:8px}.pending-loot-item button{width:100%}.pending-loot-item.salvage-marked{border-color:#e1ab59}
 
 .mystery-item{display:inline-grid;place-items:center;flex-shrink:0;width:58px;height:58px;border:2px solid #d6ba6c;border-radius:12px;background:radial-gradient(circle,#385362,#102c3a);color:#f4dfaa;font:700 42px/1 Georgia,serif;box-shadow:0 0 18px #d6ba6c33}.reward-object .mystery-item{width:150px;height:150px;font-size:110px;border-radius:24px;box-shadow:0 0 35px #d6ba6c55}
+
+.current-duel{outline:2px solid #e5c775;outline-offset:-2px;background:#e5c77510}.duel-winner{background:#83b18120;border-radius:8px}.duel-outcome{text-align:center;font-size:13px;overflow-wrap:anywhere}.duel-turn .dice-face{animation:duel-toss .65s ease-out}.duel-turn .duel-verdict b{color:#e7be70}@keyframes duel-toss{0%{transform:rotate(-25deg) scale(.7);opacity:.3}45%{transform:rotate(18deg) scale(1.1)}100%{transform:none;opacity:1}}@media(prefers-reduced-motion:reduce){.duel-turn .dice-face{animation:none}}
+
+.boss-capacity{display:flex;gap:20px;align-items:center;margin:10px 0}.boss-capacity>span{display:inline-flex;gap:6px;align-items:center;font-weight:700}.boss-capacity img{width:24px;height:24px;object-fit:contain}.party-status small{display:block;font-size:12px}
+
+.duel-outcome{color:#f0dba9}

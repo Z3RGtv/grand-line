@@ -1,6 +1,6 @@
 import{equippedItems,FINAL_EQUIPMENT}from'./equipment.mjs?v=0.27.2&rev=progress1';
 import{inventoryCapacity}from'./inventory-capacity.mjs?v=0.27.2';
-import{report}from'./adventure.mjs?v=0.27.2&rev=cadence1';
+import{report}from'./adventure.mjs?v=0.27.2&rev=duels1';
 
 export const ABYSS_COPY_LIMIT=3;
 export const islandTheftChance=p=>.30-.03*Math.min(5,Math.max(0,p.levels?.academia||0));

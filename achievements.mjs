@@ -1,5 +1,5 @@
 import{allowanceDay}from'./spending-budget.mjs?v=0.27.2';
-import{BOSS_SITES}from'./adventure.mjs?v=0.27.2&rev=cadence1';
+import{BOSS_SITES}from'./adventure.mjs?v=0.27.2&rev=duels1';
 export const ACHIEVEMENT_REWARDS={visit:30,work:30,voyage:30,boss:60,streak3:30,streak7:60};
 const dayNumber=day=>Date.parse(day)/86400000;
 export function recordPresence(w,p){
