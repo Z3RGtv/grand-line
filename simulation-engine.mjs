@@ -1,6 +1,7 @@
+import{prepareBossSpecial,battleOrderQuote,setBattleOrder}from'./battle-tactics.mjs?v=0.27.2&rev=specials1';
 import{recordPresence,recordAchievementOrder,achievementReward,collectAchievement}from'./achievements.mjs?v=0.27.2&rev=duels1';
 import{fleetEquipment,deployedEquipment,loseFleetEquipment,stealIslandEquipment,deliverCapturedEquipment,publicRelics}from'./equipment-risk.mjs?v=0.27.2&rev=duels1';
-import{actionPrice,RECOVERY_SECONDS,RECOVERY_RATE,STASH_LIMIT,FRAGMENTS_REQUIRED}from'./balance-policy.mjs?v=0.27.2&rev=duels1';
+import{actionPrice,RECOVERY_SECONDS,RECOVERY_RATE,STASH_LIMIT,FRAGMENTS_REQUIRED}from'./balance-policy.mjs?v=0.27.2&rev=specials1';
 import{EXCLUSIVE_ITEMS}from'./loot-tables.mjs?v=0.27.2&rev=progress1';
 import{gameRunning,combatWindow,noteAttack,sessionProtected}from'./game-session.mjs?v=0.27.2';
 import{walletState,changeWallet}from'./wallet-state.mjs?v=0.27.2';
@@ -15,18 +16,18 @@ import{BOSS_ATTACK_INTERVAL,bossFleetAdmission,ensureAdventure,bossAlive,bossAcc
 import{equippedItems,equipmentOrder,equipmentBonuses,equipmentTypes,partySynergy,applyFleetEquipment,rollItem,dismantleYield,itemName}from'./equipment.mjs?v=0.27.2&rev=progress1';
 import{npcFlag,npcProfile,standardizeNpcFlags}from'./npc-flags.mjs?v=0.27.2';
 import{emitActivity}from'./activity-hooks.mjs';
-import{ECONOMY_VERSION,INITIAL_RESOURCES,buildingCost,requiredWarehouse,shipMaterials,repairMaterials}from'./economy.mjs?v=0.27.2&rev=duels1';
-import{hasWall,storageCapacity,sailorState,defendingTroops,migrateHarbor}from'./harbor.mjs?v=0.27.2&rev=duels1';
+import{ECONOMY_VERSION,INITIAL_RESOURCES,buildingCost,requiredWarehouse,shipMaterials,repairMaterials}from'./economy.mjs?v=0.27.2&rev=specials1';
+import{hasWall,storageCapacity,sailorState,defendingTroops,migrateHarbor}from'./harbor.mjs?v=0.27.2&rev=specials1';
 import{defaultFlag,normalizeFlag,sameFlag}from'./flags.mjs?v=0.27.2&rev=flag3';
-import{NPC_MAX,NPC_LEVEL_RANGE,NAVAL_ROUND_SECONDS,NAVAL_TURN_SECONDS,rollNavalTurn,npcShipCount,seaFields,npcRoute,makeNpcFleet,navalUnits,rollNavalRound,distributeSeaLoot,createWreck,battleSnapshot,npcAccess,botPoint,interceptionPoint,fleetPoint,wreckPoint,routeLootBonus,resourceTotal,wreckSalvagePlan}from'./sea-system.mjs?v=0.27.2&rev=duels1';
-import{recordOrder,recordReturn,recordJobCompletion}from'./onboarding.mjs?v=0.27.2&rev=duels1';
+import{NPC_MAX,NPC_LEVEL_RANGE,NAVAL_ROUND_SECONDS,NAVAL_TURN_SECONDS,rollNavalTurn,npcShipCount,seaFields,npcRoute,makeNpcFleet,navalUnits,rollNavalRound,distributeSeaLoot,createWreck,battleSnapshot,npcAccess,botPoint,interceptionPoint,fleetPoint,wreckPoint,routeLootBonus,resourceTotal,wreckSalvagePlan}from'./sea-system.mjs?v=0.27.2&rev=specials1';
+import{recordOrder,recordReturn,recordJobCompletion}from'./onboarding.mjs?v=0.27.2&rev=specials1';
 import {DEFAULT_SLOTS,waterPoint,seaRoute,routePoint,routeLength,harbor,coastPoint,nearestWater} from './navigation.mjs?v=0.27.2&rev=duels1';
-import {WORKER_POOL,WORK_SHIFT_SECONDS,PRODUCTION_MODEL,workerCount,workerCapacity,workerState,workOrder,productionBetween} from './workers.mjs?v=0.27.2&rev=duels1';
-export {WORKER_POOL,WORK_SHIFT_SECONDS,workerState} from './workers.mjs?v=0.27.2&rev=duels1';
+import {WORKER_POOL,WORK_SHIFT_SECONDS,PRODUCTION_MODEL,workerCount,workerCapacity,workerState,workOrder,productionBetween} from './workers.mjs?v=0.27.2&rev=specials1';
+export {WORKER_POOL,WORK_SHIFT_SECONDS,workerState} from './workers.mjs?v=0.27.2&rev=specials1';
 import{populationState,recruitmentCost}from'./population.mjs?v=0.27.2&rev=recruit1';
 import{MAX_LEVEL,MAX_RESEARCH_LEVEL,buildingSeconds,maxBuildingLevel,queueDelay,researchSpec}from'./progression.mjs?v=0.27.2';
 export{maxBuildingLevel,queueDelay}from'./progression.mjs?v=0.27.2';
-import{MIN_CREW_PER_SHIP,plannedWarehouse,spawnAnchor}from'./pace-rules.mjs?v=0.27.2&rev=duels1';
+import{MIN_CREW_PER_SHIP,plannedWarehouse,spawnAnchor}from'./pace-rules.mjs?v=0.27.2&rev=specials1';
 export const BUILDINGS=['sede','serraria','pedreira','armazem','estaleiro','muralha','academia'];
 export const SHIPS={pesqueiro:{wood:80,stone:20,minutes:5,slots:1,capacity:20,cargo:20,speed:1},cargueiro:{wood:120,stone:60,minutes:7,slots:2,capacity:60,cargo:350,speed:.85},explorador:{wood:100,stone:40,minutes:6,slots:1,capacity:15,cargo:30,speed:1.35},combate:{wood:180,stone:120,minutes:10,slots:4,capacity:40,cargo:80,speed:1}};
 export const SHIP_UNLOCKS={pesqueiro:1,cargueiro:1,explorador:5,combate:8};
@@ -80,7 +81,7 @@ export function quote(w,id,request){ensureAdventure(w);const p=w.players[id];con
   else throw new Error('Construção inválida.');
   const need=requiredWarehouse(v.resources);ok(need<=MAX_LEVEL,'Quantidade demasiado grande. Reduz a encomenda.');ok(p.levels.armazem>=need,`Requer armazém N${need}; reduz a quantidade ou melhora o armazém.`);for(const[k,n]of Object.entries(v.resources))ok(p.resources[k]>=n,'Recursos insuficientes.');q.resources=v.resources;
  }else if(kind==='gestao'){
-  if(q.action==='registar-presenca'){q.description='Presença registada';}else if(q.action==='recolher-conquista'){v.reward=achievementReward(w,p,v.achievement);q.description='Recolher '+v.reward.title;}else if(q.action==='retirar-frota'){
+  if(q.action==='ordem-batalha'){battleOrderQuote(w,id,v);q.description='Ordem de batalha';}else if(q.action==='registar-presenca'){q.description='Presença registada';}else if(q.action==='recolher-conquista'){v.reward=achievementReward(w,p,v.achievement);q.description='Recolher '+v.reward.title;}else if(q.action==='retirar-frota'){
    const mission=w.missions.find(m=>m.id===v.mission&&m.user===id);
    const encounter=mission&&w.encounters[mission.target];
    ok(mission&&encounter&&encounter.id===mission.encounter&&['muralha','batalha'].includes(encounter.phase),'Só podes retirar uma frota tua em combate.');
@@ -133,7 +134,7 @@ export function execute(w,id,name,request,wall=Date.now()){
  if(q.kind==='entrar'){p={id,name,flag:v.flag,islandName:'Ilha de '+name,slot:allocSlot(w,1,true),levels:Object.fromEntries(BUILDINGS.map(k=>[k,k==='academia'?0:1])),damage:Object.fromEntries(BUILDINGS.map(k=>[k,0])),tech:{navegacao:0,logistica:0,artilharia:0},resources:{...INITIAL_RESOURCES},fleet:{pesqueiro:2,cargueiro:1,explorador:0,combate:0},reserved:{},workers:WORKER_POOL,troops:20,garrison:0,alliance:null,protectedUntil:wall+72*3600000,shieldUntil:0,liveShield:'',attacks:0,repeat:{},farmUntil:0,spent:0,dailySpent:0};startAllowance(p,wall,w.streamEpoch||0);w.players[id]=p;for(const a of Object.values(w.alliances)){a.invites??={};a.invites[id]=invitation();refreshInvites(w,a);}ensureAdventure(w);report(w,p,'ilha','A tua ilha está pronta');event(w,name+' fundou uma ilha.',{user:id});}
  else if(q.kind==='construcoes'){
   pay(p,v.resources);const last=w.clock+queueDelay(w,id,q.action);w.jobs.push({id:uid(w,'O'),user:id,action:q.action,payload:v,start:last,end:last+q.seconds});
-  }else if(q.kind==='gestao'){if(q.action==='registar-presenca'){recordPresence(w,p);}else if(q.action==='recolher-conquista'){v.reward=collectAchievement(w,p,v.achievement);changeWallet(w,id,name,v.reward.coins,wall);report(w,p,'conquista',v.reward.title,{coins:v.reward.coins,achievement:v.reward.key});}else if(q.action==='retirar-frota'){
+  }else if(q.kind==='gestao'){if(q.action==='ordem-batalha'){setBattleOrder(w,id,v);}else if(q.action==='registar-presenca'){recordPresence(w,p);}else if(q.action==='recolher-conquista'){v.reward=collectAchievement(w,p,v.achievement);changeWallet(w,id,name,v.reward.coins,wall);report(w,p,'conquista',v.reward.title,{coins:v.reward.coins,achievement:v.reward.key});}else if(q.action==='retirar-frota'){
   const mission=w.missions.find(m=>m.id===v.mission&&m.user===id),encounter=w.encounters[mission.target];
   mission.withdrawRequested=true;
   encounter.withdrawnUsers??=[];
@@ -348,7 +349,7 @@ function arriveBoss(w,m,b){
  const admission=bossFleetAdmission(w,b,m,SHIPS);if(!admission){report(w,p,'expedicao','Sem capacidade na ilha; a frota regressa',{target:b.id});return returnHome(w,m);}
  if(sum(admission.returnFleet)>0){const extra={...copy(m),id:uid(w,'V'),fleet:admission.returnFleet,troops:admission.returnTroops,initialFleet:copy(admission.returnFleet),initialTroops:admission.returnTroops,equipmentIds:[],gear:{},gearTypes:[],gearItems:[],splitFrom:m.id};m.fleet=admission.fleet;m.troops=admission.troops;m.initialFleet=copy(m.fleet);m.initialTroops=m.troops;w.missions.push(extra);returnHome(w,extra);report(w,p,'expedicao','Os barcos mais fortes entraram; o excedente regressa',{target:b.id,ships:sum(extra.fleet),troops:extra.troops});}
 
- if(!e){e={combatRule:'duel-v1',id:uid(w,'E'),target:b.id,type:'boss',bossParty:copy(bossParty(w,b.id)),name:b.bossName,boss:b.boss,bossLife:b.life,position:harbor(w.slots,b),phase:'batalha',attackers:[],defenders:[],round:0,next:w.clock,started:w.clock,log:[],naval:{attackers:[],defenders:bossUnits(b,{rule:'duel-v1'})}};w.encounters[b.id]=e;}
+ if(!e){e={combatRule:'duel-v1',specialRule:'telegraph-v1',id:uid(w,'E'),target:b.id,type:'boss',bossParty:copy(bossParty(w,b.id)),name:b.bossName,boss:b.boss,bossLife:b.life,position:harbor(w.slots,b),phase:'batalha',attackers:[],defenders:[],round:0,next:w.clock,started:w.clock,log:[],naval:{attackers:[],defenders:bossUnits(b,{rule:'duel-v1'})}};w.encounters[b.id]=e;}
  if(e.phase==='loot'||e.phase==='fim')return returnHome(w,m);
  m.naval=applyFleetEquipment(navalUnits(m.fleet,m.troops,m.level,m.id,m.user),m.gear||equipmentBonuses(p));for(const u of m.naval)u.attack=Math.round(u.attack*(1+.05*p.tech.artilharia));
  if(b.final||b.level>=12){const count=new Set([...navalMissions(w,e).filter(v=>v.troops>0&&sum(v.fleet)>0).map(v=>v.user),m.user]).size,scale=1+(b.final?.85:.7)*(count-1),previous=e.partyScale||1;if(scale>previous){for(const u of e.naval.defenders){u.hp=Math.round(u.hp*scale/previous);u.maxHP=Math.round(u.maxHP*scale/previous);}e.partyScale=scale;}}e.attackers.push(m.id);e.naval.attackers.push(...m.naval);m.phase=e.phase;m.to=e.position;m.encounter=e.id;m.foughtRounds=0;
@@ -367,7 +368,8 @@ function combatBoss(w,e){
  if(e.phase==='rally'){if(w.clock<e.rallyUntil&&w.missions.some(m=>m.target===e.target&&m.phase==='ida')){e.next=Math.min(w.clock+12,e.rallyUntil);return;}e.phase='batalha';for(const m of alive)m.phase='batalha';}
  if(!e.formed){if(!bossFormation(w,e,alive))return finishBoss(w,e,false);e.formed=true;}const attackers=ms.flatMap(m=>m.naval||[]);e.naval.attackers=attackers;
  if(!e.naval.defenders.some(u=>u.hp>0&&u.crew>0)){completeWithdrawals(w,e);return beginBossLoot(w,e);}
- const teams=battleTeams(w,e),r=navalRoll(w,e,attackers,e.naval.defenders,{attack:teams.attack.bonus,defense:teams.defense.bonus,bossLevel:b.level});r.at=w.clock;e.round++;e.log.push(r);e.log=e.log.slice(-12);e.next=w.clock+(e.combatRule==='duel-v1'?NAVAL_TURN_SECONDS:12);
+ if(!prepareBossSpecial(w,e))return;
+ const teams=battleTeams(w,e),r=navalRoll(w,e,attackers,e.naval.defenders,{attack:teams.attack.bonus,defense:teams.defense.bonus,bossLevel:b.level,special:e.specialRule==='telegraph-v1'?e.special:null});r.at=w.clock;e.round++;e.log.push(r);e.log=e.log.slice(-12);e.next=w.clock+(e.combatRule==='duel-v1'?NAVAL_TURN_SECONDS:12);
  emitActivity(w,'battle.boss_roll','battle',e.id,{round:r,boss:b.id},ms.map(m=>m.user));
  for(const m of alive){e.damageByUser??={};const ids=new Set(m.naval.map(u=>u.id));e.damageByUser[m.user]=(e.damageByUser[m.user]||0)+r.hits.filter(h=>ids.has(h.from)).reduce((n,h)=>n+h.damage,0);if(r.rolls.some(x=>ids.has(x.unit))&&(!r.cycle||m.lastFoughtCycle!==r.cycle)){m.foughtRounds++;m.lastFoughtCycle=r.cycle;}syncNaval(w,m);m.phase='batalha';}
  const survived=ms.some(m=>m.troops>0&&sum(m.fleet)>0);

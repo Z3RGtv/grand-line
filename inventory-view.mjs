@@ -1,6 +1,6 @@
 import{coinIcon}from'./wallet-view.mjs?v=0.27.2&rev=progress1';
 import{EXCLUSIVE_ITEMS}from'./equipment.mjs?v=0.27.2&rev=progress1';
-import{FRAGMENTS_REQUIRED}from'./balance-policy.mjs?v=0.27.2&rev=duels1';
+import{FRAGMENTS_REQUIRED}from'./balance-policy.mjs?v=0.27.2&rev=specials1';
 import{EQUIPMENT_SLOTS,ITEM_TYPES,ITEM_SETS,RARITIES,MAX_EQUIPPED,equippedItems,equipmentSets,itemName,itemArt,dismantleYield}from'./equipment.mjs?v=0.27.2&rev=progress1';
 import{inventoryExpansion}from'./inventory-capacity.mjs?v=0.27.2';
 import{createEquipmentDraft,draftChanged}from'./equipment-draft.mjs?v=0.27.2&rev=progress1';

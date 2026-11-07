@@ -1,5 +1,5 @@
-import{workerState,workerCount}from'./workers.mjs?v=0.27.2&rev=duels1';
-import{WORK_PRICE}from'./balance-policy.mjs?v=0.27.2&rev=duels1';
+import{workerState,workerCount}from'./workers.mjs?v=0.27.2&rev=specials1';
+import{WORK_PRICE}from'./balance-policy.mjs?v=0.27.2&rev=specials1';
 export function workerPanel(p,{clock=0,prefix='',resource=null,draft={},countdown=n=>String(n),summary=()=>''}={}){
  const s=workerState(p,clock),total=workerCount(p),wood=s.active?s.woodWorkers:resource?resource==='wood'?total:0:Math.min(total,draft.woodWorkers??Math.ceil(total/2)),stone=s.active?s.stoneWorkers:resource?resource==='stone'?total:0:Math.min(total-wood,draft.stoneWorkers??Math.floor(total/2)),other=resource==='wood'?'stone':'wood',counts={wood,stone},revision=[s.active,p.work?.start||0,p.work?.until||0,s.woodWorkers,s.stoneWorkers,total].join(':');
  const input=k=>`<input id="${prefix}workers-${k}" data-workers-resource="${k}" type="number" min="0" max="${total}" value="${counts[k]}">`;
