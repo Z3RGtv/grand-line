@@ -1,6 +1,6 @@
 import{createWalletOrders}from'./wallet-orders.mjs?v=0.27.2';
 import{gameRunning}from'./game-session.mjs?v=0.27.2';
-import{DAILY_GAME_LIMIT,GAME_BUDGET_CAP}from'./rules.mjs?v=0.27.2&rev=world2';
+import{DAILY_GAME_LIMIT,GAME_BUDGET_CAP}from'./rules.mjs?v=0.27.2&rev=progress1';
 import{bytes}from'./orders.mjs?v=0.27.2';
 import{browserVaultStore,createEncryptedVault}from'./private-cache.mjs?v=0.27.2';
 import{canReadFallback,consultationState,oauthReturn}from'./read-mode.mjs?v=0.27.2';

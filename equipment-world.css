@@ -4,7 +4,7 @@
 .protection-label{display:block;margin:10px 0;padding:8px 12px;border:1px solid #78d5ed77;border-radius:8px;background:#1c677b44;color:#b4f0ff;font-size:.88rem}
 @keyframes shield-breathe{50%{box-shadow:inset 0 2px 16px #d4fbffb5,0 0 21px #52d7fc90}}
 .boss-badge{display:block;width:100%;height:auto;filter:drop-shadow(0 3px 4px #0009)}
-.boss-badge.locked{filter:grayscale(1);opacity:.42}
+.boss-badge.badge-locked{filter:grayscale(1);opacity:.85}
 .boss-badge-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:9px;margin:8px 0 20px}
 .boss-badge-grid>button{padding:0;background:none;border:0;min-width:0;transition:transform .15s}
 .boss-badge-grid>button:hover{transform:translateY(-3px)}

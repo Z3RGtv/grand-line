@@ -1,8 +1,8 @@
-import{protection,protectionBubble}from'./island-honours.mjs?v=0.27.2&rev=world2';
+import{protection,protectionBubble}from'./island-honours.mjs?v=0.27.2&rev=progress1';
 import{gameRunning}from'./game-session.mjs?v=0.27.2';
-import{npcShipCount,botPoint,fleetPoint,battlePoint,wreckPoint}from'./sea-system.mjs?v=0.27.2&rev=world2';
+import{npcShipCount,botPoint,fleetPoint,battlePoint,wreckPoint}from'./sea-system.mjs?v=0.27.2&rev=progress1';
 import{flagSVG,defaultFlag}from'./flags.mjs?v=0.27.2&rev=flag2';
-import{seaMarkers}from'./naval-view.mjs?v=0.27.2&rev=world2';
+import{seaMarkers}from'./naval-view.mjs?v=0.27.2&rev=progress1';
 import{routePoint}from'./navigation.mjs?v=0.27.2';
 const params=new URLSearchParams(location.search),demo=['127.0.0.1','localhost'].includes(location.hostname)&&params.get('demo')==='1',compact=params.get('mode')==='compact',sceneLayout=params.get('layout')==='scene',$=s=>document.querySelector(s),esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])),fmt=s=>{s=Math.max(0,Math.ceil(s));return Math.floor(s/60)+':'+String(s%60).padStart(2,'0');};let state,publishedAt=0,layout,settings,lab,lastError=false,lastSignature='',compactSignature='';
 if(sceneLayout)document.body.classList.add('obs-scene');if(params.has('preview'))document.body.classList.add('preview');if(compact){document.body.classList.add('compact');$('#compact').hidden=false;}if(demo){const flag=document.createElement('span');flag.className='demo-flag';flag.textContent='DEMONSTRAÇÃO · JOGADORES FICTÍCIOS';document.body.append(flag);}

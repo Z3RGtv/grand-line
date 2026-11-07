@@ -1,4 +1,4 @@
-import{BOSS_SITES,EXPANDED_BOSS_SITES,LEGACY_BOSS_SITES,FINAL_BOSS_CLEARING}from'./adventure.mjs?v=0.27.2&rev=world2';
+import{BOSS_SITES,EXPANDED_BOSS_SITES,LEGACY_BOSS_SITES,FINAL_BOSS_CLEARING}from'./adventure.mjs?v=0.27.2&rev=progress1';
 // Shared sea geometry. Paths use water corridors, never island centres.
 export const MAP_WIDTH=3000,MAP_HEIGHT=2000;
 export const LAND_RX=.058,LAND_RY=.064;

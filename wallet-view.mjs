@@ -63,7 +63,7 @@ export function walletView(wallet, {demo=false, readOnly=false, canLoad=true, pa
  </section>` : '';
  const moves = (wallet.transactions || []).map(t => {
   const label = t.kind === 'credit'
-   ? ({'balance-refund':'Devolução de equilíbrio',welcome:'Bónus de boas-vindas','reset-refund':'Devolução do reset'}[t.request?.kind]||'Carregamento')
+   ? ({'balance-refund':'Devolução de equilíbrio',welcome:'Bónus de boas-vindas','reset-refund':'Devolução do reset',achievement:'Recompensa de conquista'}[t.request?.kind]||'Carregamento')
    : t.request?.kind === 'entrar' ? 'Criar ilha' : labels[t.request?.action] || 'Ação';
   const date = new Date(t.created).toLocaleString('pt-PT', {day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
   return `<div><span><b>${esc(label)}</b><small>${date}</small></span>

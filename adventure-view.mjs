@@ -1,7 +1,7 @@
-import{relicHolders}from'./island-honours.mjs?v=0.27.2&rev=world2';
-import{FINAL_SECRET_SLOTS}from'./final-rewards.mjs?v=0.27.2&rev=world2';
-import{ITEM_TYPES,RARITIES,EQUIPMENT_SLOTS,equipmentBonuses,itemBonus,itemName,dismantleYield,STAT_NAMES,ITEM_SETS,equipmentSets,equippedItems,bestSetSlots,incompatibility,lootPool,lootOdds,rarityOdds,lootTable,itemArt,DROP_TABLES}from'./equipment.mjs?v=0.27.2&rev=world2';
-import{bossAlive,bossAccess}from'./adventure.mjs?v=0.27.2&rev=world2';
+import{relicHolders,bossBadge}from'./island-honours.mjs?v=0.27.2&rev=progress1';
+import{FINAL_SECRET_SLOTS}from'./final-rewards.mjs?v=0.27.2&rev=progress1';
+import{ITEM_TYPES,RARITIES,EQUIPMENT_SLOTS,equipmentBonuses,itemBonus,itemName,dismantleYield,STAT_NAMES,ITEM_SETS,equipmentSets,equippedItems,bestSetSlots,incompatibility,lootPool,lootOdds,rarityOdds,lootTable,itemArt,DROP_TABLES}from'./equipment.mjs?v=0.27.2&rev=progress1';
+import{bossAlive,bossAccess}from'./adventure.mjs?v=0.27.2&rev=progress1';
 import{workerState}from'./workers.mjs?v=0.27.2';
 import{maxBuildingLevel}from'./progression.mjs?v=0.27.2';
 const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -9,7 +9,7 @@ const names={sede:'Casa principal',serraria:'Serraria',pedreira:'Pedreira',armaz
 const image=i=>'<img class="equipment-art" src="'+itemArt(i)+'" alt="'+esc(itemName(i))+'">';
 const attributes=i=>Object.entries(itemBonus(i)).map(([key,value])=>'<b>+'+value+'% '+STAT_NAMES[key]+'</b>').join('');
 const quality=i=>'<span class="item-quality" style="color:'+RARITIES[i.rarity].color+'">'+RARITIES[i.rarity].name+' · N'+RARITIES[i.rarity].level+' · '+ITEM_SETS[ITEM_TYPES[i.type].set].name+'</span>';
-export{inventoryView}from'./inventory-view.mjs?v=0.27.2&rev=world2';
+export{inventoryView}from'./inventory-view.mjs?v=0.27.2&rev=progress1';
 export function adventureReadiness(w,p,quote){if(!p||p.hibernating)return[];const out=[],work=workerState(p,w.clock);if(work.available>0)out.push({icon:'⚒',title:work.available+' trabalhadores livres',building:'serraria',section:'producao'});for(const building of Object.keys(names)){if(p.levels[building]>=maxBuildingLevel(building)||w.jobs.some(j=>j.user===p.id&&j.action==='edificio'&&j.payload.building===building))continue;try{const q=quote(w,p.id,{kind:'construcoes',action:'edificio',payload:{building}});out.push({icon:'⌂',title:names[building]+' → N'+q.payload.level,building});}catch{}}return out;}
 const reportIcons={ataque:'⚔',defesa:'⛨',batalha:'⚔',boss:'⚔',regresso:'⚓',trabalhadores:'⚒',ordem:'⌂',recompensa:'◆',reciclagem:'♻',equipamento:'◆',ilha:'⚑',expedicao:'⚓'};
 const mysteryItem='<span class="mystery-item" role="img" aria-label="Item por revelar">?</span>';
@@ -47,7 +47,7 @@ export function reportView(w,p,ready,clock){
   (ready.length?'<section class="readiness-panel"><h3>Disponível agora</h3>'+ready.map(a=>'<button data-build="'+a.building+'" '+(a.section?'data-section="'+a.section+'"':'')+'><span>'+a.icon+'</span><b>'+a.title+'</b><i>→</i></button>').join('')+'</section>':'')+
   '<div class="private-report-list">'+cards.join('')+'</div>';
 }
-export function bossMapArt(w,p,t){return(w.bosses||[]).map(b=>{const alive=bossAlive(w,b),a=bossAccess(w,p,b);return '<button class="boss-island '+(b.final?'final-boss ':'')+(!alive?'recovering ':'')+(a.ok?'accessible':'inaccessible')+'" data-object="'+b.id+'" style="left:'+b.x*100+'%;top:'+b.y*100+'%;width:'+b.width/3000*100+'%" aria-label="'+esc(b.name)+' nível recomendado '+b.level+(alive?' · '+a.label:' · A recuperar')+'"><img src="assets/bosses/island-'+b.boss+'.png" alt=""><span class="boss-map-level">'+(alive?'N'+b.level:'◷')+'</span><span class="boss-map-name">'+esc(b.name)+'</span>'+(!alive?'<span class="boss-map-timer" data-end="'+b.respawnAt+'">—</span>':'')+'</button>';}).join('');}
+export function bossMapArt(w,p,t){return(w.bosses||[]).map(b=>{const alive=bossAlive(w,b),a=bossAccess(w,p,b);return '<button class="boss-island '+(b.final?'final-boss ':'')+(!alive?'recovering ':'')+(a.ok?'accessible':'inaccessible')+'" data-object="'+b.id+'" style="left:'+b.x*100+'%;top:'+b.y*100+'%;width:'+b.width/3000*100+'%" aria-label="'+esc(b.name)+' nível recomendado '+b.level+(alive?' · '+a.label:' · A recuperar')+'"><span class="boss-map-badge">'+bossBadge(b.id,{locked:!p?.bossWins?.includes(b.id)})+'</span><img src="assets/bosses/island-'+b.boss+'.png" alt=""><span class="boss-map-level">'+(alive?'N'+b.level:'◷')+'</span><span class="boss-map-name">'+esc(b.name)+'</span>'+(!alive?'<span class="boss-map-timer" data-end="'+b.respawnAt+'">—</span>':'')+'</button>';}).join('');}
 export function bossPortrait(b){return '<div class="boss-portrait"><span class="boss-sprite" data-boss="'+esc(b.boss)+'" data-idle-id="'+esc(b.id||b.boss)+'" style="--boss-art:url(assets/bosses/'+b.boss+'-idle.png)" role="img" aria-label="'+esc(b.bossName)+'"></span></div>';}
 export function rewardDialog(r){
  if(['item-loss','item-capture','item-plunder'].includes(r.type)){const lost=r.type==='item-loss';return'<section role="dialog" aria-modal="true" aria-labelledby="reward-title" class="reward-card equipment-event '+(lost?'lost-item':'captured-item')+'"><button class="reward-close" data-reward-close="1" aria-label="Fechar">×</button><span class="eyebrow">'+(lost?'Equipamento perdido':'Equipamento capturado')+'</span><div class="equipment-event-items">'+(r.items||[]).map(image).join('')+'</div><h2 id="reward-title">'+esc(r.title)+'</h2><button class="primary wide" data-reward-close="1">Continuar</button></section>';}

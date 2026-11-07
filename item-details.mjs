@@ -1,5 +1,5 @@
-import{ITEM_TYPES,ITEM_SETS,RARITIES,EQUIPMENT_SLOTS,STAT_NAMES,itemName,itemArt,itemBonus,equipmentBonuses,lootOdds,EXCLUSIVE_ITEMS,FINAL_EQUIPMENT}from'./equipment.mjs?v=0.27.2&rev=world2';
-import{BOSS_SITES}from'./adventure.mjs?v=0.27.2&rev=world2';
+import{ITEM_TYPES,ITEM_SETS,RARITIES,EQUIPMENT_SLOTS,STAT_NAMES,itemName,itemArt,itemBonus,equipmentBonuses,lootOdds,EXCLUSIVE_ITEMS,FINAL_EQUIPMENT}from'./equipment.mjs?v=0.27.2&rev=progress1';
+import{BOSS_SITES}from'./adventure.mjs?v=0.27.2&rev=progress1';
 const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const percent=n=>(n*100).toLocaleString('pt-PT',{maximumFractionDigits:2})+'%';
 export function itemDetailsView(item,p,{catalog=false,marked=false}={}){
