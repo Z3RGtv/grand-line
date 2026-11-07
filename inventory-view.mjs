@@ -1,18 +1,19 @@
 import{coinIcon}from'./wallet-view.mjs?v=0.27.2';
-import{EXCLUSIVE_ITEMS}from'./equipment.mjs?v=0.27.2';
+import{EXCLUSIVE_ITEMS}from'./equipment.mjs?v=0.27.2&rev=world1';
 import{FRAGMENTS_REQUIRED}from'./balance-policy.mjs?v=0.27.2';
-import{EQUIPMENT_SLOTS,ITEM_TYPES,ITEM_SETS,RARITIES,MAX_EQUIPPED,equippedItems,equipmentSets,itemName,itemArt,dismantleYield}from'./equipment.mjs?v=0.27.2';
+import{EQUIPMENT_SLOTS,ITEM_TYPES,ITEM_SETS,RARITIES,MAX_EQUIPPED,equippedItems,equipmentSets,itemName,itemArt,dismantleYield}from'./equipment.mjs?v=0.27.2&rev=world1';
 import{inventoryExpansion}from'./inventory-capacity.mjs?v=0.27.2';
-import{createEquipmentDraft,draftChanged}from'./equipment-draft.mjs?v=0.27.2&rev=inventory1';
+import{createEquipmentDraft,draftChanged}from'./equipment-draft.mjs?v=0.27.2&rev=world1';
+import{islandTheftChance}from'./equipment-risk.mjs?v=0.27.2&rev=world1';
 const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const image=i=>'<button class="item-art-button" data-item-id="'+esc(i.id)+'" aria-label="Ver '+esc(itemName(i))+'"><img class="equipment-art" src="'+itemArt(i)+'" alt=""></button>';
 
-export function inventoryView(p, selection=new Set(), {draft=createEquipmentDraft(p)}={}) {
+export function inventoryView(p, selection=new Set(), {draft=createEquipmentDraft(p),deployed=new Set()}={}) {
  const bag = p.inventory || [];
  const preview = {...p,equipment:draft.slots};
  const completeSet = equipmentSets(preview).find(set => set.count === MAX_EQUIPPED);
  const dirty = draftChanged(draft);
- const savedIds = Object.values(p.equipment || {});
+ const savedIds = [...Object.values(p.equipment || {}),...Object.values(p.attackEquipment||{})];
  const expansion = inventoryExpansion(p);
  const status = draft.pending
   ? '<span class="equipment-pending" role="status">A guardar configuração…</span>'
@@ -38,10 +39,11 @@ export function inventoryView(p, selection=new Set(), {draft=createEquipmentDraf
   const title = esc(itemName(item));
   const chosen = draft.slots[type.slot] === item.id;
   return `<article class="equipment-tile${chosen ? ' chosen' : ''}${selection.has(item.id) ? ' salvage-marked' : ''}" style="--set-color:${set.color}">
-   <button class="equipment-piece" data-equip="${esc(item.id)}" data-drag-slot="${type.slot}"
+   <button class="equipment-piece" data-equip="${esc(item.id)}" data-drag-slot="${type.slot}" ${deployed.has(item.id)?'disabled':''}
     aria-label="Selecionar ${title} para ${EQUIPMENT_SLOTS[type.slot]}" aria-pressed="${chosen}" title="${title}">
     <span class="equipment-set-emblem" aria-hidden="true">${set.emblem}</span>
     <img src="${itemArt(item)}" alt="" draggable="false">
+    ${deployed.has(item.id)?'<small class="equipment-location">⛵ Em viagem</small>':Object.values(p.attackEquipment||{}).includes(item.id)?'<small class="equipment-location">⛵ Frota</small>':Object.values(p.equipment||{}).includes(item.id)?'<small class="equipment-location">⛨ Ilha</small>':''}
     ${chosen ? `<span class="equipment-mark" aria-hidden="true">${savedIds.includes(item.id) ? '✓' : '●'}</span>` : ''}
    </button>
    <button class="equipment-details" data-item-id="${esc(item.id)}" aria-label="Ver ${title} · ${set.name}" title="${title} · ${set.name}"><span>${title}</span></button>
@@ -53,13 +55,15 @@ export function inventoryView(p, selection=new Set(), {draft=createEquipmentDraf
  const plusTile = expansion.max ? '' : `<button class="equipment-vacancy inventory-add" data-inventory-expansion="1" aria-label="Expandir inventário">
   <span aria-hidden="true">+</span>${expansion.paid ? `<small>${expansion.paid}/${expansion.required}</small>` : ''}
  </button>`;
- const dismantle = [...bag,...(p.lootStash||[])].filter(item => !savedIds.includes(item.id) && !ITEM_TYPES[item.type].unique);
+ const dismantle = [...bag,...(p.lootStash||[])].filter(item => !savedIds.includes(item.id) && !deployed.has(item.id) && !ITEM_TYPES[item.type].unique);
  const selected = dismantle.filter(item => selection.has(item.id));
  const yieldTotal = selected.reduce((total,item) => {
   const resources = dismantleYield(item);
   return {wood:total.wood+resources.wood,stone:total.stone+resources.stone};
  },{wood:0,stone:0});
  return `<h2>Equipamento <small>${equippedItems(preview).length}/4</small></h2>
+  <div class="equipment-loadouts" role="group" aria-label="Local do equipamento"><button data-equipment-loadout="island" aria-pressed="${draft.loadout!=='fleet'}">⛨ Ilha</button><button data-equipment-loadout="fleet" aria-pressed="${draft.loadout==='fleet'}">⛵ Frota</button></div>
+  <small class="equipment-risk-note">${draft.loadout==='fleet'?'Perdes os itens se a frota for destruída.':Math.round(islandTheftChance(p)*100)+'% de risco por item se a ilha perder · Academia reduz até 15%.'}</small>
   <section class="equipment-editor" data-form-revision="${draft.revision}">
    ${status}
    <div class="equipment-selection"${completeSet ? ` data-complete-set="${completeSet.id}" style="--set-color:${completeSet.color}"` : ''}>

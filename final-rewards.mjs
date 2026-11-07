@@ -1,3 +1,4 @@
+import{abyssCopies,ABYSS_COPY_LIMIT}from'./equipment-risk.mjs?v=0.27.2&rev=world1';
 let secrets=[],ledger={hasUnique:()=>false};
 export function configureFinalCatalog(catalog){secrets=catalog.map(v=>Object.freeze({...v}));}
 export function configureFinalLedger(value){ledger=value;}
@@ -19,7 +20,7 @@ export function rollFinalReward(w,p,random,makeEquipment,id){
    p.uniqueLoot??={};p.uniqueLoot[pick]={at:w.wall,name:definition.name,art:definition.art,global:!!definition.global,equipment};w.finalDiscoveries??={};
    w.finalDiscoveries[pick]??={id:pick,name:definition.name,art:definition.art,user:p.id,playerName:p.name,at:w.wall,global:!!definition.global,equipment};
   }
- }else if(roll<.40)item=makeEquipment();
+ }else if(roll<.43){const candidate=makeEquipment();if(candidate&&abyssCopies(w,candidate.type)<ABYSS_COPY_LIMIT)item=candidate;}
  return{item,special,reason:item||special?'won':'none'};
 }
 export function publicFinalDiscoveries(w){return Object.fromEntries(Object.entries(w.finalDiscoveries||{}).filter(([id])=>FINAL_SECRET_SLOTS.includes(id)).map(([id,v])=>[id,{id,name:v.name,art:v.art,user:v.user,playerName:v.playerName,at:v.at,global:!!v.global,equipment:v.equipment||null}]));}

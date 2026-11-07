@@ -1,0 +1,68 @@
+.island-protection-bubble{position:absolute;z-index:3;inset:-25% -9% 19%;pointer-events:none;border:2px solid #91eaffb8;border-radius:50% 50% 43% 43%;background:radial-gradient(ellipse at 30% 17%,#edffff8a 0,transparent 14%),radial-gradient(ellipse at 50% 95%,#39ccf923 20%,#4ccefc14 60%,#85ecff45 93%);box-shadow:inset 0 2px 9px #d4fbff85,0 0 15px #52d7fc66;transform:perspective(300px) rotateX(-8deg);animation:shield-breathe 4s ease-in-out infinite}
+.island-protection-bubble>span{position:absolute;top:5%;left:43%;color:#dcfbff;font-style:normal;font-size:clamp(13px,1.5vw,25px);text-shadow:0 2px 5px #074456}
+.base-view>div>.island-protection-bubble{inset:0 3% 5%;z-index:0;opacity:.7}
+.protection-label{display:block;margin:10px 0;padding:8px 12px;border:1px solid #78d5ed77;border-radius:8px;background:#1c677b44;color:#b4f0ff;font-size:.88rem}
+@keyframes shield-breathe{50%{box-shadow:inset 0 2px 16px #d4fbffb5,0 0 21px #52d7fc90}}
+.boss-badge{display:block;width:100%;height:auto;filter:drop-shadow(0 3px 4px #0009)}
+.boss-badge.locked{filter:grayscale(1);opacity:.42}
+.boss-badge-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:9px;margin:8px 0 20px}
+.boss-badge-grid>button{padding:0;background:none;border:0;min-width:0;transition:transform .15s}
+.boss-badge-grid>button:hover{transform:translateY(-3px)}
+.player-honours h3{display:flex;justify-content:space-between;align-items:center}
+.player-honours h3 small{font-size:.8rem;opacity:.65}
+.boss-badge-preview{display:flex;align-items:center;gap:16px;padding:8px 0;margin:12px 0;border-block:1px solid #b89d6155}
+.boss-badge-preview .boss-badge{width:65px;flex:none}
+.player-relics>button{display:flex;align-items:center;gap:10px;width:100%;text-align:left;margin:8px 0;padding:7px}
+.player-relics img{width:52px;height:52px;object-fit:contain}
+.player-relics b{margin-left:auto;white-space:nowrap;font-size:.8rem}
+.relic-owners{display:block;color:#ddbd7d!important;line-height:1.4!important}
+.equipment-loadouts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0}
+.equipment-loadouts button[aria-pressed=true]{border-color:#e6c77e;background:#234552;color:#fff0be;box-shadow:inset 0 -3px #cfac67}
+.equipment-risk-note{display:block;line-height:1.5;margin:10px 0 16px;color:#b9cbd1;font-size:.8rem}
+.inspector .equipment-risk-note{color:#554c36}.inspector .protection-label{color:#205365;background:#2c92ac15}.inspector .relic-owners{color:#765119!important}
+.equipment-location{position:absolute;bottom:3px;left:3px;right:3px;background:#092532e6;color:#ffe3a6;border-radius:3px;font-size:.66rem;line-height:1.4;pointer-events:none}
+.equipment-piece{position:relative}
+.sail-equipment{display:grid!important;grid-template-columns:20px 1fr;align-items:center;gap:7px!important;padding:12px;background:#a3d3dd10;border-radius:8px;margin:12px 0;font-size:.88rem}
+.sail-equipment input{width:18px!important;height:18px;accent-color:#cfac67}
+.sail-equipment small{grid-column:2;color:#b6c9cc;font-size:.75rem}
+.sail-equipment-link{width:100%;margin:10px 0;font-size:.85rem}
+.equipment-event-items{display:flex;justify-content:center;flex-wrap:wrap;gap:8px;margin:30px 0;min-height:100px}
+.equipment-event-items img{width:100px;height:100px;object-fit:contain}
+.equipment-event{--rarity:#8eceb0}.equipment-event.lost-item{--rarity:#db7768}
+.equipment-event.lost-item{border-color:#db7768;background:radial-gradient(circle at 50% 30%,#712b2c,#102732 80%)}
+.equipment-event.lost-item img{animation:item-sink 1.4s both}
+.equipment-event.captured-item img{animation:item-capture .7s both}
+.equipment-event h2{font-size:1.5rem}
+.private-report .lost-item img{filter:grayscale(.65);opacity:.65}
+@keyframes item-sink{0%{transform:translateY(-20px);filter:brightness(2)}35%{transform:rotate(8deg);filter:brightness(1)}100%{transform:translateY(22px) rotate(-14deg);filter:grayscale(1);opacity:.25}}
+@keyframes item-capture{0%{transform:scale(.4) rotate(-20deg);opacity:0}80%{transform:scale(1.08)}100%{transform:scale(1);opacity:1}}
+.round-result{border:1px solid #cbb27566;border-radius:12px;padding:18px;background:linear-gradient(135deg,#122f3cf2,#0a1c29);margin:18px 0}
+.round-result h3{margin:0 0 12px;color:#edd59b;font-size:1.1rem}
+.round-score{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.round-score>span{display:flex;flex-wrap:wrap;gap:6px;justify-content:space-between;border-radius:7px;padding:10px;background:#7bd5d210;font-size:.8rem}
+.round-score b{font-size:1rem;color:#f5d78e}
+.round-result>small,.round-explainer{display:block;color:#b1c7ce;font-size:.78rem;margin:10px 0}
+.dice-duels{display:grid;gap:8px;margin:14px 0}
+.dice-duel{display:grid;grid-template-columns:minmax(0,1fr) 92px minmax(0,1fr);align-items:center;gap:12px;padding:12px;border:1px solid #8db2bf26;border-radius:8px;background:#081c2980}
+.duel-ship{min-width:0;text-align:center}
+.duel-ship>small{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.73rem;color:#b5cad1;margin-bottom:8px}
+.rolling-dice{display:flex;align-items:center;justify-content:center;gap:6px}
+.rolling-dice .dice-face{width:31px;height:31px;flex:none;animation:dice-tumble .7s both}
+.dice-duels>details summary{font-size:.8rem;color:#ceb980;padding:8px 2px;cursor:pointer}.dice-duels>details .dice-duel{margin-top:8px}
+.rolling-dice>b{font-size:1.5rem;margin-left:4px;color:#f7e7ba}
+.duel-verdict{text-align:center;display:grid;gap:4px;font-size:.72rem}
+.duel-verdict>b{font-size:.95rem}
+.duel-verdict>strong{color:#c4d6dd}
+.dice-duel.won .duel-verdict>strong{color:#88e0b4}
+.dice-duel.lost .duel-verdict>strong{color:#edac9e}
+.duel-verdict>small{font-size:.68rem;opacity:.7}
+.boss-area-hit{border-left:3px solid #e79069;padding:8px 12px;background:#dc845718;color:#f0b396;font-size:.88rem}
+.boss-area-hit>small{display:block;margin-top:5px;font-size:.73rem;color:#c5b7ab}
+.combat-math{font-size:.8rem;color:#b9cad0;margin-top:14px}
+.combat-math p{line-height:1.6;margin:10px 0}
+@keyframes dice-tumble{0%{transform:rotate(-100deg) scale(.6);opacity:.4}40%{transform:rotate(70deg) translateY(-6px)}70%{transform:rotate(-25deg)}100%{transform:rotate(0);opacity:1}}
+@media(max-width:600px){.round-result{padding:12px}.dice-duel{grid-template-columns:minmax(0,1fr) 64px minmax(0,1fr);gap:4px;padding:10px 4px}.rolling-dice{gap:3px}.rolling-dice .dice-face{width:23px;height:23px;padding:3px}.rolling-dice>b{font-size:1.15rem;margin-left:2px}.duel-ship>small{font-size:.64rem}.duel-verdict{font-size:.67rem}.duel-verdict>b{font-size:.8rem}.boss-badge-grid{gap:5px}.round-score>span{display:grid;gap:4px}.equipment-event-items img{width:78px;height:78px}}
+@media(prefers-reduced-motion:reduce){.island-protection-bubble,.rolling-dice .dice-face,.equipment-event img{animation:none!important}}
+@media(max-width:650px){.battle-view .battle-ship.boss-unit{grid-template-columns:minmax(0,1fr);padding:8px 0}.battle-view .boss-unit .boss-sprite{width:100px;height:100px;margin:auto}.battle-view .boss-unit strong{overflow-wrap:normal;word-break:normal}}
+
+.duel-verdict,.round-score b{animation:verdict-reveal .95s both}@keyframes verdict-reveal{0%,70%{opacity:0}100%{opacity:1}}@media(prefers-reduced-motion:reduce){.duel-verdict,.round-score b{animation:none}}
