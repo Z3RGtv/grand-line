@@ -1,4 +1,4 @@
-import{WAREHOUSE_HEADROOM}from'./pace-rules.mjs?v=0.27.2&rev=resources1';
+import{WAREHOUSE_HEADROOM}from'./pace-rules.mjs?v=0.27.2&rev=recruit1';
 import{MAX_LEVEL,MAX_RESEARCH_LEVEL,economyLevel}from'./progression.mjs?v=0.27.2';
 export const ECONOMY_VERSION='warehouse-v2';
 export const INITIAL_RESOURCES=Object.freeze({wood:45,stone:45,food:40});

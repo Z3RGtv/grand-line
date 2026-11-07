@@ -1,5 +1,5 @@
 // Prices are server-authoritative; channel-point loads remain 500 for 500 coins.
-export const BALANCE_RELEASE='0.28.1';
+export const BALANCE_RELEASE='0.28.2';
 export const WORK_PRICE=90;
 export function actionPrice(kind,action,v={}){
  if(kind==='gestao'&&['retirar-frota','registar-presenca','recolher-conquista'].includes(action))return 0;
@@ -10,8 +10,8 @@ function basePrice(kind,action,v={}){
  if(kind==='entrar')return 500;if(kind==='navegar')return 200;if(kind==='aliancas')return 100;
  if(kind==='gestao')return 100;
  if(kind==='construcoes'){
-  if(action==='tropas')return Math.min(350,50+5*v.count);
-  if(action==='trabalhadores')return Math.min(250,50+10*v.count);
+  if(action==='tropas')return Math.min(350,50+5*v.count)*(v.recruitment?.costMultiplier||1);
+  if(action==='trabalhadores')return Math.min(250,50+10*v.count)*(v.recruitment?.costMultiplier||1);
   if(action==='navios')return Math.min(350,100+50*v.count);
   if(action==='reparar')return Math.min(250,50+10*Math.ceil(Object.values(v.repaired||{}).reduce((a,b)=>a+b,0)/10));
   return 350;
