@@ -13,7 +13,7 @@ export const ITEM_TYPES={
  abyss_hull:{name:'Couraça Esmeralda',slot:'casco',stat:'hp',label:'Vida dos barcos',set:'brisa',power:1.1,finalOnly:true},
  abyss_compass:{name:'Astrolábio Imperial',slot:'navegacao',stat:'speed',label:'Velocidade',set:'bastiao',power:.65,finalOnly:true},
  abyss_cargo:{name:'Cofre Astral',slot:'ferramentas',stat:'cargo',label:'Carga',set:'aurora',power:1.3,finalOnly:true},
- lucky_talisman:{name:'Relíquia desconhecida',slot:'ferramentas',stat:'rareFind',label:'Hipótese de Raro+',set:'aurora',power:.5,unique:true,secret:true}};
+ lucky_talisman:{name:'Amuleto da Fortuna',slot:'ferramentas',stat:'rareFind',label:'Hipótese de Raro+',set:'aurora',power:.5,unique:true,finalOnly:true}};
 export const RARITIES=[{name:'Comum',color:'#b9c0c5',level:1,range:[2,4]},{name:'Incomum',color:'#76bf80',level:3,range:[5,7]},{name:'Raro',color:'#55a8e6',level:5,range:[8,10]},{name:'Épico',color:'#bc83e8',level:8,range:[11,14]},{name:'Lendário',color:'#efbb51',level:15,range:[15,18]}];
 export const DROP_TABLES=[{chance:.55,weights:[65,25,8,2,0]},{chance:.65,weights:[25,40,28,7,0]},{chance:.75,weights:[0,15,50,33,2]},{chance:.30,weights:[0,0,0,75,25]}];
 export const STAT_NAMES={attack:'Ataque naval',hp:'Vida dos barcos',speed:'Velocidade',production:'Produção',cargo:'Carga',rareFind:'Hipótese de Raro+'};

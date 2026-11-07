@@ -1,4 +1,4 @@
-import{ITEM_TYPES,ITEM_SETS,RARITIES,EQUIPMENT_SLOTS,STAT_NAMES,itemName,itemArt,itemBonus,equipmentBonuses,lootOdds,EXCLUSIVE_ITEMS}from'./equipment.mjs?v=0.27.2';
+import{ITEM_TYPES,ITEM_SETS,RARITIES,EQUIPMENT_SLOTS,STAT_NAMES,itemName,itemArt,itemBonus,equipmentBonuses,lootOdds,EXCLUSIVE_ITEMS}from'./equipment.mjs?v=0.27.2&rev=final2';
 import{BOSS_SITES}from'./adventure.mjs?v=0.27.2';
 const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const percent=n=>(n*100).toLocaleString('pt-PT',{maximumFractionDigits:2})+'%';
