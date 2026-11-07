@@ -14,7 +14,7 @@ import{capturePanelState,restorePanelState,createLatestReader}from'./ui-state.mj
 import{bossPartyView}from'./boss-party.mjs?v=0.27.2';
 import{bossAccess,bossAlive}from'./adventure.mjs?v=0.27.2';
 import{ITEM_TYPES,RARITIES,DROP_TABLES,EQUIPMENT_SLOTS,itemBonus,itemName,equipmentBonuses,dismantleYield,bestSetSlots,partySynergy}from'./equipment.mjs?v=0.27.2';
-import{reportView,adventureReadiness,bossMapArt,bossPortrait,rewardDialog,bossLootView}from'./adventure-view.mjs?v=0.27.2&rev=idle1';
+import{reportView,adventureReadiness,bossMapArt,bossPortrait,rewardDialog,bossLootView}from'./adventure-view.mjs?v=0.27.2&rev=lootreport1';
 import{bindEquipmentDrag,inventoryExpansionView,inventoryView}from'./inventory-view.mjs?v=0.27.2&rev=inventory2';
 import{nextMissionCue,createMissionPointer}from'./mission-cues.mjs?v=0.27.2';
 import{setButtonRequirement,highlightRequirement,interceptRequirement}from'./requirement-feedback.mjs?v=0.27.2';
