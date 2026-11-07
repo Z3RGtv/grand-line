@@ -1,5 +1,5 @@
-import{achievementList}from'./achievements.mjs?v=0.27.2&rev=progress1';
-import{bossBadge}from'./island-honours.mjs?v=0.27.2&rev=progress1';
+import{achievementList}from'./achievements.mjs?v=0.27.2&rev=cadence1';
+import{bossBadge}from'./island-honours.mjs?v=0.27.2&rev=cadence1';
 const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const hints={port:'Casa principal N2',crew:'Treina 10 marinheiros',navigator:'Conclui uma expedição',alliance:'Entra numa aliança',captain:'Casa principal N6'};
 export function achievementsView(w,p){

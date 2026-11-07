@@ -1,4 +1,4 @@
-import{abyssCopies,ABYSS_COPY_LIMIT}from'./equipment-risk.mjs?v=0.27.2&rev=progress1';
+import{abyssCopies,ABYSS_COPY_LIMIT}from'./equipment-risk.mjs?v=0.27.2&rev=cadence1';
 let secrets=[],ledger={hasUnique:()=>false};
 export function configureFinalCatalog(catalog){secrets=catalog.map(v=>Object.freeze({...v}));}
 export function configureFinalLedger(value){ledger=value;}

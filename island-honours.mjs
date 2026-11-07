@@ -1,4 +1,4 @@
-import{BOSS_SITES}from'./adventure.mjs?v=0.27.2&rev=progress1';
+import{BOSS_SITES}from'./adventure.mjs?v=0.27.2&rev=cadence1';
 import{sessionProtected}from'./game-session.mjs?v=0.27.2';
 import{itemArt,itemName}from'./equipment.mjs?v=0.27.2&rev=progress1';
 const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));

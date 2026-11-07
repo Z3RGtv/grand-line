@@ -4,7 +4,7 @@ import{FRAGMENTS_REQUIRED}from'./balance-policy.mjs?v=0.27.2&rev=recruit1';
 import{EQUIPMENT_SLOTS,ITEM_TYPES,ITEM_SETS,RARITIES,MAX_EQUIPPED,equippedItems,equipmentSets,itemName,itemArt,dismantleYield}from'./equipment.mjs?v=0.27.2&rev=progress1';
 import{inventoryExpansion}from'./inventory-capacity.mjs?v=0.27.2';
 import{createEquipmentDraft,draftChanged}from'./equipment-draft.mjs?v=0.27.2&rev=progress1';
-import{islandTheftChance}from'./equipment-risk.mjs?v=0.27.2&rev=progress1';
+import{islandTheftChance}from'./equipment-risk.mjs?v=0.27.2&rev=cadence1';
 const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const image=i=>'<button class="item-art-button" data-item-id="'+esc(i.id)+'" aria-label="Ver '+esc(itemName(i))+'"><img class="equipment-art" src="'+itemArt(i)+'" alt=""></button>';
 
