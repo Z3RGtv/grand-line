@@ -14,7 +14,7 @@ import{capturePanelState,restorePanelState,createLatestReader}from'./ui-state.mj
 import{bossPartyView}from'./boss-party.mjs?v=0.27.2';
 import{bossAccess,bossAlive}from'./adventure.mjs?v=0.27.2';
 import{ITEM_TYPES,RARITIES,DROP_TABLES,EQUIPMENT_SLOTS,itemBonus,itemName,equipmentBonuses,dismantleYield,bestSetSlots,partySynergy}from'./equipment.mjs?v=0.27.2';
-import{reportView,adventureReadiness,bossMapArt,bossPortrait,rewardDialog,bossLootView}from'./adventure-view.mjs?v=0.27.2&rev=lootreport1';
+import{reportView,adventureReadiness,bossMapArt,bossPortrait,rewardDialog,bossLootView,pendingRewardNotices}from'./adventure-view.mjs?v=0.27.2&rev=mystery1';
 import{bindEquipmentDrag,inventoryExpansionView,inventoryView}from'./inventory-view.mjs?v=0.27.2&rev=inventory2';
 import{nextMissionCue,createMissionPointer}from'./mission-cues.mjs?v=0.27.2';
 import{setButtonRequirement,highlightRequirement,interceptRequirement}from'./requirement-feedback.mjs?v=0.27.2';
@@ -443,8 +443,39 @@ if(!bossAlive(w,b))html+='<div class="boss-respawn">Regressa em '+countdown(b.re
 if(e)html+='<button class="primary wide" data-battle="'+e.id+'">⚔ Ver combate</button>';
 if(p&&a.ok&&e?.phase!=='loot'){html+=partyStatus(w,b.id,'ataque')+bossPartyView(w,p,b);const ship=preferredCombatShip(p),count=ship?Math.min(b.final?2:1,p.fleet[ship]):0,available=p.troops-defendingTroops(p);html+='<h3>Enviar frota</h3><div class="fields">'+Object.entries(SHIPS).map(([k,name])=>'<label class="fleet-input">'+name+' ('+p.fleet[k]+')<input id="send-'+k+'" type="number" min="0" max="'+p.fleet[k]+'" value="'+(k===ship?count:0)+'"></label>').join('')+'<label>Marinheiros<input id="send-troops" type="number" min="0" max="'+available+'" value="'+Math.min(b.final?80:40,available,count*(SHIP_RULES[ship]?.capacity||0))+'"></label></div><small data-sail-estimate></small><button class="primary wide" data-action="sail">Preparar ataque · 180 moedas</button>';}
 openAdventurePanel(id,html);updateSailingCrew();updateRoutes();}
-function queueRewardReveals(){const p=me();if(!p)return;const key='grand-line-loot-'+p.id+'-'+(state.world.previewInstance||'live'),last=Number(adventurePref(key)),fresh=(p.reports||[]).filter(r=>r.type==='recompensa'&&r.id>last);if(!fresh.length)return;writePref(key,String(fresh.at(-1).id));for(const r of fresh.slice(-5))if(!rewardQueue.some(v=>v.id===r.id))rewardQueue.push(r);showNextReward();}
-function showNextReward(){if(rewardShowing||!rewardQueue.length)return;rewardShowing=true;const r=rewardQueue.shift(),el=document.createElement('div');el.id='reward-reveal';el.className='reward-reveal';el.innerHTML=rewardDialog(r);document.body.append(el);el.querySelector('button').focus();}
+function queueRewardReveals(){
+ const p=me();if(!p)return;
+ const scope=p.id+'-'+(state.world.previewInstance||'live');
+ const notices=pendingRewardNotices(state.world,p),activeIds=new Set(notices.map(r=>r.id));
+ rewardQueue=rewardQueue.filter(r=>!r.mystery||activeIds.has(r.id));
+ const shown=$('#reward-reveal');
+ if(shown?.dataset.mysteryMission&&!notices.some(r=>r.mission===shown.dataset.mysteryMission)){
+  shown.remove();rewardShowing=false;
+ }
+ const noticeKey='grand-line-mystery-'+scope+'-'+(state.world.season||'');
+ let seen=[];
+ try{const saved=JSON.parse(adventurePref(noticeKey));if(Array.isArray(saved))seen=saved;}catch{}
+ const freshNotices=notices.filter(r=>!seen.includes(r.id));
+ if(freshNotices.length){
+  writePref(noticeKey,JSON.stringify([...seen,...freshNotices.map(r=>r.id)].slice(-100)));
+  rewardQueue.push(...freshNotices);
+ }
+ const key='grand-line-loot-'+scope,last=Number(adventurePref(key));
+ const fresh=(p.reports||[]).filter(r=>r.type==='recompensa'&&r.id>last);
+ if(fresh.length){
+  writePref(key,String(fresh.at(-1).id));
+  for(const r of fresh.slice(-5))if(!rewardQueue.some(v=>v.id===r.id))rewardQueue.push(r);
+ }
+ showNextReward();
+}
+function showNextReward(){
+ if(rewardShowing||!rewardQueue.length)return;
+ rewardShowing=true;
+ const r=rewardQueue.shift(),el=document.createElement('div');
+ el.id='reward-reveal';el.className='reward-reveal';
+ if(r.mystery)el.dataset.mysteryMission=r.mission;
+ el.innerHTML=rewardDialog(r);document.body.append(el);el.querySelector('button').focus();
+}
 function closeRewardReveal(){$('#reward-reveal')?.remove();rewardShowing=false;showNextReward();}
 
 function adventurePref(key){try{return localStorage.getItem(key)||'0';}catch{return'0';}}
