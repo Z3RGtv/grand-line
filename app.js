@@ -2,7 +2,7 @@ import{purchaseFeedback}from'./wallet-orders.mjs?v=0.27.2';
 import{gameRunning,fundingOpen}from'./game-session.mjs?v=0.27.2';
 import{coinIcon,entryWalletView,walletHud,walletOrderMessage,walletView}from'./wallet-view.mjs?v=0.27.2&rev=season1';
 import './boss-idle.mjs?v=0.27.2&rev=refresh1';
-import{itemDetailsView,discoveryDetailsView}from'./item-details.mjs?v=0.27.2&rev=final2';
+import{itemDetailsView,discoveryDetailsView}from'./item-details.mjs?v=0.27.2&rev=final2a';
 import{inventoryExpansion,inventoryCapacity}from'./inventory-capacity.mjs?v=0.27.2';
 import{createEquipmentDraft,selectEquipment,equipmentDraftOrder,markEquipmentPending,reconcileEquipmentDraft}from'./equipment-draft.mjs?v=0.27.2&rev=inventory1';
 import{writeRestriction}from'./read-mode.mjs?v=0.27.2';
