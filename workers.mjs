@@ -1,10 +1,28 @@
 import{civilianCount,populationCapacity}from'./population.mjs?v=0.27.2';
-import{productionBatch,storageCapacityAt}from'./economy.mjs?v=0.27.2';
+import{productionBatch,storageCapacityAt}from'./economy.mjs?v=0.27.2&rev=resources1';
 export const WORKER_POOL=20; // Starting civilians; separate from sailors.
 export const WORK_SHIFT_SECONDS=15*60;
 export const PRODUCTION_MODEL='batches-v2';
 export const workerCount=civilianCount;
 export const workerCapacity=p=>Math.floor(populationCapacity(p)/2);
+// Forecast only the remaining paid shift; never extend it when redistributing.
+export function workForecast(p,clock,woodWorkers,stoneWorkers,gearBonus=0){
+ const current=workerState(p,clock),seconds=current.active?current.remaining:WORK_SHIFT_SECONDS,cap=storageCapacityAt(p.levels.armazem);
+ const progress=current.active?Object.fromEntries(['wood','stone'].map(k=>[k,workProgress(p,k,clock)])):{wood:0,stone:0};
+ const unchanged=current.active&&woodWorkers===current.woodWorkers&&stoneWorkers===current.stoneWorkers;
+ const model=unchanged?current.model:current.active?'batches-v3':PRODUCTION_MODEL;
+ const planned={...p,work:{model,start:clock,until:clock+seconds,woodWorkers,stoneWorkers,progress,gearBonus:unchanged?p.work?.gearBonus||0:gearBonus}};
+ const produced=productionBetween(planned,clock,clock+seconds),resources={};
+ for(const k of ['wood','stone']){const room=Math.max(0,cap-p.resources[k]),kept=Math.min(room,produced[k]);resources[k]={produced:produced[k],room,kept,overflow:Math.max(0,produced[k]-kept)};}
+ return{seconds,resources};
+}
+export function spaceAllocation(p,clock,gearBonus=0){
+ const total=workerCount(p),wood=[],stone=[];
+ for(let n=0;n<=total;n++){const f=workForecast(p,clock,n,n,gearBonus);wood.push(f.resources.wood);stone.push(f.resources.stone);}
+ let best={woodWorkers:0,stoneWorkers:0,kept:0,overflow:0,workers:0};
+ for(let a=0;a<=total;a++)for(let b=0;b<=total-a;b++){const kept=wood[a].kept+stone[b].kept,overflow=wood[a].overflow+stone[b].overflow,workers=a+b;if(kept>best.kept||kept===best.kept&&(overflow<best.overflow||overflow===best.overflow&&workers<best.workers))best={woodWorkers:a,stoneWorkers:b,kept,overflow,workers};}
+ return{woodWorkers:best.woodWorkers,stoneWorkers:best.stoneWorkers};
+}
 const assignment=p=>p?.work||(p?.farmUntil>0?{woodWorkers:10,stoneWorkers:10,start:0,until:p.farmUntil}:null);
 export function workProgress(p,resource,clock){const w=assignment(p);if(!w)return 0;const end=Math.max(w.start||0,Math.min(clock,w.until)),unit=w.model==='batches-v1'?6000:1200;return(w.progress?.[resource]||0)+Math.max(0,end-(w.start||0))*(w[resource+'Workers']||0)/unit;}
 export function productionCycle(p,resource,workers,clock=0,model=PRODUCTION_MODEL){

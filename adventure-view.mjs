@@ -2,7 +2,7 @@ import{relicHolders,bossBadge}from'./island-honours.mjs?v=0.27.2&rev=progress1';
 import{FINAL_SECRET_SLOTS}from'./final-rewards.mjs?v=0.27.2&rev=progress1';
 import{ITEM_TYPES,RARITIES,EQUIPMENT_SLOTS,equipmentBonuses,itemBonus,itemName,dismantleYield,STAT_NAMES,ITEM_SETS,equipmentSets,equippedItems,bestSetSlots,incompatibility,lootPool,lootOdds,rarityOdds,lootTable,itemArt,DROP_TABLES}from'./equipment.mjs?v=0.27.2&rev=progress1';
 import{bossAlive,bossAccess}from'./adventure.mjs?v=0.27.2&rev=progress1';
-import{workerState}from'./workers.mjs?v=0.27.2';
+import{workerState}from'./workers.mjs?v=0.27.2&rev=resources1';
 import{maxBuildingLevel}from'./progression.mjs?v=0.27.2';
 const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const names={sede:'Casa principal',serraria:'Serraria',pedreira:'Pedreira',armazem:'Armazém',estaleiro:'Estaleiro',muralha:'Muralha',academia:'Academia Náutica'};

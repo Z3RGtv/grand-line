@@ -2,3 +2,5 @@
 @media(max-width:420px){.achievement-card{grid-template-columns:42px minmax(0,1fr) 60px;gap:8px}.achievement-card strong{font-size:12px}.achievement-card>.boss-badge{width:40px;height:45px}.achievement-card>.achievement-art{width:38px;height:40px}.adventure-tools button[data-adventure=achievements] .tool-label{display:none!important}}
 
 .boss-map-badge{position:absolute!important;left:-8px!important;top:-8px!important;right:auto!important;bottom:auto!important;display:block;width:24px;padding:0!important;background:none!important;border:0!important;z-index:4;pointer-events:none}.boss-map-badge>.boss-badge{display:block;width:24px;height:27px;max-width:none;padding:0;border:0;background:none}.shot-power{color:#e3c58c!important;font-size:.7rem!important;margin:3px 0 7px}.battle-captain-details{padding:10px 0;color:#c4bd9f;font-size:.8rem}.duel-verdict>strong{font-size:.82rem;text-transform:uppercase;letter-spacing:.02em}
+
+.work-forecast{display:block}.work-forecast b{color:#a33c20}.worker-presets{flex-wrap:wrap}
