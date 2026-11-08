@@ -11,7 +11,7 @@
     "gestao": 90
   },
   "launchEnabled": true,
-  "apiOrigin": "https://goal-disabled-buys-marble.trycloudflare.com",
+  "apiOrigin": "https://completed-divisions-bands-retailer.trycloudflare.com",
   "paymentMode": "wallet",
   "coinPack": 500
 }
