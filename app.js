@@ -1,7 +1,7 @@
 import{battleTacticsControls,syncCombatEffects}from'./battle-effects.mjs?v=0.27.2&rev=controls2';
-import{achievementsView,availableAchievements}from'./achievements-view.mjs?v=0.27.2&rev=duels1';
+import{achievementsView,availableAchievements}from'./achievements-view.mjs?v=0.27.2&rev=collection1';
 import{allowanceDay}from'./spending-budget.mjs?v=0.27.2';
-import{protection,protectionBubble,protectionLabel,playerHonours,bossBadge}from'./island-honours.mjs?v=0.27.2&rev=duels1';
+import{protection,protectionBubble,protectionLabel,playerHonours,bossBadge}from'./island-honours.mjs?v=0.27.2&rev=collection1';
 import{deployedEquipment,fleetEquipment,islandTheftChance}from'./equipment-risk.mjs?v=0.27.2&rev=duels1';
 import{purchaseFeedback}from'./wallet-orders.mjs?v=0.27.2';
 import{gameRunning,fundingOpen}from'./game-session.mjs?v=0.27.2';
@@ -13,37 +13,37 @@ import{createEquipmentDraft,selectEquipment,equipmentDraftOrder,markEquipmentPen
 import{writeRestriction}from'./read-mode.mjs?v=0.27.2';
 import{spendingBudget}from'./spending-budget.mjs?v=0.27.2';
 import{participation,combatSummary}from'./combat-party.mjs?v=0.27.2&rev=duels1';
-import{productionEntries}from'./production-queue.mjs?v=0.27.2&rev=specials1';
-import{workerPanel,allocateWorkers}from'./worker-controls.mjs?v=0.27.2&rev=specials1';
+import{productionEntries}from'./production-queue.mjs?v=0.27.2&rev=collection1';
+import{workerPanel,allocateWorkers}from'./worker-controls.mjs?v=0.27.2&rev=collection1';
 import{capturePanelState,restorePanelState,createLatestReader}from'./ui-state.mjs?v=0.27.2';
 import{bossPartyView}from'./boss-party.mjs?v=0.27.2';
 import{bossAccess,bossCapacity,bossAlive}from'./adventure.mjs?v=0.27.2&rev=duels1';
 import{ITEM_TYPES,RARITIES,DROP_TABLES,EQUIPMENT_SLOTS,itemBonus,itemName,equipmentBonuses,dismantleYield,bestSetSlots,partySynergy}from'./equipment.mjs?v=0.27.2&rev=progress1';
-import{reportView,adventureReadiness,bossMapArt,bossPortrait,rewardDialog,bossLootView,pendingRewardNotices}from'./adventure-view.mjs?v=0.27.2&rev=specials1';
-import{bindEquipmentDrag,inventoryExpansionView,inventoryView}from'./inventory-view.mjs?v=0.27.2&rev=specials1';
+import{reportView,adventureReadiness,bossMapArt,bossPortrait,rewardDialog,bossLootView,pendingRewardNotices}from'./adventure-view.mjs?v=0.27.2&rev=collection1';
+import{bindEquipmentDrag,inventoryExpansionView,inventoryView}from'./inventory-view.mjs?v=0.27.2&rev=collection1';
 import{nextMissionCue,createMissionPointer}from'./mission-cues.mjs?v=0.27.2';
 import{setButtonRequirement,highlightRequirement,interceptRequirement}from'./requirement-feedback.mjs?v=0.27.2';
 import{orderTransition}from'./order-flow.mjs?v=0.27.2';
-import{MIN_CREW_PER_SHIP}from'./pace-rules.mjs?v=0.27.2&rev=specials1';
+import{MIN_CREW_PER_SHIP}from'./pace-rules.mjs?v=0.27.2&rev=collection1';
 import{NPC_FLAGS,npcFlag,npcProfile}from'./npc-flags.mjs?v=0.27.2';
-import{buildingCost,storageCapacityAt,highestBuildingCost}from'./economy.mjs?v=0.27.2&rev=specials1';
-import{hasWall,storageCapacity,sailorState,defendingTroops,harborMetrics}from'./harbor.mjs?v=0.27.2&rev=specials1';
+import{buildingCost,storageCapacityAt,highestBuildingCost}from'./economy.mjs?v=0.27.2&rev=collection1';
+import{hasWall,storageCapacity,sailorState,defendingTroops,harborMetrics}from'./harbor.mjs?v=0.27.2&rev=collection1';
 import{flagSVG,crestSVG,defaultFlag,flagEditor,readFlagEditor,updateFlagEditor}from'./flags.mjs?v=0.27.2&rev=flag2';
 import{populationState}from'./population.mjs?v=0.27.2&rev=recruit1';
 import{MAX_LEVEL,MAX_RESEARCH_LEVEL,maxBuildingLevel,buildingTier,researchSpec,researchBenefits,jobLane}from'./progression.mjs?v=0.27.2';
-import{npcShipCount,npcAccess,fleetPoint,botPoint,wreckPoint,battlePoint}from'./sea-system.mjs?v=0.27.2&rev=specials1';
-import{battleView,resolveBattle,seaMarkers,accessBadge}from'./naval-view.mjs?v=0.27.2&rev=controls2';
+import{npcShipCount,npcAccess,fleetPoint,botPoint,wreckPoint,battlePoint}from'./sea-system.mjs?v=0.27.2&rev=collection1';
+import{battleView,resolveBattle,seaMarkers,accessBadge}from'./naval-view.mjs?v=0.27.2&rev=collection1';
 import{islandArt,buildingArt,wallTier,WALL_NAMES}from'./island-art.mjs?v=0.27.2';
-import{missionProgress,missionWait}from'./onboarding.mjs?v=0.27.2&rev=specials1';
+import{missionProgress,missionWait}from'./onboarding.mjs?v=0.27.2&rev=collection1';
 
-import {quote as quoteRule,SHIPS as SHIP_RULES,SHIP_UNLOCKS,fishingOrder} from './rules.mjs?v=0.27.2&rev=specials1';
+import {quote as quoteRule,SHIPS as SHIP_RULES,SHIP_UNLOCKS,fishingOrder} from './rules.mjs?v=0.27.2&rev=collection1';
 import {routePoint,waterPoint} from './navigation.mjs?v=0.27.2&rev=duels1';
-import {WORKER_POOL,workerCount,workerCapacity,workerState,workerRates,productionCycle,workForecast,spaceAllocation} from './workers.mjs?v=0.27.2&rev=specials1';
+import {WORKER_POOL,workerCount,workerCapacity,workerState,workerRates,productionCycle,workForecast,spaceAllocation} from './workers.mjs?v=0.27.2&rev=collection1';
 
 const LOCAL_TESTS=['127.0.0.1','localhost'].includes(location.hostname);const TRAIN=LOCAL_TESTS&&location.pathname.endsWith('/treino.html');const LAB=TRAIN||LOCAL_TESTS&&location.pathname.endsWith('/demo.html');
-let trainingConfig,trainingState,trainingPlan,trainingExecute,trainingAdvance,trainingNextDay,trainingNextWait,resetTraining,restoreTraining,setTrainingLayout;if(TRAIN)({trainingConfig,trainingState,trainingPlan,trainingExecute,trainingAdvance,trainingNextDay,trainingNextWait,resetTraining,restoreTraining,setTrainingLayout}=await import('./training.mjs?v=0.27.2&rev=specials1'));
-let labConfig,labState,labPlan,labExecute,labAdvance,nextDay,seedLab,scenario,setLabLayout,setLabPopulation,labTopUp;if(LAB&&!TRAIN){const lab=await import('./lab.mjs?v=0.27.2&rev=specials1');({labConfig,labState,labPlan,labExecute,labAdvance,nextDay,seedLab,scenario,setLabLayout,setLabPopulation,labTopUp}=lab);const catalog=await fetch('/api/demo/final-catalog',{cache:'no-store'});if(!catalog.ok)throw Error('O catálogo de teste exige acesso privado local.');lab.configureLabRewards(await catalog.json());}
-import {setupGithub,githubState,githubPlan,loginGithub,logoutGithub,githubFound,githubOwner,githubSpend,githubWallet,githubRetrySpend} from './github-client.mjs?v=0.27.2&rev=specials1';
+let trainingConfig,trainingState,trainingPlan,trainingExecute,trainingAdvance,trainingNextDay,trainingNextWait,resetTraining,restoreTraining,setTrainingLayout;if(TRAIN)({trainingConfig,trainingState,trainingPlan,trainingExecute,trainingAdvance,trainingNextDay,trainingNextWait,resetTraining,restoreTraining,setTrainingLayout}=await import('./training.mjs?v=0.27.2&rev=collection1'));
+let labConfig,labState,labPlan,labExecute,labAdvance,nextDay,seedLab,scenario,setLabLayout,setLabPopulation,labTopUp;if(LAB&&!TRAIN){const lab=await import('./lab.mjs?v=0.27.2&rev=collection1');({labConfig,labState,labPlan,labExecute,labAdvance,nextDay,seedLab,scenario,setLabLayout,setLabPopulation,labTopUp}=lab);const catalog=await fetch('/api/demo/final-catalog',{cache:'no-store'});if(!catalog.ok)throw Error('O catálogo de teste exige acesso privado local.');lab.configureLabRewards(await catalog.json());}
+import {setupGithub,githubState,githubPlan,loginGithub,logoutGithub,githubFound,githubOwner,githubSpend,githubWallet,githubRetrySpend} from './github-client.mjs?v=0.27.2&rev=collection1';
 const GITHUB=!LAB&&(!['127.0.0.1','localhost'].includes(location.hostname)||new URLSearchParams(location.search).has('github'));
 const OWNER_TEST=GITHUB&&(new URLSearchParams(location.search).get('teste')==='1'||location.hash.includes('access_token')&&sessionStorage.getItem('grand-line-preview-login')==='1');
 const BASE=new URL('.',document.baseURI).pathname.replace(/\/$/,'');

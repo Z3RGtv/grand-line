@@ -332,3 +332,5 @@ body[data-view=batalha] .battle-view:has(.battle-orders){padding-bottom:110px}
 @media(max-width:650px){.combat-stage{scroll-margin-top:115px}}
 @media(prefers-reduced-motion:reduce){.orders-ready button:not(:disabled){animation:none;outline:2px solid #ffda82;outline-offset:2px}}
 body[data-view=batalha]:has(.battle-orders) #toast{bottom:calc(115px + env(safe-area-inset-bottom,0px));pointer-events:none}
+
+.player-item-collection h3{display:flex;align-items:center;justify-content:space-between}.player-item-collection h3>b{font-size:18px}.player-item-collection button{border-left:3px solid var(--rarity);min-height:58px}.player-item-collection button>span{min-width:0;overflow-wrap:anywhere}

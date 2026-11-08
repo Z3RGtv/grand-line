@@ -1,6 +1,6 @@
 import{MAX_RESEARCH_LEVEL}from'./progression.mjs?v=0.27.2';
-import{storageCapacityAt}from'./economy.mjs?v=0.27.2&rev=specials1';
-import{workerCount,workerCapacity,workerState}from'./workers.mjs?v=0.27.2&rev=specials1';
+import{storageCapacityAt}from'./economy.mjs?v=0.27.2&rev=collection1';
+import{workerCount,workerCapacity,workerState}from'./workers.mjs?v=0.27.2&rev=collection1';
 import{populationState,populationCapacity}from'./population.mjs?v=0.27.2&rev=recruit1';
 export const hasWall=p=>(p?.levels?.muralha||1)>=2;
 export const storageCapacity=p=>p?storageCapacityAt(p.levels.armazem):0;

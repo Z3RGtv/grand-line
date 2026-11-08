@@ -1,0 +1,3 @@
+import{ITEM_TYPES}from'./equipment.mjs?v=0.27.2&rev=progress1';
+// Publish only delivered ownership totals and named exceptional equipment.
+export function publicItemCollection(p){const seen=new Set(),items=[...(p.inventory||[]),...(p.lootStash||[]),...(p.pendingUniqueItem?[p.pendingUniqueItem]:[])].filter(i=>{if(!i||!ITEM_TYPES[i.type]||seen.has(i.id))return false;seen.add(i.id);return true;}),groups=new Map();for(const i of items){if(i.rarity<4&&!ITEM_TYPES[i.type].finalOnly)continue;const key=i.type+':'+i.rarity;if(!groups.has(key))groups.set(key,{type:i.type,rarity:i.rarity,count:0});groups.get(key).count++;}return{total:items.length,featured:[...groups.values()].sort((a,b)=>b.rarity-a.rarity||a.type.localeCompare(b.type))};}
