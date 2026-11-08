@@ -11,7 +11,7 @@
     "gestao": 90
   },
   "launchEnabled": true,
-  "apiOrigin": "https://completed-divisions-bands-retailer.trycloudflare.com",
+  "apiOrigin": "https://dana-beijing-potatoes-prison.trycloudflare.com",
   "paymentMode": "wallet",
   "coinPack": 500
 }
