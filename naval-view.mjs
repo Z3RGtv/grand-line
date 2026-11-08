@@ -1,4 +1,4 @@
-import{combatStage}from'./battle-effects.mjs?v=0.27.2&rev=specials1';
+import{combatStage}from'./battle-effects.mjs?v=0.27.2&rev=controls2';
 import{itemArt,itemName}from'./equipment.mjs?v=0.27.2&rev=progress1';
 import{battleParticipants}from'./battle-loadout.mjs?v=0.27.2&rev=progress1';
 import{ITEM_TYPES,ITEM_SETS,EQUIPMENT_SLOTS,RARITIES,STAT_NAMES,itemBonus}from'./equipment.mjs?v=0.27.2&rev=progress1';

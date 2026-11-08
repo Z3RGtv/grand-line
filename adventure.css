@@ -323,3 +323,12 @@
 body[data-view=batalha] #mission-dock{display:none}
 
 body[data-view=batalha] .resource-bar{position:static}.combat-stage{scroll-margin-top:80px}.stage-winner{border-color:#9fdaa4;background:#244e43;color:#e1ffbc;box-shadow:0 0 12px #8bcf8c33}.stage-damage>span{font-size:28px;line-height:23px}
+
+/* Keep tactical choices reachable while the player follows any ship. */
+body[data-view=batalha] .battle-view:has(.battle-orders){padding-bottom:110px}
+.battle-orders{position:fixed;z-index:35;bottom:calc(12px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%);box-sizing:border-box;width:max-content;max-width:calc(100vw - 16px);margin:0;padding:10px;gap:8px;align-items:center;border:2px solid #c5ad78;border-radius:16px;background:#102e3df5;box-shadow:0 4px 24px #000a}
+.battle-orders button{flex:none;margin:0}.battle-orders button:disabled:not([aria-pressed=true]){opacity:.8}.battle-order-status{width:38px;display:grid;justify-items:center;gap:2px;color:#c5c8b9}.battle-order-status .combat-icon{width:25px;height:25px}.battle-order-status b{font-size:12px;font-variant-numeric:tabular-nums}.orders-ready{border-color:#ffda82;box-shadow:0 0 20px #ffbb4066,0 4px 24px #000a}.orders-ready .battle-order-status{color:#ffe2a1}.orders-ready button:not(:disabled){animation:order-invite 1.2s ease-in-out infinite alternate;border-color:currentColor}.inspector-open .battle-orders,.order-open .battle-orders{display:none}.fleet-battle-link{min-height:48px;margin:12px 0}
+@keyframes order-invite{to{box-shadow:0 0 15px #ffce7366;background:#365768}}
+@media(max-width:650px){.combat-stage{scroll-margin-top:115px}}
+@media(prefers-reduced-motion:reduce){.orders-ready button:not(:disabled){animation:none;outline:2px solid #ffda82;outline-offset:2px}}
+body[data-view=batalha]:has(.battle-orders) #toast{bottom:calc(115px + env(safe-area-inset-bottom,0px));pointer-events:none}
