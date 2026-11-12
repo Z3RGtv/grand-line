@@ -2,7 +2,7 @@ import{publicItemCollection}from'./public-inventory.mjs?v=0.27.2&rev=collection1
 import{prepareBossSpecial,battleOrderQuote,setBattleOrder}from'./battle-tactics.mjs?v=0.27.2&rev=specials1';
 import{recordPresence,recordAchievementOrder,achievementReward,collectAchievement}from'./achievements.mjs?v=0.27.2&rev=duels1';
 import{fleetEquipment,deployedEquipment,loseFleetEquipment,stealIslandEquipment,deliverCapturedEquipment,publicRelics}from'./equipment-risk.mjs?v=0.27.2&rev=duels1';
-import{actionPrice,RECOVERY_SECONDS,RECOVERY_RATE,STASH_LIMIT,FRAGMENTS_REQUIRED}from'./balance-policy.mjs?v=0.27.2&rev=collection1';
+import{actionPrice,RECOVERY_SECONDS,RECOVERY_RATE,STASH_LIMIT,FRAGMENTS_REQUIRED}from'./balance-policy.mjs?v=0.27.2&rev=worker-sale1';
 import{EXCLUSIVE_ITEMS}from'./loot-tables.mjs?v=0.27.2&rev=progress1';
 import{gameRunning,combatWindow,noteAttack,sessionProtected}from'./game-session.mjs?v=0.27.2';
 import{walletState,changeWallet}from'./wallet-state.mjs?v=0.27.2';
@@ -18,13 +18,13 @@ import{equippedItems,equipmentOrder,equipmentBonuses,equipmentTypes,partySynergy
 import{npcFlag,npcProfile,standardizeNpcFlags}from'./npc-flags.mjs?v=0.27.2';
 import{emitActivity}from'./activity-hooks.mjs';
 import{ECONOMY_VERSION,INITIAL_RESOURCES,buildingCost,requiredWarehouse,shipMaterials,repairMaterials}from'./economy.mjs?v=0.27.2&rev=collection1';
-import{hasWall,storageCapacity,sailorState,defendingTroops,migrateHarbor}from'./harbor.mjs?v=0.27.2&rev=collection1';
+import{hasWall,storageCapacity,sailorState,defendingTroops,migrateHarbor}from'./harbor.mjs?v=0.27.2&rev=worker-sale1';
 import{defaultFlag,normalizeFlag,sameFlag}from'./flags.mjs?v=0.27.2&rev=flag3';
 import{NPC_MAX,NPC_LEVEL_RANGE,NAVAL_ROUND_SECONDS,NAVAL_TURN_SECONDS,rollNavalTurn,npcShipCount,seaFields,npcRoute,makeNpcFleet,navalUnits,rollNavalRound,distributeSeaLoot,createWreck,battleSnapshot,npcAccess,botPoint,interceptionPoint,fleetPoint,wreckPoint,routeLootBonus,resourceTotal,wreckSalvagePlan}from'./sea-system.mjs?v=0.27.2&rev=collection1';
-import{recordOrder,recordReturn,recordJobCompletion}from'./onboarding.mjs?v=0.27.2&rev=collection1';
+import{recordOrder,recordReturn,recordJobCompletion}from'./onboarding.mjs?v=0.27.2&rev=worker-sale1';
 import {DEFAULT_SLOTS,waterPoint,seaRoute,routePoint,routeLength,harbor,coastPoint,nearestWater} from './navigation.mjs?v=0.27.2&rev=duels1';
-import {WORKER_POOL,WORK_SHIFT_SECONDS,PRODUCTION_MODEL,workerCount,workerCapacity,workerState,workOrder,productionBetween} from './workers.mjs?v=0.27.2&rev=collection1';
-export {WORKER_POOL,WORK_SHIFT_SECONDS,workerState} from './workers.mjs?v=0.27.2&rev=collection1';
+import {WORKER_POOL,WORK_SHIFT_SECONDS,PRODUCTION_MODEL,workerCount,workerCapacity,workerState,workOrder,workerSaleQuote,productionBetween} from './workers.mjs?v=0.27.2&rev=worker-sale1';
+export {WORKER_POOL,WORK_SHIFT_SECONDS,workerState} from './workers.mjs?v=0.27.2&rev=worker-sale1';
 import{populationState,recruitmentCost}from'./population.mjs?v=0.27.2&rev=recruit1';
 import{MAX_LEVEL,MAX_RESEARCH_LEVEL,buildingSeconds,maxBuildingLevel,queueDelay,researchSpec}from'./progression.mjs?v=0.27.2';
 export{maxBuildingLevel,queueDelay}from'./progression.mjs?v=0.27.2';
@@ -90,6 +90,11 @@ export function quote(w,id,request){ensureAdventure(w);const p=w.players[id];con
    q.seconds=Math.max(0,encounter.next-w.clock);
    q.description='Retirada pedida. A frota sai depois da próxima ronda, sem saque.';
   }
+  else if(q.action==='vender-trabalhadores'){
+   const sale=workerSaleQuote(p,w.clock,v.count);
+   q.payload=sale;
+   q.description='Vender '+sale.count+(sale.count===1?' trabalhador':' trabalhadores');
+  }
   else if(q.action==='recolher-espolio'){const index=(p.lootStash||[]).findIndex(i=>i.id===v.item);ok(index>=0,'Item indisponível.');ok(p.inventory.length<inventoryCapacity(p),'Liberta um lugar.');v.item=p.lootStash[index].id;q.description='Recolher espólio';}
   else if(q.action==='trocar-fragmentos'){const source=Object.entries(EXCLUSIVE_ITEMS).find(([,id])=>id===v.boss);ok(source,'Ilha sem peça exclusiva.');ok((p.fragments?.[v.boss]||0)>=FRAGMENTS_REQUIRED,'Fragmentos insuficientes.');ok(p.inventory.length<inventoryCapacity(p),'Liberta um lugar.');v.type=source[0];q.description='Forjar equipamento';}
   else
@@ -140,6 +145,10 @@ export function execute(w,id,name,request,wall=Date.now()){
   mission.withdrawRequested=true;
   encounter.withdrawnUsers??=[];
   if(!encounter.withdrawnUsers.includes(id))encounter.withdrawnUsers.push(id);
+ }else if(q.action==='vender-trabalhadores'){
+  p.workers=workerCount(p)-v.count;
+  add(p,v.refund);
+  report(w,p,'reciclagem','Venda de trabalhadores',{count:v.count,resources:v.refund,slots:v.slots});
  }else if(q.action==='recolher-espolio'){const i=p.lootStash.findIndex(item=>item.id===v.item);p.inventory.push(p.lootStash.splice(i,1)[0]);}
  else if(q.action==='trocar-fragmentos'){p.fragments[v.boss]-=FRAGMENTS_REQUIRED;p.inventory.push({id:uid(w,'IT'),type:v.type,rarity:2,value:9});report(w,p,'recompensa','Equipamento forjado',{item:p.inventory.at(-1)});}
  else if(q.action==='equipar'){const key=v.loadout==='fleet'?'attackEquipment':'equipment',other=key==='equipment'?'attackEquipment':'equipment';p[key]=v.equipment;for(const[slot,item]of Object.entries(p[other]||{}))if(Object.values(v.equipment).includes(item))delete p[other][slot];p.equipmentRevision=(p.equipmentRevision??0)+1;report(w,p,'equipamento','Configuração de equipamento confirmada');}else if(q.action==='desmontar'){p.inventory=p.inventory.filter(i=>!v.items.includes(i.id));p.lootStash=(p.lootStash||[]).filter(i=>!v.items.includes(i.id));collectUniqueItem(w,p);const overflow=add(p,v.resources);report(w,p,'reciclagem','Itens transformados em recursos',{resources:v.resources,overflow});}
@@ -302,7 +311,7 @@ export function advance(w,seconds,wall=Date.now()){
  }
  hibernateInactive(w);validate(w);
 }
-export function validate(w){const used=new Set();for(const p of Object.values(w.players)){validateAllowance(p);inventoryExpansion(p);if(p.hibernating)ok(p.slot===null,'Ilha em hibernação não pode ocupar posição.');else{ok(Number.isInteger(p.slot)&&p.slot>=0&&p.slot<w.slots.length,'Posição inválida.');ok(!used.has(p.slot),'Posição repetida.');used.add(p.slot);}ok(p.troops>=p.garrison&&p.garrison>=0,'Guarnição inválida.');for(const n of Object.values(p.resources))ok(Number.isFinite(n)&&n>=0,'Recursos inválidos.');if(p.workers!==undefined)int(p.workers,WORKER_POOL,100000);if(p.work){int(p.work.woodWorkers,0,workerCount(p));int(p.work.stoneWorkers,0,workerCount(p));ok(p.work.woodWorkers+p.work.stoneWorkers<=workerCount(p),'Trabalhadores acima da capacidade.');}for(const n of Object.values(p.fleet))ok(Number.isInteger(n)&&n>=0,'Frota inválida.');}for(const a of Object.values(w.alliances))ok(a.members.length<=3,'Aliança com mais de 3.');for(const target of new Set(w.missions.filter(m=>m.phase!=='regresso'&&m.targetType!=='wreck').map(m=>m.target)))for(const side of ['ataque','defesa'])ok(sidePlayers(w,target,side).size<=MAX_BATTLE_PLAYERS,'Encontro com mais de 3 jogadores por lado.');}
+export function validate(w){const used=new Set();for(const p of Object.values(w.players)){validateAllowance(p);inventoryExpansion(p);if(p.hibernating)ok(p.slot===null,'Ilha em hibernação não pode ocupar posição.');else{ok(Number.isInteger(p.slot)&&p.slot>=0&&p.slot<w.slots.length,'Posição inválida.');ok(!used.has(p.slot),'Posição repetida.');used.add(p.slot);}ok(p.troops>=p.garrison&&p.garrison>=0,'Guarnição inválida.');for(const n of Object.values(p.resources))ok(Number.isFinite(n)&&n>=0,'Recursos inválidos.');if(p.workers!==undefined)int(p.workers,WORKER_POOL,100000);if(p.work){int(p.work.woodWorkers,0,100000);int(p.work.stoneWorkers,0,100000);if(p.work.until>w.clock)ok(p.work.woodWorkers+p.work.stoneWorkers<=workerCount(p),'Trabalhadores acima da capacidade.');}for(const n of Object.values(p.fleet))ok(Number.isInteger(n)&&n>=0,'Frota inválida.');}for(const a of Object.values(w.alliances))ok(a.members.length<=3,'Aliança com mais de 3.');for(const target of new Set(w.missions.filter(m=>m.phase!=='regresso'&&m.targetType!=='wreck').map(m=>m.target)))for(const side of ['ataque','defesa'])ok(sidePlayers(w,target,side).size<=MAX_BATTLE_PLAYERS,'Encontro com mais de 3 jogadores por lado.');}
 export function publicState(w,user=null){const safe=copy(w);delete safe.wallets;delete safe.creditStreams;if(user)safe.wallet=walletState(w,user);delete safe.rng;safe.relics=publicRelics(w);safe.finalDiscoveries=publicFinalDiscoveries(w);safe.finalSecretSlots=finalSecretSlots(w);delete safe.secureRandom;delete safe.exposure;delete safe.nextSpawn;delete safe.npcCoverage;delete safe.coverageRetryAt;for(const a of Object.values(safe.alliances)){delete a.invite;delete a.invites;}for(const p of Object.values(safe.players)){p.badges=[...(p.bossWins||[])];p.itemCollection=publicItemCollection(p);if(p.id!==user)delete p.repeat;delete p.shieldOpponents;if(p.id!==user){delete p.bossAttackReadyAt;delete p.shipLosses;delete p.bossWins;delete p.fragments;delete p.lootStash;delete p.onboarding;delete p.allianceInvite;delete p.allianceInvites;delete p.lastActiveLiveDay;delete p.dailySpent;delete p.actionAllowance;delete p.attackWindows;delete p.attackWindow;delete p.dayBase;delete p.lost;delete p.work;delete p.farmUntil;delete p.workers;delete p.resources;delete p.fleet;delete p.troops;delete p.garrison;delete p.spent;delete p.uniqueLoot;delete p.finalLootDay;delete p.finalLootReceipt;delete p.pendingUniqueItem;delete p.inventory;delete p.inventoryTier;delete p.inventoryProgress;delete p.equipmentRevision;delete p.equipment;delete p.attackEquipment;delete p.reports;delete p.reportSerial;delete p.achievements;}}for(const e of Object.values(safe.encounters||{}))e.participants=battleParticipants(w,w.encounters[e.target]);for(const m of safe.missions){if(m.user!==user){delete m.pendingReward;delete m.equipmentIds;delete m.stolenItems;delete m.gear;delete m.gearItems;}}for(const e of Object.values(safe.encounters||{}))if(e.target!==user){delete e.homeGear;delete e.homeGearItems;}return safe;}
 export function regroup(w){hibernateInactive(w);return false;}
 export function redistributeIslands(w){ok(!w.missions.length&&!Object.keys(w.encounters).length,'Há viagens ou batalhas em curso.');const players=activePlayers(w),before=players.map(p=>({user:p.id,from:p.slot}));for(const p of players)p.slot=-1;for(const p of players)p.slot=allocSlot(w,level(p),true,before.find(x=>x.user===p.id).from);event(w,'As ilhas foram distribuídas pelo arquipélago.');return before.map(x=>({...x,to:w.players[x.user].slot}));}

@@ -1,5 +1,5 @@
-import{nextLearningStep}from'./mission-plan.mjs?v=0.27.2&rev=collection1';
-import{workerState}from'./workers.mjs?v=0.27.2&rev=collection1';
+import{nextLearningStep}from'./mission-plan.mjs?v=0.27.2&rev=worker-sale1';
+import{workerState}from'./workers.mjs?v=0.27.2&rev=worker-sale1';
 import{buildingCost}from'./economy.mjs?v=0.27.2&rev=collection1';
 export const MISSIONS=[
  {id:'island',title:'A tua ilha está pronta',short:'Conhece o teu porto.',icon:'shield',view:'ilha',body:'Seleciona um edifício para começar.',target:'.island-stage'},

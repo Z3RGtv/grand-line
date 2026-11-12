@@ -1,4 +1,4 @@
-import{civilianCount,populationCapacity}from'./population.mjs?v=0.27.2&rev=recruit1';
+import{civilianCount,populationCapacity,RECRUITMENT_TIERS,WORKER_SPACE}from'./population.mjs?v=0.27.2&rev=recruit1';
 import{productionBatch,storageCapacityAt}from'./economy.mjs?v=0.27.2&rev=collection1';
 export const WORKER_POOL=20; // Starting civilians; separate from sailors.
 export const WORK_SHIFT_SECONDS=15*60;
@@ -35,5 +35,20 @@ export function productionCycle(p,resource,workers,clock=0,model=PRODUCTION_MODE
 export function workerRates(p,woodWorkers,stoneWorkers,model=PRODUCTION_MODEL){return{wood:productionCycle(p,'wood',woodWorkers,0,model).perHour,stone:productionCycle(p,'stone',stoneWorkers,0,model).perHour};}
 function legacyRates(p,woodWorkers,stoneWorkers){const factor=k=>(1-(p.damage[k]||0)/100)*1.1**(p.levels[k]-1);return{wood:150*p.levels.serraria*factor('serraria')*woodWorkers/10,stone:110*p.levels.pedreira*factor('pedreira')*stoneWorkers/10};}
 export function workerState(p,clock){const w=assignment(p),active=!!w&&w.until>clock,total=workerCount(p),legacy=!!w&&!['batches-v1','batches-v2','batches-v3'].includes(w.model);return{active,total,capacity:workerCapacity(p),available:active?total-w.woodWorkers-w.stoneWorkers:total,woodWorkers:active?w.woodWorkers:0,stoneWorkers:active?w.stoneWorkers:0,start:w?.start||0,until:active?w.until:0,remaining:active?w.until-clock:0,model:w?.model||PRODUCTION_MODEL,legacy,gathered:w?.gathered||{wood:0,stone:0},rates:active?(legacy?legacyRates:workerRates)(p,w.woodWorkers,w.stoneWorkers,w.model):{wood:0,stone:0},cycles:p?{wood:productionCycle(p,'wood',active?w.woodWorkers:0,clock,w?.model),stone:productionCycle(p,'stone',active?w.stoneWorkers:0,clock,w?.model)}:{}};}
+export function workerSaleLimit(player,clock){
+ const workers=workerState(player,clock);
+ return Math.max(0,Math.min(workers.available,workers.total-WORKER_POOL));
+}
+export function workerSaleQuote(player,clock,count){
+ const limit=workerSaleLimit(player,clock);
+ if(!Number.isInteger(count)||count<1||count>limit)throw Error(limit?'Podes vender até '+limit+' trabalhadores livres.':'Precisas de trabalhadores livres acima dos '+WORKER_POOL+' iniciais.');
+ const storage=storageCapacityAt(player.levels.armazem);
+ const refund={};
+ for(const [resource,baseCost] of Object.entries(RECRUITMENT_TIERS.trabalhadores.resources)){
+  const room=Math.max(0,Math.floor(storage-player.resources[resource]));
+  refund[resource]=Math.min(room,Math.floor(count*baseCost/2));
+ }
+ return {count,refund,slots:count*WORKER_SPACE};
+}
 export function workOrder(p,clock,payload={}){const active=workerState(p,clock).active,total=workerCount(p),defaults=payload.woodWorkers===undefined&&payload.stoneWorkers===undefined,woodWorkers=defaults?Math.ceil(total/2):payload.woodWorkers??0,stoneWorkers=defaults?Math.floor(total/2):payload.stoneWorkers??0;if(!Number.isInteger(woodWorkers)||!Number.isInteger(stoneWorkers)||woodWorkers<0||stoneWorkers<0||woodWorkers+stoneWorkers<1||woodWorkers+stoneWorkers>total)throw Error(`Distribui entre 1 e ${total} trabalhadores, sem ultrapassar os ${total} disponíveis.`);const current=assignment(p);if(active&&current.woodWorkers===woodWorkers&&current.stoneWorkers===stoneWorkers)throw Error('Os trabalhadores já estão nessa distribuição durante este turno.');if(!active&&!['wood','stone'].some(k=>(k==='wood'?woodWorkers:stoneWorkers)>0&&p.resources[k]<storageCapacityAt(p.levels.armazem)))throw Error('Armazém cheio para os recursos escolhidos.');return{woodWorkers,stoneWorkers,seconds:active?current.until-clock:WORK_SHIFT_SECONDS,redistribution:active,progress:active?Object.fromEntries(['wood','stone'].map(k=>[k,workProgress(p,k,clock)])):{wood:0,stone:0}};}
 export function productionBetween(p,from,to){const w=assignment(p);if(!w)return{wood:0,stone:0};const a=Math.max(from,w.start||0),b=Math.min(to,w.until);if(b<=a)return{wood:0,stone:0};if(!['batches-v1','batches-v2','batches-v3'].includes(w.model)){const rates=legacyRates(p,w.woodWorkers,w.stoneWorkers);return{wood:rates.wood*(b-a)/3600,stone:rates.stone*(b-a)/3600};}const result={wood:0,stone:0};for(const resource of ['wood','stone']){const c=productionCycle(p,resource,w[resource+'Workers'],0,w.model);if(c.interval){const batches=Math.floor((b-w.start)/c.interval+1e-9)-Math.floor((a-w.start)/c.interval+1e-9);const completed=Math.floor(workProgress(p,resource,b)+1e-9),previous=Math.floor(workProgress(p,resource,a)+1e-9);result[resource]=Math.max(0,Math.floor(completed*c.amount+1e-9)-Math.floor(previous*c.amount+1e-9));}}return result;}
