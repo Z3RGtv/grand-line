@@ -9,7 +9,7 @@ const names={sede:'Casa principal',serraria:'Serraria',pedreira:'Pedreira',armaz
 const image=i=>'<img class="equipment-art" src="'+itemArt(i)+'" alt="'+esc(itemName(i))+'">';
 const attributes=i=>Object.entries(itemBonus(i)).map(([key,value])=>'<b>+'+value+'% '+STAT_NAMES[key]+'</b>').join('');
 const quality=i=>'<span class="item-quality" style="color:'+RARITIES[i.rarity].color+'">'+RARITIES[i.rarity].name+' · N'+RARITIES[i.rarity].level+' · '+ITEM_SETS[ITEM_TYPES[i.type].set].name+'</span>';
-export{inventoryView}from'./inventory-view.mjs?v=0.27.2&rev=worker-sale1';
+export{inventoryView}from'./inventory-view.mjs?v=0.27.2&rev=level-budget2';
 export function adventureReadiness(w,p,quote){if(!p||p.hibernating)return[];const out=[],work=workerState(p,w.clock);if(work.available>0)out.push({icon:'⚒',title:work.available+' trabalhadores livres',building:'serraria',section:'producao'});for(const building of Object.keys(names)){if(p.levels[building]>=maxBuildingLevel(building)||w.jobs.some(j=>j.user===p.id&&j.action==='edificio'&&j.payload.building===building))continue;try{const q=quote(w,p.id,{kind:'construcoes',action:'edificio',payload:{building}});out.push({icon:'⌂',title:names[building]+' → N'+q.payload.level,building});}catch{}}return out;}
 const reportIcons={ataque:'⚔',defesa:'⛨',batalha:'⚔',boss:'⚔',regresso:'⚓',trabalhadores:'⚒',ordem:'⌂',recompensa:'◆',reciclagem:'♻',equipamento:'◆',ilha:'⚑',expedicao:'⚓'};
 const mysteryItem='<span class="mystery-item" role="img" aria-label="Item por revelar">?</span>';

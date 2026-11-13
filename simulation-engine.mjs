@@ -1,15 +1,15 @@
 import{publicItemCollection}from'./public-inventory.mjs?v=0.27.2&rev=collection1';
 import{prepareBossSpecial,battleOrderQuote,setBattleOrder}from'./battle-tactics.mjs?v=0.27.2&rev=specials1';
-import{recordPresence,recordAchievementOrder,achievementReward,collectAchievement}from'./achievements.mjs?v=0.27.2&rev=duels1';
+import{recordPresence,recordAchievementOrder,achievementReward,collectAchievement}from'./achievements.mjs?v=0.27.2&rev=level-budget2';
 import{fleetEquipment,deployedEquipment,loseFleetEquipment,stealIslandEquipment,deliverCapturedEquipment,publicRelics}from'./equipment-risk.mjs?v=0.27.2&rev=duels1';
-import{actionPrice,RECOVERY_SECONDS,RECOVERY_RATE,STASH_LIMIT,FRAGMENTS_REQUIRED}from'./balance-policy.mjs?v=0.27.2&rev=worker-sale1';
+import{actionPrice,RECOVERY_SECONDS,RECOVERY_RATE,STASH_LIMIT,FRAGMENTS_REQUIRED}from'./balance-policy.mjs?v=0.27.2&rev=level-budget2';
 import{EXCLUSIVE_ITEMS}from'./loot-tables.mjs?v=0.27.2&rev=progress1';
 import{gameRunning,combatWindow,noteAttack,sessionProtected}from'./game-session.mjs?v=0.27.2';
 import{walletState,changeWallet}from'./wallet-state.mjs?v=0.27.2';
 import{rollFinalReward,finalSecretSlots,publicFinalDiscoveries}from'./final-rewards.mjs?v=0.27.2&rev=duels1';
 import{inventoryCapacity,inventoryExpansion,expansionOrder}from'./inventory-capacity.mjs?v=0.27.2';
-import{DAILY_GAME_LIMIT,GAME_BUDGET_CAP,spendingBudget,syncAllowance,startAllowance,chargeAllowance,validateAllowance,allowanceDay,migrateStreamAllowance,registerStreamAllowance}from'./spending-budget.mjs?v=0.27.2';
-export{DAILY_GAME_LIMIT,GAME_BUDGET_CAP,spendingBudget}from'./spending-budget.mjs?v=0.27.2';
+import{DAILY_GAME_LIMIT,GAME_BUDGET_CAP,spendingBudget,syncAllowance,startAllowance,chargeAllowance,validateAllowance,allowanceDay,migrateStreamAllowance,registerStreamAllowance}from'./spending-budget.mjs?v=0.27.2&rev=level-budget2';
+export{DAILY_GAME_LIMIT,GAME_BUDGET_CAP,spendingBudget}from'./spending-budget.mjs?v=0.27.2&rev=level-budget2';
 import{combatLoadout,battleParticipants}from'./battle-loadout.mjs?v=0.27.2&rev=progress1';
 import{assertCanRejoin,assertParticipation,sidePlayers,MAX_BATTLE_PLAYERS}from'./combat-party.mjs?v=0.27.2&rev=duels1';
 import{bossParty,bossPartyOrder}from'./boss-party.mjs?v=0.27.2';
@@ -132,7 +132,7 @@ export function quote(w,id,request){ensureAdventure(w);const p=w.players[id];con
   if(t.type==='bot'){const b=w.bots.find(b=>b.id===t.id),intercept=interceptNpc(w,p,b,v.fleet,gear);ok(!intercept.mayEscape,'Este corsário sai antes da chegada da tua frota. Escolhe outro alvo.');destination=intercept.destination;q.seconds=intercept.seconds;v.mayEscape=false;}
   if(t.type==='bot'){const b=w.bots.find(b=>b.id===t.id);v.targetExpires=b.end;v.mayEscape=!!v.mayEscape||w.clock+q.seconds>=b.end;}if(t.type==='wreck'){const r=w.wrecks.find(r=>r.id===t.id);destination=wreckPoint(w,r,w.clock+q.seconds);v.targetExpires=r.end;v.salvage=wreckSalvagePlan(p,v.fleet,gear,r,w.clock+q.seconds+5);v.mayEscape=!v.salvage.amount;ok(!v.mayEscape,'Os destroços desaparecem antes de conseguires recolher. Escolhe outro alvo.');}v.destination=nearestWater(w.slots,destination);v.route=seaRoute(w.slots,home(w,p),v.destination);q.description=`Navegar para ${t.name}`;q.role=choice.role;if(t.type==='player')q.description=(q.role==='defesa'?'Defender ':'Atacar ')+t.name;
  }
- q.cost=actionPrice(kind,q.action,v);ok(spendingBudget(w,p).remaining>=q.cost,'Limite disponível insuficiente: +4.000 por stream, até 8.000.');return q;
+ q.cost=actionPrice(kind,q.action,v);ok(spendingBudget(w,p).remaining>=q.cost,'Limite disponível insuficiente.');return q;
 }
 function fleetSlots(p){return Object.entries(p.fleet).reduce((n,[k,v])=>n+SHIPS[k].slots*v,0)+Object.values(p.reserved||{}).reduce((n,v)=>n+v,0);}
 export function execute(w,id,name,request,wall=Date.now()){

@@ -54,7 +54,7 @@ export function walletView(wallet, {demo=false, readOnly=false, canLoad=true, pa
  const limit = budget ? `<section class="wallet-budget${budget.remaining === 0 ? ' limit-hit' : ''}">
   <h3>Limite de gasto</h3>
   <strong>${budget.remaining === 0 ? 'Limite atingido' : num(budget.remaining)+' disponíveis'}</strong>
-  <small>+${num(budget.daily)} por transmissão · máximo de ${num(budget.cap)}</small>
+  <small>+${num(budget.daily)} por transmissão · teto da sede ${num(budget.cap)}</small>
  </section>` : '';
  const pending = wallet.pending ? `<section class="wallet-pending">
   <strong>Compra por confirmar</strong>
