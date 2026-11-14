@@ -42,7 +42,35 @@ export function npcRoute(w,near,rng){const entrySide=Math.floor(rng()*4),exitSid
  const permutations=[[0,1,2],[0,2,1],[1,0,2],[1,2,0],[2,0,1],[2,1,0]];const pathDistance=order=>{const ps=[entry.gate,...order.map(i=>stops[i]),exit.gate];return ps.slice(1).reduce((n,p,i)=>n+Math.hypot(p.x-ps[i].x,p.y-ps[i].y),0);};permutations.sort((a,b)=>pathDistance(a)-pathDistance(b));const points=[entry.gate,...permutations[0].map(i=>stops[i]),exit.gate],route=[entry.outside,entry.gate];for(let i=1;i<points.length;i++)route.push(...seaRoute(w.slots,points[i-1],points[i]).slice(1));route.push(exit.outside);return{route,entryGate:entry.gate,exitGate:exit.gate,entrySide,exitSide};
 }
 export function makeNpcFleet(level,variant=.5){const cargo=variant<.35;return level<=2?{pesqueiro:1}:level<=4?cargo?{cargueiro:1}:{explorador:1,pesqueiro:1}:level<=7?cargo?{cargueiro:1,explorador:1}:{combate:1,explorador:1}:level<=10?cargo?{cargueiro:2,explorador:1}:{combate:1,explorador:1,cargueiro:1}:cargo?{cargueiro:2,explorador:1}:{combate:2,cargueiro:1};}
-export function navalUnits(fleet,troops,level,prefix,owner){const units=[];for(const[type,count]of Object.entries(fleet))for(let i=0;i<count;i++){const h=HULLS[type];if(!h)continue;units.push({id:prefix+'-'+type+'-'+i,type,owner,level,hp:Math.round(h.hp*(1+.025*(level-1))),maxHP:Math.round(h.hp*(1+.025*(level-1))),attack:Math.round(h.attack*(1+.035*(level-1))),capacity:h.capacity,crew:0,initialCrew:0});}const base=units.length?Math.min(MIN_CREW_PER_SHIP,Math.floor(troops/units.length)):0;let remaining=troops-base*units.length;for(let i=0;i<units.length;i++){const u=units[i],capacityAfter=units.slice(i).reduce((n,x)=>n+x.capacity-base,0),extra=i===units.length-1?remaining:Math.min(u.capacity-base,Math.round(remaining*(u.capacity-base)/capacityAfter));u.crew=u.initialCrew=base+extra;remaining-=extra;}return units;}
+function spreadCrew(units,remaining,base){
+ let capacity=units.reduce((sum,unit)=>sum+unit.capacity-base,0);
+ for(const [index,unit] of units.entries()){
+  const space=unit.capacity-base;
+  const extra=index===units.length-1?remaining:Math.min(space,Math.round(remaining*space/capacity));
+  unit.crew=unit.initialCrew=base+extra;
+  remaining-=extra;
+  capacity-=space;
+ }
+}
+export function navalUnits(fleet,troops,level,prefix,owner,prioritizeCombat=false){
+ const units=[];
+ for(const [type,count] of Object.entries(fleet)){
+  const hull=HULLS[type];if(!hull)continue;
+  for(let i=0;i<count;i++){
+   const hp=Math.round(hull.hp*(1+.025*(level-1)));
+   units.push({id:prefix+'-'+type+'-'+i,type,owner,level,hp,maxHP:hp,attack:Math.round(hull.attack*(1+.035*(level-1))),capacity:hull.capacity,crew:0,initialCrew:0});
+  }
+ }
+ if(!units.length)return units;
+ const base=Math.min(MIN_CREW_PER_SHIP,Math.floor(troops/units.length)),remaining=troops-base*units.length;
+ if(prioritizeCombat){
+  const combat=units.filter(unit=>unit.type==='combate');
+  const combatExtra=Math.min(remaining,combat.length*(HULLS.combate.capacity-base));
+  spreadCrew(combat,combatExtra,base);
+  spreadCrew(units.filter(unit=>unit.type!=='combate'),remaining-combatExtra,base);
+ }else spreadCrew(units,remaining,base);
+ return units;
+}
 export function navalHitPower(u,target=null,modifiers={}){if(!u||u.crew<=0)return 0;const side=u.type==='boss'||u.owner==='npc'?'defense':'attack',own=side==='attack'?modifiers.attack||0:modifiers.defense||0,opponent=side==='attack'?modifiers.defense||0:modifiers.attack||0,level=modifiers.bossLevel&&target?(u.type==='boss'?Math.max(1,(modifiers.bossLevel+3)/((target.level||1)+3)):Math.min(1,((u.level||1)+3)/(modifiers.bossLevel+3))):1;return Math.max(0,Math.round(u.attack*.30*(.2+.8*Math.min(1,u.crew/u.capacity))*(1+own/100)/(1+opponent/100)*level));}
 export function rollNavalRound(attackers,defenders,rng,round=0,modifiers={}){const live=x=>x.filter(u=>u.hp>0&&u.crew>0),a=live(attackers),d=live(defenders),all=[...a,...d],rolls=all.map(u=>{const dice=[1+Math.floor(rng()*6),1+Math.floor(rng()*6)];return{unit:u.id,owner:u.owner,type:u.type,dice,total:dice[0]+dice[1]};}),byId=new Map(rolls.map(r=>[r.unit,r])),hits=[];const pending=new Map();
  for(const[own,enemies,side]of[[a,d,'attack'],[d,a,'defense']])for(let i=0;i<own.length&&enemies.length;i++){const u=own[i],target=enemies[(i+round)%enemies.length],r=byId.get(u.id),opposed=byId.get(target.id),difference=Math.max(0,r.total-opposed.total),percent=difference*10,synergy=side==='attack'?(modifiers.attack||0):(modifiers.defense||0),opponentBonus=side==='attack'?(modifiers.defense||0):(modifiers.attack||0),levelFactor=modifiers.bossLevel?(u.type==='boss'?Math.max(1,(modifiers.bossLevel+3)/((target.level||1)+3)):Math.min(1,((u.level||1)+3)/(modifiers.bossLevel+3))):1,legacyDamage=u.crew>0?Math.round(u.attack*(.2+.8*Math.min(1,u.crew/u.capacity))*percent/100*(1+synergy/100)/(1+opponentBonus/100)*levelFactor):0,power=navalHitPower(u,target,modifiers),damage=modifiers.rule==='legacy'?legacyDamage:r.total>opposed.total?power:0;r.power=power;hits.push({from:u.id,to:target.id,side,percent,damage,power,targetHPBefore:target.hp});pending.set(target.id,(pending.get(target.id)||0)+damage);}

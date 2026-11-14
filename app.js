@@ -17,7 +17,7 @@ import{productionEntries}from'./production-queue.mjs?v=0.27.2&rev=worker-sale1';
 import{workerPanel,allocateWorkers}from'./worker-controls.mjs?v=0.27.2&rev=level-budget2';
 import{capturePanelState,restorePanelState,createLatestReader}from'./ui-state.mjs?v=0.27.2&rev=crew-draft1';
 import{bossPartyView}from'./boss-party.mjs?v=0.27.2';
-import{bossAccess,bossCapacity,bossAlive}from'./adventure.mjs?v=0.27.2&rev=duels1';
+import{bossAccess,bossCapacity,bossAlive,bossFleetAdmission}from'./adventure.mjs?v=0.27.2&rev=n9-crew1';
 import{ITEM_TYPES,RARITIES,DROP_TABLES,EQUIPMENT_SLOTS,itemBonus,itemName,equipmentBonuses,dismantleYield,bestSetSlots,partySynergy}from'./equipment.mjs?v=0.27.2&rev=progress1';
 import{reportView,adventureReadiness,bossMapArt,bossPortrait,rewardDialog,bossLootView,pendingRewardNotices}from'./adventure-view.mjs?v=0.27.2&rev=level-budget2';
 import{bindEquipmentDrag,inventoryExpansionView,inventoryView}from'./inventory-view.mjs?v=0.27.2&rev=level-budget2';
@@ -31,12 +31,12 @@ import{hasWall,storageCapacity,sailorState,defendingTroops,harborMetrics}from'./
 import{flagSVG,crestSVG,defaultFlag,flagEditor,readFlagEditor,updateFlagEditor}from'./flags.mjs?v=0.27.2&rev=flag2';
 import{populationState}from'./population.mjs?v=0.27.2&rev=recruit1';
 import{MAX_LEVEL,MAX_RESEARCH_LEVEL,maxBuildingLevel,buildingTier,researchSpec,researchBenefits,jobLane}from'./progression.mjs?v=0.27.2';
-import{npcShipCount,npcAccess,fleetPoint,botPoint,wreckPoint,battlePoint}from'./sea-system.mjs?v=0.27.2&rev=collection1';
+import{npcShipCount,npcAccess,fleetPoint,botPoint,wreckPoint,battlePoint,navalUnits}from'./sea-system.mjs?v=0.27.2&rev=n9-crew1';
 import{battleView,resolveBattle,seaMarkers,accessBadge}from'./naval-view.mjs?v=0.27.2&rev=collection1';
 import{islandArt,buildingArt,wallTier,WALL_NAMES}from'./island-art.mjs?v=0.27.2';
 import{missionProgress,missionWait}from'./onboarding.mjs?v=0.27.2&rev=worker-sale1';
 
-import {quote as quoteRule,SHIPS as SHIP_RULES,SHIP_UNLOCKS,fishingOrder} from './rules.mjs?v=0.27.2&rev=level-budget2';
+import {quote as quoteRule,SHIPS as SHIP_RULES,SHIP_UNLOCKS,fishingOrder} from './rules.mjs?v=0.27.2&rev=n9-crew1';
 import {routePoint,waterPoint} from './navigation.mjs?v=0.27.2&rev=duels1';
 import {WORKER_POOL,workerCount,workerCapacity,workerState,workerSaleLimit,workerSaleQuote,workerRates,productionCycle,workForecast,spaceAllocation} from './workers.mjs?v=0.27.2&rev=worker-sale1';
 
@@ -289,6 +289,7 @@ actionButton=b;try{
 
  if(b.dataset.workerDelta){const panel=b.closest('[data-workers-panel]'),resource=panel.dataset.workerResource,input=panel.querySelector('[data-workers-resource='+resource+']'),count=Math.max(0,Math.min(workerCount(me()),Number(input.value)+Number(b.dataset.workerDelta)));clearInlineOrder();updateLocalWorkers(panel,resource,count);return;}
 
+ if(b.dataset.fillCombatCrew){fillCombatCrew();return;}
  if(b.dataset.itemId||b.dataset.itemType||b.dataset.secretDetails){inspectItem(b.dataset.itemId?'owned:'+b.dataset.itemId:b.dataset.itemType?'type:'+b.dataset.itemType:'secret:'+b.dataset.secretDetails);return;}
  if(b.dataset.itemBack){const target=itemReturnTarget,snapshot=itemReturnState;inspect(target,false);restorePanelState($('.inspector'),snapshot);return;}
  if(b.dataset.itemSource){inspectBoss(b.dataset.itemSource);return;}
@@ -363,17 +364,60 @@ const equipmentDrag=bindEquipmentDrag($('#detail'),{
 setInterval(pollGame,2000);document.addEventListener('visibilitychange',()=>{if(document.hidden)equipmentDrag.cancel();else pollGame();});setInterval(positionShips,100);
 
 function syncBossPartyControls(){const mode=$('#send-party-mode'),list=$('#boss-invitees');if(!mode||!list)return;list.hidden=mode.value!=='invite';$('#boss-party-hint').textContent=list.hidden?'Qualquer capitão elegível pode juntar-se.':'Só tu e os convidados. Entram pelo mapa ou pelo relatório.';const chosen=[...list.querySelectorAll('[data-boss-invite]:checked')];for(const el of list.querySelectorAll('[data-boss-invite]'))el.disabled=!el.checked&&chosen.length>=2;}
+function sailingFleet(){return Object.fromEntries(Object.keys(SHIPS).map(type=>[type,Number($('#send-'+type)?.value)||0]));}
+function fillCombatCrew(){
+ const toggle=$('#send-combat-priority'),fleet=sailingFleet(),input=$('#send-troops');
+ if(!toggle||!input||!fleet.combate)return;
+ toggle.checked=!toggle.checked;
+ if(toggle.checked){
+  const support=Object.entries(fleet).reduce((total,[type,count])=>total+(type==='combate'?0:count),0);
+  const fullCombat=fleet.combate*SHIP_RULES.combate.capacity+support*MIN_CREW_PER_SHIP;
+  input.value=Math.min(Number(input.max),Math.max(fullCombat,Number(input.value)||0));
+ }
+ clearInlineOrder();
+ updateSailingCrew();
+}
+function sailingCrewPreview(fleet,troops,minimum,maximum,validFleet){
+ const preview=$('[data-crew-preview]');
+ if(!preview)return;
+ const priority=$('#send-combat-priority').checked,button=$('[data-fill-combat-crew]');
+ button.hidden=!(fleet.combate>0);
+ button.disabled=!validFleet||maximum<minimum;
+ button.setAttribute('aria-pressed',String(priority));
+ const boss=state.world.bosses?.find(b=>b.id===selected.id);
+ let content='';
+ if(validFleet&&Number.isInteger(troops)&&troops>=minimum&&troops<=maximum){
+  const admission=boss?bossFleetAdmission(state.world,boss,{fleet,troops},SHIP_RULES):null;
+  const admittedFleet=admission?.fleet||fleet,admittedTroops=admission?.troops??troops;
+  const units=navalUnits(admittedFleet,admittedTroops,me().levels.sede,'preview',me().id,priority);
+  const rows=Object.entries(admittedFleet).filter(([,count])=>count>0).map(([type,count])=>{
+   const crew=units.filter(unit=>unit.type===type).map(unit=>unit.crew),low=Math.min(...crew),high=Math.max(...crew);
+   const range=low===high?String(low):low+'–'+high,total=crew.reduce((sum,n)=>sum+n,0);
+   return '<li><span>'+SHIPS[type]+'</span><b>'+total+'/'+count*SHIP_RULES[type].capacity+'</b>'+(count>1?'<small>'+range+' por barco</small>':'')+'</li>';
+  });
+  const split=admission&&Object.values(admission.returnFleet).reduce((n,count)=>n+count,0);
+  const note=boss&&!admission?'Sem espaço livre nesta ilha agora.':split?'Com a capacidade atual, '+(split===1?'regressa 1 barco.':'regressam '+split+' barcos.'):'';
+  content=(note?'<small>'+note+'</small>':'')+'<ul aria-label="Marinheiros por tipo de barco">'+rows.join('')+'</ul>';
+ }
+ if(preview.innerHTML!==content)preview.innerHTML=content;
+}
+function navalCrewControls(){return '<div class="sailing-crew"><input id="send-combat-priority" type="checkbox" hidden><div data-crew-preview></div><button type="button" data-fill-combat-crew="1" aria-pressed="false" hidden>Encher navios de combate</button></div>';}
 function updateSailingCrew(){if(!state||!me()||!selected?.id)return;syncBossPartyControls();
  const input=$('#send-troops'),button=$('#detail [data-action="sail"]');if(!input||!button)return;
- const ships=Object.keys(SHIPS).reduce((n,k)=>n+Math.max(0,Number($('#send-'+k)?.value)||0),0),wreck=state.world.wrecks?.some(r=>r.id===selected?.id),minimum=wreck?0:ships*MIN_CREW_PER_SHIP,capacity=Object.keys(SHIPS).reduce((n,k)=>n+(Number($('#send-'+k)?.value)||0)*SHIP_RULES[k].capacity,0),available=me().troops-defendingTroops(me());
- input.min=minimum;input.max=Math.min(available,capacity);input.title=wreck?'Recolha de destroços sem tripulação mínima':MIN_CREW_PER_SHIP+' marinheiros por barco';let hint=$('#crew-minimum');if(!hint){hint=document.createElement('small');hint.id='crew-minimum';input.after(hint);}hint.textContent=minimum?'mín. '+minimum:'';
+ const fleet=sailingFleet(),ships=Object.values(fleet).reduce((n,count)=>n+count,0);
+ const wreck=state.world.wrecks?.some(r=>r.id===selected.id),minimum=wreck?0:ships*MIN_CREW_PER_SHIP;
+ const capacity=Object.entries(fleet).reduce((n,[type,count])=>n+count*SHIP_RULES[type].capacity,0),available=me().troops-defendingTroops(me()),maximum=Math.min(available,capacity);
+ const validFleet=ships>0&&Object.entries(fleet).every(([type,count])=>Number.isInteger(count)&&count>=0&&count<=me().fleet[type]);
+ input.min=minimum;input.max=maximum;input.title=wreck?'Recolha de destroços sem tripulação mínima':MIN_CREW_PER_SHIP+' marinheiros por barco';let hint=$('#crew-minimum');if(!hint){hint=document.createElement('small');hint.id='crew-minimum';input.after(hint);}hint.textContent=minimum?'mín. '+minimum:'';
  const side=$('#send-side');if(side&&!button.classList.contains('copy-ready')&&!button.classList.contains('copy-done'))button.textContent=(side.value==='defesa'?'Defender':'Atacar')+' · 180 moedas';const status=$('#combat-party-status');if(status&&side)status.outerHTML=partyStatus(state.world,selected.id,side.value);
- button.disabled=ships===0||Number(input.value)<minimum||Number(input.value)>Math.min(available,capacity);refreshActionRequirements();decorateGuide();
+ const troops=Number(input.value);
+ button.disabled=!validFleet||!Number.isInteger(troops)||troops<minimum||troops>maximum;
+ sailingCrewPreview(fleet,troops,minimum,maximum,validFleet);refreshActionRequirements();decorateGuide();
 }
 
 function flagView(){return '<section class="card flag-creation">'+flagEditor(flagDraft||me()?.flag||defaultFlag(state.user.id))+'<button class="primary" data-action="confirm-flag">'+(me()?'Guardar bandeira · 90 moedas':walletMode()&&state.entry?.status!=='ready'?'Criar ilha · '+num(entryCost())+' moedas':'Criar ilha')+'</button></section>';}
 function inspectSea(id){$('#inspector-title').textContent='Mar';const w=state.world,b=w.bots.find(b=>b.id===id),r=(w.wrecks||[]).find(r=>r.id===id);selected={id};document.body.classList.add('inspector-open');if(!b&&!r){$('#detail').innerHTML='<h2>O alvo já saiu</h2>';return;}const mine=me(),e=w.encounters[id],access=b?npcAccess(mine,b):{ok:true},flag=b?npcFlag(b):npcFlag(r);let html=`<div class="target-identity">${flagSVG(flag)}<span class="pill">${b?npcProfile(b).label+' · NPC':'DESTROÇOS'}</span></div><h2>${esc(b?.name||r.name)}</h2>${b?accessBadge(mine,b):'<div class="attack-access '+(r.lockedBy?'neutral':'')+'">'+(r.lockedBy?'◷ Recolha em curso':'✓ Loot livre · qualquer nível')+'</div>'}${stats([b?.engagedAt!==undefined?['Estado','Em combate']:['Sai do mapa em',countdown(b?.end||r.end)],...(b?[['Tripulação',b.troops],['Loot de rota',b.lootBonus>1.02?'+'+Math.round((b.lootBonus-1)*100)+'%':'Normal']]:[])])}<div class="wreck-loot">${Object.entries(b?.loot||r.resources).map(([k,n])=>`<span>${icon(k)}${num(n)}</span>`).join('')}</div>${b?'<div class="target-fleet">'+Object.entries(b.fleet||{}).filter(([,n])=>n).map(([k,n])=>'<span><img src="assets/fleet-'+k+'.png" alt="'+SHIPS[k]+'">×'+n+'</span>').join('')+'</div>':''}${e?'<button class="primary wide" data-battle="'+e.id+'">⚔ Ver batalha em direto</button>':''}`;
-if(state.needsDevice)html+=deviceGate();else if(!mine)html+='<button data-action="found">Criar a minha ilha</button>';else if(!access.ok)html+='<p class="level-range">Precisas de N'+access.min+'–'+access.max+'</p>';else if(r?.lockedBy)html+='<p>Disponível depois da recolha atual.</p>';else{if(b)html+=partyStatus(w,b.id,'ataque');const ship=b&&mine.fleet.combate?'combate':mine.fleet.cargueiro?'cargueiro':mine.fleet.combate?'combate':Object.keys(SHIPS).find(k=>mine.fleet[k]>0),available=mine.troops-defendingTroops(mine);html+=`<h3>Frota</h3><div class="fields">${Object.entries(SHIPS).map(([k,name])=>`<label class="fleet-input">${name} (${mine.fleet[k]})<input id="send-${k}" type="number" min="0" max="${mine.fleet[k]}" value="${k===ship?1:0}"></label>`).join('')}<label>Marinheiros<input id="send-troops" type="number" inputmode="numeric" data-preserve-number-draft min="0" max="${available}" value="${r?0:Math.min(20,available,SHIP_RULES[ship]?.capacity||0)}"></label></div>${sailingEquipmentChoice()}<small data-sail-estimate></small><button class="primary wide" data-action="sail" ${!ship||b&&available<=0?'disabled':''}>${r?'Preparar recolha':'Preparar ataque'} · 180 moedas</button>`;}$('#detail').innerHTML=html;updateSailingCrew();simplifyCurrentView();updateRoutes();}
+if(state.needsDevice)html+=deviceGate();else if(!mine)html+='<button data-action="found">Criar a minha ilha</button>';else if(!access.ok)html+='<p class="level-range">Precisas de N'+access.min+'–'+access.max+'</p>';else if(r?.lockedBy)html+='<p>Disponível depois da recolha atual.</p>';else{if(b)html+=partyStatus(w,b.id,'ataque');const ship=b&&mine.fleet.combate?'combate':mine.fleet.cargueiro?'cargueiro':mine.fleet.combate?'combate':Object.keys(SHIPS).find(k=>mine.fleet[k]>0),available=mine.troops-defendingTroops(mine);html+=`<h3>Frota</h3><div class="fields">${Object.entries(SHIPS).map(([k,name])=>`<label class="fleet-input">${name} (${mine.fleet[k]})<input id="send-${k}" type="number" min="0" max="${mine.fleet[k]}" value="${k===ship?1:0}"></label>`).join('')}<label>Marinheiros<input id="send-troops" type="number" inputmode="numeric" data-preserve-number-draft min="0" max="${available}" value="${r?0:Math.min(20,available,SHIP_RULES[ship]?.capacity||0)}"></label></div>${b?navalCrewControls():''}${sailingEquipmentChoice()}<small data-sail-estimate></small><button class="primary wide" data-action="sail" ${!ship||b&&available<=0?'disabled':''}>${r?'Preparar recolha':'Preparar ataque'} · 180 moedas</button>`;}$('#detail').innerHTML=html;updateSailingCrew();simplifyCurrentView();updateRoutes();}
 
 
 
@@ -409,7 +453,7 @@ function actionRequest(button){
  if(d.action==='leave-alliance')return{kind:'aliancas',action:'sair'};
  if(d.action==='confirm-flag'&&p)return{kind:'gestao',action:'bandeira',payload:{flag:readFlagEditor()}};
  if(d.action==='withdraw')return{kind:'gestao',action:'retirar-frota',payload:{mission:d.missionId}};
- if(d.action==='sail')return{kind:'navegar',action:'enviar',payload:{target:selected?.id,useEquipment:!!$('#send-equipment')?.checked,fleet:Object.fromEntries(Object.keys(SHIPS).map(k=>[k,n('#send-'+k)])),troops:n('#send-troops'),...($('#send-side')?{side:$('#send-side').value}:{}),...($('#send-party-mode')?{bossParty:{mode:$('#send-party-mode').value,invitees:[...document.querySelectorAll('[data-boss-invite]:checked')].map(el=>el.dataset.bossInvite)}}:{})}};
+ if(d.action==='sail')return{kind:'navegar',action:'enviar',payload:{target:selected?.id,useEquipment:!!$('#send-equipment')?.checked,fleet:sailingFleet(),troops:n('#send-troops'),...($('#send-combat-priority')?.checked?{prioritizeCombat:true}:{}),...($('#send-side')?{side:$('#send-side').value}:{}),...($('#send-party-mode')?{bossParty:{mode:$('#send-party-mode').value,invitees:[...document.querySelectorAll('[data-boss-invite]:checked')].map(el=>el.dataset.bossInvite)}}:{})}};
  return null;
 }
 function refreshActionRequirements(){
@@ -486,7 +530,7 @@ function inspectBoss(id){$('#inspector-title').textContent='Ilha hostil';const w
 const capacity=bossCapacity(w,b);html+='<div class="boss-capacity"><span title="Barcos em combate / limite">⛵ '+capacity.usedShips+'/'+capacity.ships+'</span><span title="Marinheiros em combate / limite">'+'<img src="assets/ui/crew.png" alt="Marinheiros">'+' '+capacity.usedTroops+'/'+capacity.troops+'</span></div>';
 if(!bossAlive(w,b))html+='<div class="boss-respawn">Regressa em '+countdown(b.respawnAt)+'</div>';else html+=bossLootView(b,w,p);
 html+='<div class="boss-badge-preview">'+bossBadge(b.id,{locked:!p?.bossWins?.includes(b.id)})+'<small>'+(p?.bossWins?.includes(b.id)?'Conquistado':'Primeira vitória · +60 moedas')+'</small></div>';if(e)html+='<button class="primary wide" data-battle="'+e.id+'">⚔ Ver combate</button>';
-if(p&&a.ok&&e?.phase!=='loot'){html+=partyStatus(w,b.id,'ataque')+bossPartyView(w,p,b);const ship=preferredCombatShip(p),count=ship?Math.min(b.final?2:1,p.fleet[ship]):0,available=p.troops-defendingTroops(p);html+='<h3>Enviar frota</h3><div class="fields">'+Object.entries(SHIPS).map(([k,name])=>'<label class="fleet-input">'+name+' ('+p.fleet[k]+')<input id="send-'+k+'" type="number" min="0" max="'+p.fleet[k]+'" value="'+(k===ship?count:0)+'"></label>').join('')+'<label>Marinheiros<input id="send-troops" type="number" inputmode="numeric" data-preserve-number-draft min="0" max="'+available+'" value="'+Math.min(b.final?80:40,available,count*(SHIP_RULES[ship]?.capacity||0))+'"></label></div>'+sailingEquipmentChoice()+'<small data-sail-estimate></small><button class="primary wide" data-action="sail">Preparar ataque · 180 moedas</button>';}
+if(p&&a.ok&&e?.phase!=='loot'){html+=partyStatus(w,b.id,'ataque')+bossPartyView(w,p,b);const ship=preferredCombatShip(p),count=ship?Math.min(b.final?2:1,p.fleet[ship]):0,available=p.troops-defendingTroops(p);html+='<h3>Enviar frota</h3><div class="fields">'+Object.entries(SHIPS).map(([k,name])=>'<label class="fleet-input">'+name+' ('+p.fleet[k]+')<input id="send-'+k+'" type="number" min="0" max="'+p.fleet[k]+'" value="'+(k===ship?count:0)+'"></label>').join('')+'<label>Marinheiros<input id="send-troops" type="number" inputmode="numeric" data-preserve-number-draft min="0" max="'+available+'" value="'+Math.min(b.final?80:40,available,count*(SHIP_RULES[ship]?.capacity||0))+'"></label></div>'+navalCrewControls()+sailingEquipmentChoice()+'<small data-sail-estimate></small><button class="primary wide" data-action="sail">Preparar ataque · 180 moedas</button>';}
 openAdventurePanel(id,html);updateSailingCrew();updateRoutes();}
 function queueRewardReveals(){
  const p=me();if(!p)return;
