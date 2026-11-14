@@ -2,7 +2,7 @@ import{publicItemCollection}from'./public-inventory.mjs?v=0.27.2&rev=collection1
 import{prepareBossSpecial,battleOrderQuote,setBattleOrder}from'./battle-tactics.mjs?v=0.27.2&rev=specials1';
 import{recordPresence,recordAchievementOrder,achievementReward,collectAchievement}from'./achievements.mjs?v=0.27.2&rev=level-budget2';
 import{fleetEquipment,deployedEquipment,loseFleetEquipment,stealIslandEquipment,deliverCapturedEquipment,publicRelics}from'./equipment-risk.mjs?v=0.27.2&rev=duels1';
-import{actionPrice,RECOVERY_SECONDS,RECOVERY_RATE,STASH_LIMIT,FRAGMENTS_REQUIRED}from'./balance-policy.mjs?v=0.27.2&rev=level-budget2';
+import{actionPrice,RECOVERY_SECONDS,RECOVERY_RATE,STASH_LIMIT,FRAGMENTS_REQUIRED}from'./balance-policy.mjs?v=0.27.2&rev=ship-scrap1';
 import{EXCLUSIVE_ITEMS}from'./loot-tables.mjs?v=0.27.2&rev=progress1';
 import{gameRunning,combatWindow,noteAttack,sessionProtected}from'./game-session.mjs?v=0.27.2';
 import{walletState,changeWallet}from'./wallet-state.mjs?v=0.27.2';
@@ -95,6 +95,17 @@ export function quote(w,id,request){ensureAdventure(w);const p=w.players[id];con
    q.payload=sale;
    q.description='Vender '+sale.count+(sale.count===1?' trabalhador':' trabalhadores');
   }
+  else if(q.action==='desmontar-navios'){
+   const {ship,count}=v;
+   ok(typeof ship==='string'&&Object.hasOwn(SHIPS,ship),'Tipo de barco inválido.');
+   ok(Number.isSafeInteger(count)&&count>=1&&count<=p.fleet[ship],'Escolhe uma quantidade de barcos no porto.');
+   const hull=SHIPS[ship],cap=storageCapacity(p);
+   const refund=Object.fromEntries(['wood','stone'].map(resource=>[
+    resource,Math.min(Math.floor(hull[resource]*count/2),Math.max(0,Math.floor(cap-p.resources[resource])))
+   ]));
+   q.payload={ship,count,refund,slots:hull.slots*count};
+   q.description=count===1?'Desmontar 1 barco':'Desmontar '+count+' barcos';
+  }
   else if(q.action==='recolher-espolio'){const index=(p.lootStash||[]).findIndex(i=>i.id===v.item);ok(index>=0,'Item indisponível.');ok(p.inventory.length<inventoryCapacity(p),'Liberta um lugar.');v.item=p.lootStash[index].id;q.description='Recolher espólio';}
   else if(q.action==='trocar-fragmentos'){const source=Object.entries(EXCLUSIVE_ITEMS).find(([,id])=>id===v.boss);ok(source,'Ilha sem peça exclusiva.');ok((p.fragments?.[v.boss]||0)>=FRAGMENTS_REQUIRED,'Fragmentos insuficientes.');ok(p.inventory.length<inventoryCapacity(p),'Liberta um lugar.');v.type=source[0];q.description='Forjar equipamento';}
   else
@@ -150,6 +161,10 @@ export function execute(w,id,name,request,wall=Date.now()){
   p.workers=workerCount(p)-v.count;
   add(p,v.refund);
   report(w,p,'reciclagem','Venda de trabalhadores',{count:v.count,resources:v.refund,slots:v.slots});
+ }else if(q.action==='desmontar-navios'){
+  p.fleet[v.ship]-=v.count;
+  add(p,v.refund);
+  report(w,p,'reciclagem',q.description,{ship:v.ship,count:v.count,resources:v.refund,slots:v.slots});
  }else if(q.action==='recolher-espolio'){const i=p.lootStash.findIndex(item=>item.id===v.item);p.inventory.push(p.lootStash.splice(i,1)[0]);}
  else if(q.action==='trocar-fragmentos'){p.fragments[v.boss]-=FRAGMENTS_REQUIRED;p.inventory.push({id:uid(w,'IT'),type:v.type,rarity:2,value:9});report(w,p,'recompensa','Equipamento forjado',{item:p.inventory.at(-1)});}
  else if(q.action==='equipar'){const key=v.loadout==='fleet'?'attackEquipment':'equipment',other=key==='equipment'?'attackEquipment':'equipment';p[key]=v.equipment;for(const[slot,item]of Object.entries(p[other]||{}))if(Object.values(v.equipment).includes(item))delete p[other][slot];p.equipmentRevision=(p.equipmentRevision??0)+1;report(w,p,'equipamento','Configuração de equipamento confirmada');}else if(q.action==='desmontar'){p.inventory=p.inventory.filter(i=>!v.items.includes(i.id));p.lootStash=(p.lootStash||[]).filter(i=>!v.items.includes(i.id));collectUniqueItem(w,p);const overflow=add(p,v.resources);report(w,p,'reciclagem','Itens transformados em recursos',{resources:v.resources,overflow});}
