@@ -1,3 +1,4 @@
+import{storageCapacity}from'./harbor.mjs?v=0.27.2&rev=worker-sale1';
 import{coinIcon}from'./wallet-view.mjs?v=0.27.2&rev=level-budget2';
 import{EXCLUSIVE_ITEMS}from'./equipment.mjs?v=0.27.2&rev=progress1';
 import{FRAGMENTS_REQUIRED}from'./balance-policy.mjs?v=0.27.2&rev=level-budget2';
@@ -8,6 +9,11 @@ import{islandTheftChance}from'./equipment-risk.mjs?v=0.27.2&rev=duels1';
 const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const image=i=>'<button class="item-art-button" data-item-id="'+esc(i.id)+'" aria-label="Ver '+esc(itemName(i))+'"><img class="equipment-art" src="'+itemArt(i)+'" alt=""></button>';
 
+function salvageButton(item,selected){
+ const label=(selected?'Desmarcar ':'Marcar para desmontar ')+itemName(item);
+ return `<button class="item-salvage-button" data-mark-salvage="${esc(item.id)}" aria-pressed="${selected}" aria-label="${esc(label)}" title="${esc(label)}"><span aria-hidden="true">${selected?'✓':'♻'}</span></button>`;
+}
+
 export function inventoryView(p, selection=new Set(), {draft=createEquipmentDraft(p),deployed=new Set()}={}) {
  const bag = p.inventory || [];
  const preview = {...p,equipment:draft.slots};
@@ -15,6 +21,8 @@ export function inventoryView(p, selection=new Set(), {draft=createEquipmentDraf
  const dirty = draftChanged(draft);
  const savedIds = [...Object.values(p.equipment || {}),...Object.values(p.attackEquipment||{})];
  const expansion = inventoryExpansion(p);
+ const dismantle = [...bag,...(p.lootStash||[])].filter(item => !savedIds.includes(item.id) && !deployed.has(item.id) && !ITEM_TYPES[item.type].unique);
+ const dismantleIds = new Set(dismantle.map(item => item.id));
  const status = draft.pending
   ? '<span class="equipment-pending" role="status">A guardar configuração…</span>'
   : dirty
@@ -47,6 +55,7 @@ export function inventoryView(p, selection=new Set(), {draft=createEquipmentDraf
     ${chosen ? `<span class="equipment-mark" aria-hidden="true">${savedIds.includes(item.id) ? '✓' : '●'}</span>` : ''}
    </button>
    <button class="equipment-details" data-item-id="${esc(item.id)}" aria-label="Ver ${title} · ${set.name}" title="${title} · ${set.name}"><span>${title}</span></button>
+   ${dismantleIds.has(item.id)?salvageButton(item,selection.has(item.id)):''}
   </article>`;
  }).join('');
 
@@ -55,12 +64,13 @@ export function inventoryView(p, selection=new Set(), {draft=createEquipmentDraf
  const plusTile = expansion.max ? '' : `<button class="equipment-vacancy inventory-add" data-inventory-expansion="1" aria-label="Expandir inventário">
   <span aria-hidden="true">+</span>${expansion.paid ? `<small>${expansion.paid}/${expansion.required}</small>` : ''}
  </button>`;
- const dismantle = [...bag,...(p.lootStash||[])].filter(item => !savedIds.includes(item.id) && !deployed.has(item.id) && !ITEM_TYPES[item.type].unique);
  const selected = dismantle.filter(item => selection.has(item.id));
  const yieldTotal = selected.reduce((total,item) => {
   const resources = dismantleYield(item);
   return {wood:total.wood+resources.wood,stone:total.stone+resources.stone};
  },{wood:0,stone:0});
+ const room = resource => Math.max(0,storageCapacity(p)-(p.resources?.[resource]||0));
+ const refund = resource => Math.min(yieldTotal[resource],room(resource)).toLocaleString("pt-PT",{maximumFractionDigits:2});
  return `<h2>Equipamento <small>${equippedItems(preview).length}/4</small></h2>
   <div class="equipment-loadouts" role="group" aria-label="Local do equipamento"><button data-equipment-loadout="island" aria-pressed="${draft.loadout!=='fleet'}">⛨ Ilha</button><button data-equipment-loadout="fleet" aria-pressed="${draft.loadout==='fleet'}">⛵ Frota</button></div>
   <small class="equipment-risk-note">${draft.loadout==='fleet'?'Perdes os itens se a frota for destruída.':Math.round(islandTheftChance(p)*100)+'% de risco por item se a ilha perder · Academia reduz até 15%.'}</small>
@@ -75,12 +85,13 @@ export function inventoryView(p, selection=new Set(), {draft=createEquipmentDraf
     <button class="equipment-reset" data-equipment-reset="1">Repor</button>
    </div>` : ''}
    <h3>Itens <small>${bag.length}/${expansion.capacity}</small></h3>
-   ${bag.length ? '<p class="equipment-hint">Arrasta ou toca na imagem para selecionar.</p>' : ''}
+   ${bag.length ? '<p class="equipment-hint">Arrasta ou toca na imagem para selecionar equipamento.</p>' : ''}
+   ${dismantle.length ? '<p class="equipment-hint">Toca em ♻ para marcar itens para desmontar.</p>' : ''}
    <div class="equipment-bag">${tiles}${emptyTiles}${plusTile}</div>
    ${p.pendingUniqueItem ? '<p class="inventory-full">Uma relíquia única aguarda um lugar livre.</p>' : ''}
    ${bag.length>=expansion.capacity?'<small class="inventory-full">Inventário cheio</small>':''}
-   ${pendingLootView(p,selection)}
-   ${selected.length ? `<div class="dismantle-panel"><span>+${yieldTotal.wood} madeira · +${yieldTotal.stone} pedra</span>
+   ${pendingLootView(p,selection,dismantleIds)}
+   ${selected.length ? `<div class="dismantle-panel"><span>+${refund('wood')} madeira · +${refund('stone')} pedra</span>
     <button data-dismantle="1">Desmontar ${selected.length} · 90 moedas</button>
     <button data-clear-salvage="1">Limpar seleção</button>
    </div>` : ''}
@@ -176,7 +187,7 @@ export function bindEquipmentDrag(panel, {canEdit,onEquip,onInvalid}) {
  return {get active(){return !!drag;},cancel};
 }
 
-export function pendingLootView(p,selection=new Set()){
+export function pendingLootView(p,selection=new Set(),dismantleIds=new Set()){
  const stash=p.lootStash||[],fragments=Object.entries(EXCLUSIVE_ITEMS).filter(([,boss])=>(p.fragments?.[boss]||0)>0);
- return (stash.length?'<h3>Espólio <small>'+stash.length+'</small></h3><div class="pending-loot-grid">'+stash.map(i=>'<article class="pending-loot-item '+(selection.has(i.id)?'salvage-marked':'')+'"><button data-item-id="'+esc(i.id)+'" title="Ver '+esc(itemName(i))+'" aria-label="Ver '+esc(itemName(i))+'"><img src="'+itemArt(i)+'" alt=""></button><button data-claim-loot="'+esc(i.id)+'" title="Recolher '+esc(itemName(i))+' · 90 moedas" aria-label="Recolher '+esc(itemName(i))+' por 90 moedas"><span class="loot-price">↓ '+coinIcon()+'90</span></button></article>').join('')+'</div>':'')+(fragments.length?'<h3>Fragmentos</h3><div class="pending-loot-grid">'+fragments.map(([type,boss])=>'<button data-craft-boss="'+boss+'" title="Criar '+esc(ITEM_TYPES[type].name)+' raro · 10 fragmentos e 90 moedas" aria-label="Criar '+esc(ITEM_TYPES[type].name)+' raro por 10 fragmentos e 90 moedas"><img src="'+itemArt({type})+'" alt=""><span>'+p.fragments[boss]+'/'+FRAGMENTS_REQUIRED+'</span><span class="loot-price">'+coinIcon()+'90</span></button>').join('')+'</div>':'');
+ return (stash.length?'<h3>Espólio <small>'+stash.length+'</small></h3><div class="pending-loot-grid">'+stash.map(i=>'<article class="pending-loot-item '+(selection.has(i.id)?'salvage-marked':'')+'"><button data-item-id="'+esc(i.id)+'" title="Ver '+esc(itemName(i))+'" aria-label="Ver '+esc(itemName(i))+'"><img src="'+itemArt(i)+'" alt=""></button><button data-claim-loot="'+esc(i.id)+'" title="Recolher '+esc(itemName(i))+' · 90 moedas" aria-label="Recolher '+esc(itemName(i))+' por 90 moedas"><span class="loot-price">↓ '+coinIcon()+'90</span></button>'+(dismantleIds.has(i.id)?salvageButton(i,selection.has(i.id)):'')+'</article>').join('')+'</div>':'')+(fragments.length?'<h3>Fragmentos</h3><div class="pending-loot-grid">'+fragments.map(([type,boss])=>'<button data-craft-boss="'+boss+'" title="Criar '+esc(ITEM_TYPES[type].name)+' raro · 10 fragmentos e 90 moedas" aria-label="Criar '+esc(ITEM_TYPES[type].name)+' raro por 10 fragmentos e 90 moedas"><img src="'+itemArt({type})+'" alt=""><span>'+p.fragments[boss]+'/'+FRAGMENTS_REQUIRED+'</span><span class="loot-price">'+coinIcon()+'90</span></button>').join('')+'</div>':'');
 }

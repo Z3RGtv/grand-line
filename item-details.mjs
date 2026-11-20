@@ -2,13 +2,13 @@ import{ITEM_TYPES,ITEM_SETS,RARITIES,EQUIPMENT_SLOTS,STAT_NAMES,itemName,itemArt
 import{BOSS_SITES}from'./adventure.mjs?v=0.27.2&rev=duels1';
 const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const percent=n=>(n*100).toLocaleString('pt-PT',{maximumFractionDigits:2})+'%';
-export function itemDetailsView(item,p,{catalog=false,marked=false}={}){
+export function itemDetailsView(item,p,{catalog=false,marked=false,deployed=false}={}){
  const type=ITEM_TYPES[item.type];if(!type)return'<h2>Item indisponível</h2>';
  const set=ITEM_SETS[type.set],rarity=RARITIES[item.rarity],inBag=!catalog&&p?.inventory?.some(i=>i.id===item.id),pending=!catalog&&p?.lootStash?.some(i=>i.id===item.id),owned=inBag||pending,sources=BOSS_SITES.flatMap(b=>{const odds=lootOdds(b).find(o=>o.type===item.type);return odds?[{...odds,name:b.name,id:b.id}]:[];});
  const statistics=catalog?'<div class="item-rarity-ranges">'+RARITIES.filter((_,i)=>type.unique?i===3:!type.finalOnly||i>=3).map(r=>{const low=itemBonus({...item,value:type.unique?14:r.range[0]}),high=itemBonus({...item,value:type.unique?14:r.range[1]});return '<div><span style="color:'+r.color+'">'+r.name+' · N'+r.level+'</span><b>+'+low[type.stat]+(low[type.stat]!==high[type.stat]?'–'+high[type.stat]:'')+'% '+STAT_NAMES[type.stat]+'</b></div>';}).join('')+'</div>':'<div class="item-main-stat">'+Object.entries(itemBonus(item)).map(([k,v])=>'<strong>+'+v+'% '+STAT_NAMES[k]+'</strong>').join('')+'<small>'+rarity.name+' · Requer sede N'+rarity.level+'</small></div>';
  const bonuses=Object.entries(set.bonus).map(([k,v])=>'+'+v+'% '+STAT_NAMES[k]).join(' · ');
  const incompatible=type.set==='bastiao'?'Aurora':type.set==='aurora'?'Bastião':'';
- const canMark=owned&&!type.unique&&![...Object.values(p.equipment||{}),...Object.values(p.attackEquipment||{})].includes(item.id);
+ const canMark=owned&&!deployed&&!type.unique&&![...Object.values(p.equipment||{}),...Object.values(p.attackEquipment||{})].includes(item.id);
  return `<button class="item-back" data-item-back="1">← Voltar</button>
   <div class="item-detail-hero" style="--set-color:${set.color}">
    <img src="${itemArt(item)}" alt="">

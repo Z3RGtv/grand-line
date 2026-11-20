@@ -7,7 +7,7 @@ import{purchaseFeedback}from'./wallet-orders.mjs?v=0.27.2';
 import{gameRunning,fundingOpen}from'./game-session.mjs?v=0.27.2';
 import{coinIcon,entryWalletView,walletHud,walletOrderMessage,walletView}from'./wallet-view.mjs?v=0.27.2&rev=level-budget2';
 import './boss-idle.mjs?v=0.27.2&rev=refresh1';
-import{itemDetailsView,discoveryDetailsView}from'./item-details.mjs?v=0.27.2&rev=duels1';
+import{itemDetailsView,discoveryDetailsView}from'./item-details.mjs?v=0.27.2&rev=salvage2';
 import{inventoryExpansion,inventoryCapacity}from'./inventory-capacity.mjs?v=0.27.2';
 import{createEquipmentDraft,selectEquipment,equipmentDraftOrder,markEquipmentPending,reconcileEquipmentDraft}from'./equipment-draft.mjs?v=0.27.2&rev=progress1';
 import{writeRestriction}from'./read-mode.mjs?v=0.27.2';
@@ -18,9 +18,9 @@ import{workerPanel,allocateWorkers}from'./worker-controls.mjs?v=0.27.2&rev=level
 import{capturePanelState,restorePanelState,createLatestReader}from'./ui-state.mjs?v=0.27.2&rev=crew-draft1';
 import{bossPartyView}from'./boss-party.mjs?v=0.27.2';
 import{bossAccess,bossCapacity,bossAlive,bossFleetAdmission}from'./adventure.mjs?v=0.27.2&rev=n9-crew1';
-import{ITEM_TYPES,RARITIES,DROP_TABLES,EQUIPMENT_SLOTS,itemBonus,itemName,equipmentBonuses,dismantleYield,bestSetSlots,partySynergy}from'./equipment.mjs?v=0.27.2&rev=progress1';
-import{reportView,adventureReadiness,bossMapArt,bossPortrait,rewardDialog,bossLootView,pendingRewardNotices}from'./adventure-view.mjs?v=0.27.2&rev=level-budget2';
-import{bindEquipmentDrag,inventoryExpansionView,inventoryView}from'./inventory-view.mjs?v=0.27.2&rev=level-budget2';
+import{ITEM_TYPES,RARITIES,DROP_TABLES,EQUIPMENT_SLOTS,EXCLUSIVE_ITEMS,itemBonus,itemName,equipmentBonuses,dismantleYield,bestSetSlots,partySynergy}from'./equipment.mjs?v=0.27.2&rev=progress1';
+import{reportView,adventureReadiness,bossMapArt,bossPortrait,rewardDialog,bossLootView,pendingRewardNotices}from'./adventure-view.mjs?v=0.27.2&rev=salvage2';
+import{bindEquipmentDrag,inventoryExpansionView,inventoryView}from'./inventory-view.mjs?v=0.27.2&rev=salvage2';
 import{nextMissionCue,createMissionPointer}from'./mission-cues.mjs?v=0.27.2';
 import{setButtonRequirement,highlightRequirement,interceptRequirement}from'./requirement-feedback.mjs?v=0.27.2';
 import{orderTransition}from'./order-flow.mjs?v=0.27.2';
@@ -311,7 +311,9 @@ actionButton=b;try{
    if(inventorySelection.size>=10){toast('Até 10 itens por ordem.');return;}
    inventorySelection.add(id);
   }
-  inspectInventory();restorePanelState($('.inspector'),itemReturnState);return;
+  const panel=$('.inspector');
+  const snapshot=selected?.id?.startsWith('item:')?itemReturnState:capturePanelState(panel);
+  inspectInventory();restorePanelState(panel,snapshot);return;
  }
  if(b.dataset.clearSalvage){inventorySelection.clear();inspectInventory();return;}
  if(b.dataset.inventoryExpansion){inspectInventoryExpansion();return;}
@@ -323,7 +325,20 @@ actionButton=b;try{
  if(b.dataset.inlineExecute){const req=inlineOrder.request;clearInlineOrder();await api('/api/demo/execute',req);planRequest=null;previewVoyage=null;await refresh();toast(req.action==='equipar'?'Configuração confirmada.':'Ordem executada no teste.');return;}
  if(b.dataset.equipmentLoadout){if(!equipmentEditingAllowed()){toast('A aguardar a confirmação.');return;}equipmentDraft=createEquipmentDraft(me(),b.dataset.equipmentLoadout);inspectInventory();return;}
  if(b.dataset.equipSet||b.dataset.equip||b.dataset.unequip||b.dataset.equipmentReset){editEquipmentDraft({item:b.dataset.equip,slot:b.dataset.unequip,set:b.dataset.equipSet,reset:!!b.dataset.equipmentReset});return;}
- if(b.dataset.dismantle||b.dataset.claimLoot||b.dataset.craftBoss){await prepare(actionRequest(b),b);return;}
+ if(b.dataset.dismantle){
+  const request=actionRequest(b),p=me();
+  const {cost,payload:{resources}}=quoteRule(state.world,state.user.id,request);
+  const cap=storageCapacity(p);
+  const amount=key=>Math.min(resources[key],Math.max(0,cap-p.resources[key])).toLocaleString("pt-PT",{maximumFractionDigits:2});
+  const owned=[...(p.inventory||[]),...(p.lootStash||[])];
+  const items=request.payload.items.map(id=>owned.find(item=>item.id===id));
+  const special=items.filter(item=>ITEM_TYPES[item.type].finalOnly||Object.hasOwn(EXCLUSIVE_ITEMS,item.type));
+  const details="Recebes "+amount("wood")+" madeira e "+amount("stone")+" pedra. Custa "+num(cost)+" moedas.";
+  const warning=special.length?"\n\nPeças exclusivas selecionadas: "+special.map(itemName).join(", ")+".":"";
+  if(confirm("Desmontar "+items.length+(items.length===1?" item?":" itens?")+" A destruição é definitiva. "+details+warning))await prepare(request,b);
+  return;
+ }
+ if(b.dataset.claimLoot||b.dataset.craftBoss){await prepare(actionRequest(b),b);return;}
  if(b.dataset.action==='confirm-equipment'||b.dataset.action==='expand-inventory'){await prepare(actionRequest(b),b);return;}
 
  if(b.dataset.guide){if(b.dataset.guide==='continue')await continueMission();else if(b.dataset.guide==='copy-explanation'){await navigator.clipboard.writeText($('#short-explanation').textContent);toast('Copiado');}else{guideFocus=null;guidePaused=true;clearGuideFocus();}return;}if(b.dataset.training){const mode=b.dataset.training;if(mode==='wait')await api('/api/training/wait',{});if(mode==='five')await api('/api/demo/advance',{seconds:300});if(mode==='day')await api('/api/lab/day',{});if(mode==='restart'){const resetButton=b;resetButton.outerHTML='<button data-training="confirm-restart">Confirmar novo treino</button><button data-training="cancel-restart">Cancelar</button>';return;}if(mode==='confirm-restart')await api('/api/training/reset',{});if(mode==='restore')await api('/api/training/restore',{});if(['confirm-restart','restore'].includes(mode)){tab='ilha';selected=null;guideFocus=null;planRequest=null;previewVoyage=null;$('#plan').innerHTML='';document.body.classList.remove('inspector-open');clearGuideFocus();}trainingStamp='';guideSeenCount=null;await refresh();return;}if(b.dataset.tab){guideFocus=null;clearGuideFocus();const house={trabalhadores:'serraria',construcoes:'sede',frota:'estaleiro',pesquisas:'academia',aliancas:'sede'}[b.dataset.tab];tab=house?'ilha':b.dataset.tab;selected=null;previewVoyage=null;planRequest=null;$('#plan').innerHTML='';document.body.classList.remove('inspector-open','chart-expanded','order-open');window.scrollTo(0,0);render();if(house)inspectBuilding(house);window.scrollTo(0,0);return;}if(b.dataset.action==='close-inspector'){selected=null;previewVoyage=null;planRequest=null;$('#plan').innerHTML='';document.body.classList.remove('inspector-open','order-open');updateRoutes();decorateGuide();}if(b.dataset.mapControl){if(b.dataset.mapControl==='expand'){document.body.classList.toggle('chart-expanded');b.textContent=document.body.classList.contains('chart-expanded')?'Restaurar':'Expandir';fitSea();}else if(b.dataset.mapControl==='fit')fitSea();else if(b.dataset.mapControl==='home')focusIsland();else setMapZoom(zoom*(b.dataset.mapControl==='in'?1.2:1/1.2));}
@@ -535,7 +550,7 @@ function inspectItem(key){
  const item=kind==='type'?{type:id}:kind==='owned'?[...(p?.inventory||[]),...(p?.lootStash||[])].find(i=>i.id===id)||(p?.pendingUniqueItem?.id===id?p.pendingUniqueItem:null):record?.equipment;
  if(!item&&!record){toast('Item indisponível.');return;}
  if(!selected?.id?.startsWith('item:')){itemReturnTarget=selected?.id||'inventory';itemReturnState=capturePanelState($('.inspector'));}
- openAdventurePanel('item:'+key,item?itemDetailsView(item,p,{catalog:kind==='type',marked:inventorySelection.has(id)}):discoveryDetailsView(record));
+ openAdventurePanel('item:'+key,item?itemDetailsView(item,p,{catalog:kind==='type',marked:inventorySelection.has(id),deployed:!!p&&deployedEquipment(state.world,p.id).has(id)}):discoveryDetailsView(record));
 }
 function equipmentEditingAllowed(){return !equipmentSaving&&!equipmentDraft?.pending&&!$('#detail [data-action="confirm-equipment"][data-order-busy]');}
 function editEquipmentDraft(change){

@@ -335,6 +335,10 @@ body[data-view=batalha]:has(.battle-orders) #toast{bottom:calc(115px + env(safe-
 
 .player-item-collection h3{display:flex;align-items:center;justify-content:space-between}.player-item-collection h3>b{font-size:18px}.player-item-collection button{border-left:3px solid var(--rarity);min-height:58px}.player-item-collection button>span{min-width:0;overflow-wrap:anywhere}
 
+#detail .equipment-tile .item-salvage-button,
+#detail .pending-loot-item .item-salvage-button{width:100%;min-height:44px;margin:0;padding:3px;font-size:19px;color:#654522;border-top:1px solid #bba980;border-radius:0 0 4px 4px;background:#eee0c2;box-shadow:none}
+#detail .item-salvage-button[aria-pressed=true]{background:#f1d1a3;color:#573919}
+
 /* Keep the three hidden final prizes together on narrow screens. */
 @media(max-width:650px){
  .final-secret-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
