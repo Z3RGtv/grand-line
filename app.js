@@ -19,7 +19,7 @@ import{capturePanelState,restorePanelState,createLatestReader}from'./ui-state.mj
 import{bossPartyView}from'./boss-party.mjs?v=0.27.2';
 import{bossAccess,bossCapacity,bossAlive,bossFleetAdmission}from'./adventure.mjs?v=0.27.2&rev=n9-crew1';
 import{ITEM_TYPES,RARITIES,DROP_TABLES,EQUIPMENT_SLOTS,EXCLUSIVE_ITEMS,itemBonus,itemName,equipmentBonuses,dismantleYield,bestSetSlots,partySynergy}from'./equipment.mjs?v=0.27.2&rev=progress1';
-import{reportView,adventureReadiness,bossMapArt,bossPortrait,rewardDialog,bossLootView,pendingRewardNotices}from'./adventure-view.mjs?v=0.27.2&rev=salvage2';
+import{reportView,adventureReadiness,bossMapArt,bossPortrait,rewardDialog,bossLootView,pendingRewardNotices}from'./adventure-view.mjs?v=0.27.2&rev=prize-rates1';
 import{bindEquipmentDrag,inventoryExpansionView,inventoryView}from'./inventory-view.mjs?v=0.27.2&rev=salvage2';
 import{nextMissionCue,createMissionPointer}from'./mission-cues.mjs?v=0.27.2';
 import{setButtonRequirement,highlightRequirement,interceptRequirement}from'./requirement-feedback.mjs?v=0.27.2';
@@ -36,7 +36,7 @@ import{battleView,resolveBattle,seaMarkers,accessBadge}from'./naval-view.mjs?v=0
 import{islandArt,buildingArt,wallTier,WALL_NAMES}from'./island-art.mjs?v=0.27.2';
 import{missionProgress,missionWait}from'./onboarding.mjs?v=0.27.2&rev=worker-sale1';
 
-import {quote as quoteRule,SHIPS as SHIP_RULES,SHIP_UNLOCKS,fishingOrder} from './rules.mjs?v=0.27.2&rev=ship-scrap1';
+import {quote as quoteRule,SHIPS as SHIP_RULES,SHIP_UNLOCKS,fishingOrder} from './rules.mjs?v=0.27.2&rev=prize-rates1';
 import {routePoint,waterPoint} from './navigation.mjs?v=0.27.2&rev=duels1';
 import {WORKER_POOL,workerCount,workerCapacity,workerState,workerSaleLimit,workerSaleQuote,workerRates,productionCycle,workForecast,spaceAllocation} from './workers.mjs?v=0.27.2&rev=worker-sale1';
 
