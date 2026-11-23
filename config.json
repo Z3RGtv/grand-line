@@ -11,7 +11,7 @@
     "gestao": 90
   },
   "launchEnabled": true,
-  "apiOrigin": "https://cover-permits-consumer-saves.trycloudflare.com",
+  "apiOrigin": "https://trunk-label-lab-documentary.trycloudflare.com",
   "paymentMode": "wallet",
   "coinPack": 500
 }
