@@ -11,7 +11,7 @@
     "gestao": 90
   },
   "launchEnabled": true,
-  "apiOrigin": "https://trunk-label-lab-documentary.trycloudflare.com",
+  "apiOrigin": "https://barrier-quick-bug-router.trycloudflare.com",
   "paymentMode": "wallet",
   "coinPack": 500
 }
