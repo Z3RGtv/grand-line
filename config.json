@@ -11,7 +11,7 @@
     "gestao": 90
   },
   "launchEnabled": true,
-  "apiOrigin": "https://barrier-quick-bug-router.trycloudflare.com",
+  "apiOrigin": "https://mechanisms-turning-connect-traveler.trycloudflare.com",
   "paymentMode": "wallet",
   "coinPack": 500
 }
