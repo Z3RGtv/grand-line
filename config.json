@@ -11,7 +11,7 @@
     "gestao": 90
   },
   "launchEnabled": true,
-  "apiOrigin": "https://mechanisms-turning-connect-traveler.trycloudflare.com",
+  "apiOrigin": "https://davidson-reload-uniform-habitat.trycloudflare.com",
   "paymentMode": "wallet",
   "coinPack": 500
 }
